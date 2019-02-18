@@ -8,6 +8,6 @@ contract ConstraintsInterface {
 
     function getUserListEntry(address user, uint key) public view returns (uint value);
 
-    function check() public returns (bool authorized);
+    function check(address _from, address _to, uint256 _value) public returns (bool authorized);
 
 }

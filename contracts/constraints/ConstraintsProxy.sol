@@ -13,9 +13,10 @@ contract ConstraintsProxy {
         constraintsLogicContract = _impl;
     }
 
-    function updateLogicContract(address newLogic) public {
+    function updateLogicContract(address newLogic) public returns (bool) {
         // test if address
         constraintsLogicContract = newLogic;
+        return true;
     }
 
 
