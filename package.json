@@ -1,0 +1,26 @@
+{
+  "name": "azhos_smart_contracts",
+  "version": "0.1.0",
+  "description": "Azhos AOS smart contracts",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/micoboteam/azhos_smart_contracts.git"
+  },
+  "author": "Simon Dosch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/micoboteam/azhos_smart_contracts/issues"
+  },
+  "homepage": "https://gitlab.com/micoboteam/azhos_smart_contracts#readme",
+  "dependencies": {
+    "truffle": "^5.0.4",
+    "truffle-hdwallet-provider": "^1.0.4"
+  }
+}

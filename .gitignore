@@ -1,0 +1,4 @@
+.idea/
+.secret
+contracts/dummy/
+node_modules
