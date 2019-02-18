@@ -1,6 +1,6 @@
 ### Azhos Smart Contracts
 
-#####Components
+#### Components
 
 There are 4 main components:
 
@@ -23,7 +23,7 @@ The Administration contract will assign addresses with one or more of these **ab
 - **edit constraints** in CLC (such as whitelist etc)
 
 #
-####Architecture
+#### Architecture
 
 ![architecture](./resources/Azhos_Architecture.jpg)
 
