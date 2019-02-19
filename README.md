@@ -28,6 +28,17 @@ The Administration contract can endow addresses with one or more of these **abil
 ![architecture](./resources/Azhos_Architecture.jpg "AOS Architecture")
 
 #
+#### Contract descriptions
+##### AOS Token
+Minting
+Happens during contract creation, then never again
+Burning
+will be decided upon, depending on caps.
+Token Transfer
+restricted by a check() function
+
+
+#
 #### Updatable contracts
 
 The contracts we call _logic_ contracts are treated as Solidity [_libraries_](https://solidity.readthedocs.io/en/latest/contracts.html?#libraries).  
@@ -58,7 +69,8 @@ We can identify 6 main interactions:
 
 **Admin**  
     5. transfer admin ownership  
-    6. edit authorized addresses
+    6. edit authorized addresses  
+    7. edit userList (i.e. whitelist)
 
 ##
 ##### 1. transfer AOS token
@@ -121,4 +133,21 @@ functions in the Administration Contract (see [Architecture](#architecture))
 - DividendLogicUpdater  
 - ConstraintsEditor (i.e. whitelist)  
 - TokenPauser
+
+##
+##### 7. edit userList (whitelist)
+
+An authorized actor can make changes in the userList mapping of the CLC.  
+For example, an addition to the whitelist can be made by calling the 
+```
+editUserList(address user, uint key, uint value)
+```
+function in the CLC like this:
+
+![userlist_edit](./resources/userlist_edit.jpg "edit userList (whitelist)")
+
+##
+
+
+
 
