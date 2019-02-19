@@ -1,6 +1,6 @@
-### Azhos Smart Contracts
+## Azhos Smart Contracts
 
-#### Components
+### Components
 
 There are 4 main components:
 
@@ -22,24 +22,16 @@ The Administration contract can endow addresses with one or more of these **abil
 - **pause** AOS Token Contract
 - **edit constraints** in CLC (such as whitelist etc)
 
+
+
 #
-#### Architecture
+### Architecture
 
 ![architecture](./resources/Azhos_Architecture.jpg "AOS Architecture")
 
-#
-#### Contract descriptions
-##### AOS Token
-Minting
-Happens during contract creation, then never again
-Burning
-will be decided upon, depending on caps.
-Token Transfer
-restricted by a check() function
-
 
 #
-#### Updatable contracts
+### Updatable contracts
 
 The contracts we call _logic_ contracts are treated as Solidity [_libraries_](https://solidity.readthedocs.io/en/latest/contracts.html?#libraries).  
 This means that they are exclusively used to perform tasks for other contracts, in this case the _master_ contracts.  
@@ -55,7 +47,7 @@ This gives us the ability to update the logic contract whenever we want!
 
 
 #
-#### Process Flows
+### Process Flows
 
 We can identify 6 main interactions:  
 
@@ -73,7 +65,7 @@ We can identify 6 main interactions:
     7. edit userList (i.e. whitelist)
 
 ##
-##### 1. transfer AOS token
+#### 1. transfer AOS token
 
 Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the proxy contract (here Master Contract)
 
@@ -81,7 +73,7 @@ Every token transferring action triggers a call to the _check()_ function in the
 
 
 ##
-##### 2. claim dividend
+#### 2. claim dividend
 
 As a token holder, I can claim my fair share of the dividend.
 
@@ -89,7 +81,7 @@ As a token holder, I can claim my fair share of the dividend.
 
 
 ##
-##### 3. update constraints logic contract
+#### 3. update constraints logic contract
 
 Given the necessary authorisation, we can update the Constraints Logic Contract.  
 We need to deploy the new version, which has to inherit the old one.  
@@ -98,14 +90,14 @@ We then register the new contract address with the master contract (proxy).
 ![contract_update](./resources/contract_update.jpg "update contstraints logic contract")
 
 ##
-##### 4. update dividend contract
+#### 4. update dividend contract
 
 Updating the dividend contract includes providing the new contract with enough funds to satisfy all token holders' claims.  
 
 The process is almost identical to the one showing the constraint logic contract update, so it is omitted here.
 
 ##
-##### 5. transfer admin ownership
+#### 5. transfer admin ownership
 
 Ownership can only be transferred, not granted.  
 There can be group of owners at the inception of the _Administration_ contract.  
@@ -118,7 +110,7 @@ transferOwnership(address to)
  function, given that the caller is an owner himself.
 
 ##
-##### 6. edit authorized addresses
+#### 6. edit authorized addresses
 
 Owners are authorised to edit the various mappings regulating administrative abilities.
 
@@ -135,7 +127,7 @@ functions in the Administration Contract (see [Architecture](#architecture))
 - TokenPauser
 
 ##
-##### 7. edit userList (whitelist)
+#### 7. edit userList (whitelist)
 
 An authorized actor can make changes in the userList mapping of the CLC.  
 For example, an addition to the whitelist can be made by calling the 
@@ -147,6 +139,11 @@ function in the CLC like this:
 ![userlist_edit](./resources/userlist_edit.jpg "edit userList (whitelist)")
 
 ##
+
+#
+### Contract descriptions
+#### AOS Token
+TODO
 
 
 
