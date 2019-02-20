@@ -49,7 +49,7 @@ This gives us the ability to update the logic contract whenever we want!
 #
 ### Process Flows
 
-We can identify 6 main interactions:  
+We can identify 7 main interactions:  
 
 **User Interaction**  
     1. transfer AOS token  

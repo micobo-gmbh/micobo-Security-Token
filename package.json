@@ -20,7 +20,10 @@
   },
   "homepage": "https://gitlab.com/micoboteam/azhos_smart_contracts#readme",
   "dependencies": {
+    "openzeppelin-solidity": "^2.1.2",
     "truffle": "^5.0.4",
-    "truffle-hdwallet-provider": "^1.0.4"
+    "truffle-assertions": "^0.8.0",
+    "truffle-hdwallet-provider": "^1.0.4",
+    "web3": "^1.0.0-beta.46"
   }
 }

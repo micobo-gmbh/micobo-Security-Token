@@ -1,6 +1,6 @@
 const Logic = artifacts.require('ConstraintsLogicContract')
 const Proxy = artifacts.require('ConstraintsProxy')
-const Interface = artifacts.require('ConstraintsInterface')
+const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 
 contract('Test Proxies', async () => {
 	let logic, proxy, proxyInterface
@@ -11,15 +11,16 @@ contract('Test Proxies', async () => {
 	before(async () => {
 		logic = await Logic.new()
 		console.log('logic address:', logic.address);
-	})
 
-	it("deploys a proxy", async () => {
 		proxy = await Proxy.new(logic.address)
-
 		console.log('proxy address', proxy.address);
 
 		// pretend proxy is logic
-		proxyInterface = await Interface.at(proxy.address)
+		proxyInterface = await ConstraintsInterface.at(proxy.address)
+	})
+
+
+	it("can edit and get userList entries", async () => {
 
 		await proxyInterface.editUserList(testAddress, 0, 1)
 
@@ -30,7 +31,7 @@ contract('Test Proxies', async () => {
 		)
 	})
 
-	it("deploys new logic", async () => {
+	it("can update logic contract", async () => {
 		logic = await Logic.new()
 
 		console.log('new logic address: ', logic.address)
@@ -45,11 +46,18 @@ contract('Test Proxies', async () => {
 	})
 
 	it("keeps the storage unaffected by new logic contract", async () => {
+		await proxyInterface.editUserList(testAddress, 1, 1)
+
+		logic = await Logic.new()
+
+		console.log('new logic address: ', logic.address)
+
+		await proxy.updateLogicContract(logic.address)
+
 		assert.deepEqual(
-			(await proxyInterface.getUserListEntry(testAddress, 0)).toString(10),
+			(await proxyInterface.getUserListEntry(testAddress, 1)).toString(10),
 			'1'
 		)
 	})
-
 
 })

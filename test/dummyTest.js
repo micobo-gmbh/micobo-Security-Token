@@ -1,4 +1,4 @@
-
+/**
 const DummyMaster = artifacts.require('DummyMaster')
 const Dummy = artifacts.require('Dummy')
 const DummyInterface = artifacts.require('DummyInterface')
@@ -30,3 +30,5 @@ contract('Test Proxies', async () => {
 		assert.equal((await dummy.get()).toString(10), '1')
 	})
 })
+
+*/

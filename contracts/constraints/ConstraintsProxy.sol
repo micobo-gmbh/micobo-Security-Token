@@ -5,27 +5,32 @@ contract ConstraintsProxy {
 
     address public constraintsLogicContract;
 
-    event DelegatecallResult(
-        bytes data
-    );
-
     constructor (address _impl) public {
         constraintsLogicContract = _impl;
     }
 
-    function updateLogicContract(address newLogic) public returns (bool) {
-        // test if address
-        constraintsLogicContract = newLogic;
-        return true;
+    /**
+    * @dev See if the new address is home to a contract
+    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
+    *
+    * @param a Address of the new logic contract
+    */
+    modifier isContract (address a) {
+        uint length;
+        assembly {
+        // get the code size of this address, if it has code it's a contract!
+            length := extcodesize(a)
+        }
+        require(length > 0);
+        _;
     }
 
 
-    //    function () payable external {
-    //        (bool success, bytes memory data) = (constraintsLogicContract).delegatecall(msg.data);
-    //        require(success);
-    //
-    //        emit DelegatecallResult(data);
-    //    }
+    function updateLogicContract(address newLogic) isContract(newLogic) public returns (bool) {
+
+        constraintsLogicContract = newLogic;
+        return true;
+    }
 
     function() external {
         require(msg.sig != 0x0);
