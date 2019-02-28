@@ -15,7 +15,7 @@ const truffleAssert = require('truffle-assertions')
 const aos_conf = require('../AOS-config')
 
 
-contract('Test Proxies', async (accounts) => {
+contract('Test Constraint Contract', async (accounts) => {
 	let constraintsLogic, constraintsProxy, constraintsInterface, newConstraintsLogicContract, compliantToken, compliantTokenInterface
 
 	// deepEqual compares with '==='

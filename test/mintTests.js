@@ -10,7 +10,7 @@ const truffleAssert = require('truffle-assertions')
 const aos_conf = require('../AOS-config');
 
 
-contract('Test Pausing', async (accounts) => {
+contract('Test Minting', async (accounts) => {
 	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface
 
 

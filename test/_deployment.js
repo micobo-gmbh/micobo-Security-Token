@@ -33,6 +33,7 @@ contract('Test Deployment', async (accounts) => {
 
 	it("proxy saves correct logic address", async () => {
 		constraintsLogic = await ConstraintsLogic.new()
+
 		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address)
 
 		assert.deepEqual(
