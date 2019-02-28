@@ -4,7 +4,7 @@ pragma solidity ^0.5.0;
  * @title AOS-Token-ConstraintsInterface
  */
 
-interface AosTokenInterface {
+interface CompliantTokenInterface {
 
     function name() external view returns (string memory);
 

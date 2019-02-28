@@ -8,23 +8,27 @@ import "../constraints/ConstraintsInterface.sol";
 
 // AosToken implements the ERC20 token standard
 
-contract AosToken is ERC20Capped, Pausable {
+contract CompliantToken is ERC20Capped, Pausable {
 
     /**
      * @dev The Constraints Master Contract
      */
-    ConstraintsInterface public constraints;
+    ConstraintsInterface public _constraints;
 
     // ERC20Detailed
 
-    string private _name = "AOS Token";
-    string private _symbol = "AOS";
-    uint8 private _decimals = 18;
+    string private _name;
+    string private _symbol;
+    uint8 private _decimals;
 
     // we hand over the _cap to ERC20Capped's constructor
 
-    constructor (ConstraintsInterface _constraints, uint _cap) ERC20Capped(_cap) public {
-        constraints = _constraints;
+    constructor (string memory name, string memory symbol, uint8 decimals, ConstraintsInterface constraints, uint cap) ERC20Capped(cap) public {
+        _name = name;
+        _symbol = symbol;
+        _decimals = decimals;
+
+        _constraints = constraints;
     }
 
     /**
@@ -53,7 +57,7 @@ contract AosToken is ERC20Capped, Pausable {
 
     function transfer(address to, uint256 value) whenNotPaused public returns (bool) {
 
-        (bool success, string memory message) = constraints.check(msg.sender, msg.sender, to, value);
+        (bool success, string memory message) = _constraints.check(msg.sender, msg.sender, to, value);
 
         // check the constraints contract, if this transfer is valid
         require(success, message);
@@ -64,7 +68,7 @@ contract AosToken is ERC20Capped, Pausable {
 
     function transferFrom(address from, address to, uint256 value) whenNotPaused public returns (bool) {
 
-        (bool success, string memory message) = constraints.check(msg.sender, msg.sender, to, value);
+        (bool success, string memory message) = _constraints.check(msg.sender, msg.sender, to, value);
 
         // check the constraints contract, if this transfer is valid
         require(success, message);

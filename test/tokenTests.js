@@ -1,101 +1,115 @@
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
 const ConstraintsProxy = artifacts.require('ConstraintsProxy')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
-const AosToken = artifacts.require('AosToken')
-const AosTokenInterface = artifacts.require('AosTokenInterface')
+const CompliantToken = artifacts.require('CompliantToken')
+const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 
 const truffleAssert = require('truffle-assertions')
 
-const Web3 = require('web3')
-const web3 = new Web3('http://localhost:8545')
-console.log(web3.currentProvider)
+const aos_conf = require('../AOS-config');
 
 
-contract('Test Token', async () => {
-	let contstraintsLogic, constraintsProxy, constraintsInterface, aosToken, aosTokenInterface
-
-	// DEFAULT address all transactions are sent from !
-	let testAddress1 = "0x024269E2057b904d1Fa6a7B52056A8580a85180F"
-
-	let testAddress2 = "0xe375639d0Fa6feC13e6F00A09A3D3BAcf18A354F";
-
+contract('Test Token', async (accounts) => {
+	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface
 
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contstraintsLogic = await ConstraintsLogic.new()
-		console.log('logic address:', contstraintsLogic.address);
 
-		constraintsProxy = await ConstraintsProxy.new(contstraintsLogic.address)
-		console.log('proxy address', constraintsProxy.address);
+		constraintsLogic = await ConstraintsLogic.new()
 
-		aosToken = await AosToken.new(constraintsProxy.address, 1000000000)
+		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address)
 
-		aosTokenInterface = await AosTokenInterface.at(aosToken.address)
+		// pretend proxy is logic
+		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
+
+		compliantToken = await CompliantToken.new(
+			aos_conf.name,
+			aos_conf.symbol,
+			aos_conf.decimals,
+			constraintsProxy.address,
+			aos_conf.cap)
+
+		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 	})
+
+	it("gives me all the correct token informations", async () => {
+
+		assert.deepEqual((await compliantTokenInterface.name.call()), aos_conf.name)
+
+		assert.deepEqual((await compliantTokenInterface.symbol()), aos_conf.symbol)
+
+		assert.deepEqual((await compliantTokenInterface.decimals()).toNumber(), aos_conf.decimals)
+
+		assert.deepEqual((await compliantTokenInterface.cap()).toNumber(), aos_conf.cap)
+
+		assert.deepEqual((await compliantTokenInterface.totalSupply()).toNumber(), 0)
+
+		assert.deepEqual((await compliantTokenInterface.isMinter(accounts[0])), true)
+
+		assert.deepEqual((await compliantTokenInterface.isPauser(accounts[0])), true)
+
+	})
+
 
 	it("mints tokens to test addresses", async () => {
 
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress1)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
 			0
 		)
 
-		await aosTokenInterface.mint(testAddress1, 1000);
+		await compliantTokenInterface.mint(accounts[0], 1000);
 
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress1)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
 			1000
 		)
 
 
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress2)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
 			0
 		)
 
-		await aosTokenInterface.mint(testAddress2, 1000);
+		await compliantTokenInterface.mint(accounts[1], 1000);
 
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress2)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
 			1000
 		)
 	})
+
 
 	it("cannot send token if account is not whitelisted", async () => {
 
-		/* TODO get the error messages thrown by require
-		try {
-			await aosTokenInterface.transfer(testAddress2, 5)
-		} catch (e) {
-			let r = await web3.eth.getTransactionReceipt(e.tx);
-			console.log(r);
-		}
-		*/
+		// TODO get the error messages thrown by require
 
-		truffleAssert.fails(
-			aosTokenInterface.transfer(testAddress2, 5),
-			truffleAssert.ErrorType.OUT_OF_GAS,
-			"_from address cannot send"
+		await truffleAssert.fails(
+			compliantTokenInterface.transfer(accounts[1], 5)
 		)
 	})
 
-	/*
+
 	it("can send tokens from and to authorized addresses", async () => {
 
 		// TODO add whitelist entries
+		await constraintsInterface.editUserList(accounts[0], 0, 1)
 
-		await aosTokenInterface.transfer(testAddress2, 5)
+		await constraintsInterface.editUserList(accounts[1], 1, 1)
+
+		await compliantTokenInterface.transfer(accounts[1], 5)
 
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress2)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
 			1005
 		)
+
 		assert.deepEqual(
-			(await aosTokenInterface.balanceOf(testAddress1)).toNumber(),
+			(await compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
 			995
 		)
+
 	})
-	*/
 
 })

@@ -5,14 +5,14 @@
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
 const ConstraintsProxy = artifacts.require('ConstraintsProxy')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
-const AosToken = artifacts.require('AosToken');
-const AosTokenInterface = artifacts.require('AosTokenInterface');
+const CompliantToken = artifacts.require('CompliantToken')
+const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 
-contract('Test Deployment', async () => {
+contract('Test Deployment', async (accounts) => {
 	let constraintsLogic, constraintsProxy
 
-	// deepEqual compares with '==='
 
+	// deepEqual compares with '==='
 
 	it("deploys constraints logic", async () => {
 		await assert.doesNotThrow(async () => {
@@ -39,12 +39,12 @@ contract('Test Deployment', async () => {
 
 	it("deploys a token contract", async () => {
 
-		aosToken = await AosToken.new(constraintsProxy.address, 1000000000)
+		aosToken = await CompliantToken.new(constraintsProxy.address, 1000000000)
 
-		aosTokenInterface = await AosTokenInterface.at(aosToken.address)
+		aosTokenInterface = await CompliantTokenInterface.at(aosToken.address)
 
 		assert.deepEqual(
-			(await aosTokenInterface.name()).toString(10),
+			(await CompliantTokenInterface.name()).toString(10),
 			'AOS Token'
 		)
 	})
