@@ -1,6 +1,6 @@
 module.exports = {
 
-		name: "AOS Token",
+		name: "Azhos Compliant Token",
 		symbol: "AOS",
 		decimals: 18,
 		cap: 1000000000

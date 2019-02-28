@@ -5,21 +5,37 @@
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
 const ConstraintsProxy = artifacts.require('ConstraintsProxy')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
+const NewConstraintsLogicContract = artifacts.require('NewConstraintsLogicContract')
+const CompliantToken = artifacts.require('CompliantToken')
+const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
+
+
+const truffleAssert = require('truffle-assertions')
+
+const aos_conf = require('../AOS-config')
+
 
 contract('Test Proxies', async (accounts) => {
-	let constraintsLogic, constraintsProxy, constraintsInterface
+	let constraintsLogic, constraintsProxy, constraintsInterface, newConstraintsLogicContract, compliantToken, compliantTokenInterface
 
 	// deepEqual compares with '==='
 
 	before(async () => {
 		constraintsLogic = await ConstraintsLogic.new()
-		console.log('logic address:', constraintsLogic.address);
 
 		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address)
-		console.log('proxy address', constraintsProxy.address);
 
 		// pretend proxy is logic
 		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
+
+		compliantToken = await CompliantToken.new(
+			aos_conf.name,
+			aos_conf.symbol,
+			aos_conf.decimals,
+			constraintsProxy.address,
+			aos_conf.cap)
+
+		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 	})
 
 
@@ -37,8 +53,6 @@ contract('Test Proxies', async (accounts) => {
 	it("can update logic contract", async () => {
 		constraintsLogic = await ConstraintsLogic.new()
 
-		console.log('new logic address: ', constraintsLogic.address)
-
 		await constraintsProxy.updateLogicContract(constraintsLogic.address)
 
 		// The new ConstraintsLogicContract address has been saved to the proxy's storage
@@ -51,15 +65,31 @@ contract('Test Proxies', async (accounts) => {
 	it("keeps the storage unaffected by new logic contract", async () => {
 		await constraintsInterface.editUserList(accounts[0], 1, 1)
 
-		constraintsLogic = await ConstraintsLogic.new()
+		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
 
-		console.log('new logic address: ', constraintsLogic.address)
-
-		await constraintsProxy.updateLogicContract(constraintsLogic.address)
+		await constraintsProxy.updateLogicContract(newConstraintsLogicContract.address)
 
 		assert.deepEqual(
 			(await constraintsInterface.getUserListEntry(accounts[0], 1)).toString(10),
 			'1'
+		)
+	})
+
+	it("new different contract keeps storage and extends functionality", async () => {
+
+		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
+
+		await constraintsProxy.updateLogicContract(newConstraintsLogicContract.address)
+
+
+		// add whitelist entries
+		await constraintsInterface.editUserList(accounts[0], 0, 1)
+
+		await constraintsInterface.editUserList(accounts[1], 1, 1)
+
+		// should throw because of new 1234 constraint
+		await truffleAssert.fails(
+			compliantTokenInterface.transfer(accounts[1], 5)
 		)
 	})
 

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract ConstraintsLogicContract {
+contract NewConstraintsLogicContract {
 
     // this needs to match the proxy's storage order
     address public constraintsLogicContract;

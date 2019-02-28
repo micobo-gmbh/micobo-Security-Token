@@ -35,8 +35,8 @@ contract ConstraintsLogicContract {
         uint256 _value)
     public returns (
         bool authorized,
-        string memory message
-    )  {
+        string memory message)
+    {
 
         // we don't use require here, because errors are not thrown through low-level calls like delegatecall
         // so we return the error message explicitly

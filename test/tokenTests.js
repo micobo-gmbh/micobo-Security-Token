@@ -6,7 +6,7 @@ const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 
 const truffleAssert = require('truffle-assertions')
 
-const aos_conf = require('../AOS-config');
+const aos_conf = require('../AOS-config')
 
 
 contract('Test Token', async (accounts) => {
@@ -31,6 +31,10 @@ contract('Test Token', async (accounts) => {
 			aos_conf.cap)
 
 		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
+
+		await compliantTokenInterface.mint(accounts[0], 1000);
+		await compliantTokenInterface.mint(accounts[1], 1000);
+
 	})
 
 	it("gives me all the correct token informations", async () => {
@@ -43,41 +47,12 @@ contract('Test Token', async (accounts) => {
 
 		assert.deepEqual((await compliantTokenInterface.cap()).toNumber(), aos_conf.cap)
 
-		assert.deepEqual((await compliantTokenInterface.totalSupply()).toNumber(), 0)
+		assert.deepEqual((await compliantTokenInterface.totalSupply()).toNumber(), 2000)
 
 		assert.deepEqual((await compliantTokenInterface.isMinter(accounts[0])), true)
 
 		assert.deepEqual((await compliantTokenInterface.isPauser(accounts[0])), true)
 
-	})
-
-
-	it("mints tokens to test addresses", async () => {
-
-		assert.deepEqual(
-			(await compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
-			0
-		)
-
-		await compliantTokenInterface.mint(accounts[0], 1000);
-
-		assert.deepEqual(
-			(await compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
-			1000
-		)
-
-
-		assert.deepEqual(
-			(await compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
-			0
-		)
-
-		await compliantTokenInterface.mint(accounts[1], 1000);
-
-		assert.deepEqual(
-			(await compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
-			1000
-		)
 	})
 
 
@@ -93,7 +68,7 @@ contract('Test Token', async (accounts) => {
 
 	it("can send tokens from and to authorized addresses", async () => {
 
-		// TODO add whitelist entries
+		// add whitelist entries
 		await constraintsInterface.editUserList(accounts[0], 0, 1)
 
 		await constraintsInterface.editUserList(accounts[1], 1, 1)

@@ -8,8 +8,12 @@ const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')
 const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 
+
+const aos_conf = require('../AOS-config');
+
+
 contract('Test Deployment', async (accounts) => {
-	let constraintsLogic, constraintsProxy
+	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface
 
 
 	// deepEqual compares with '==='
@@ -39,16 +43,19 @@ contract('Test Deployment', async (accounts) => {
 
 	it("deploys a token contract", async () => {
 
-		aosToken = await CompliantToken.new(constraintsProxy.address, 1000000000)
+		compliantToken = await CompliantToken.new(
+			aos_conf.name,
+			aos_conf.symbol,
+			aos_conf.decimals,
+			constraintsProxy.address,
+			aos_conf.cap)
 
-		aosTokenInterface = await CompliantTokenInterface.at(aosToken.address)
+		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 
 		assert.deepEqual(
-			(await CompliantTokenInterface.name()).toString(10),
-			'AOS Token'
+			(await compliantTokenInterface.name()).toString(10),
+			aos_conf.name
 		)
 	})
-
-	// TODO add other contracts
 
 })

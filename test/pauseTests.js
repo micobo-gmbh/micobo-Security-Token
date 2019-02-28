@@ -4,6 +4,7 @@ const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')
 const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 
+
 const truffleAssert = require('truffle-assertions')
 
 const aos_conf = require('../AOS-config');
