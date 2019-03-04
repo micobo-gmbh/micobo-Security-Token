@@ -75,7 +75,8 @@ Every token transferring action triggers a call to the _check()_ function in the
 ##
 #### 2. claim dividend
 
-As a token holder, I can claim my fair share of the dividend.
+As a token holder, I can claim my fair share of the dividend.  
+A call to determine the callers token balance (greyed out here) is not planned for now, but can easily be added later on.
 
 ![dividen_claim](./resources/dividend_claim.jpg "claim dividend")
 
@@ -144,6 +145,13 @@ function in the CLC like this:
 ### Contract descriptions
 #### AOS Token
 TODO
+
+
+### Tests
+
+All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.  
+The tests are kept completely as atomic (specific) and autonomous as possible.  
+Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
 
 
 
