@@ -4,6 +4,8 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-solidity/contracts/lifecycle/Pausable.sol';
 
 import "../constraints/ConstraintsInterface.sol";
+import "../administration/AdministrationInterface.sol";
+
 
 
 // AosToken implements the ERC20 token standard
@@ -14,6 +16,11 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @dev The Constraints Master Contract
      */
     ConstraintsInterface public _constraints;
+
+    /**
+     * @dev The Administration Master Contract
+     */
+    AdministrationInterface public _admin;
 
     // ERC20Detailed
 
@@ -53,7 +60,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
 
-    // override critical functions with "whenNotPause" and "check()"
+    // override critical functions with "whenNotPaused" and "check()"
 
     function transfer(address to, uint256 value) whenNotPaused public returns (bool) {
 
