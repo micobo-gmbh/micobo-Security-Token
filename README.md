@@ -155,4 +155,11 @@ Autonomy means that no test will fail or succeed dependant on the outcome of a d
 
 
 
+### Diagrams
+
+All diagrams were made with the free software [draw.io](draw.io)  
+Simply open the corresponding XML file in the editor and export into JPEG to update any diagram.
+
+
+
 
