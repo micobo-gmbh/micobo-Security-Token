@@ -28,8 +28,8 @@ contract('Test Pausing', async (accounts) => {
 			aos_conf.name,
 			aos_conf.symbol,
 			aos_conf.decimals,
-			constraintsProxy.address,
-			aos_conf.cap)
+			aos_conf.cap,
+			constraintsProxy.address)
 
 		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 

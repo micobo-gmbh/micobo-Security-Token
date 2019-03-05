@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/access/Roles.sol';
 import './roles/AdminRole.sol';
 import './roles/MinterRole.sol';
 

@@ -28,9 +28,19 @@ contract CompliantToken is ERC20Capped, Pausable {
     string private _symbol;
     uint8 private _decimals;
 
+
+
     // we hand over the _cap to ERC20Capped's constructor
 
-    constructor (string memory name, string memory symbol, uint8 decimals, ConstraintsInterface constraints, uint cap) ERC20Capped(cap) public {
+    constructor (
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint cap,
+        ConstraintsInterface constraints
+    
+    ) ERC20Capped(cap) public {
+
         _name = name;
         _symbol = symbol;
         _decimals = decimals;

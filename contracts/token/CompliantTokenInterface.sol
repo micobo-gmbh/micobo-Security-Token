@@ -115,6 +115,7 @@ interface CompliantTokenInterface {
             function isMinter(address account) public view returns (bool) {
                 return _minters.has(account);
             }*/
+
     function isMinter(address account) external view returns (bool);
 
     /*         function addMinter(address account) public onlyMinter {
