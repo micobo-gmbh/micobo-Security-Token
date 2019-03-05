@@ -38,7 +38,7 @@ contract CompliantToken is ERC20Capped, Pausable {
         uint8 decimals,
         uint cap,
         ConstraintsInterface constraints
-    
+
     ) ERC20Capped(cap) public {
 
         _name = name;
@@ -85,7 +85,7 @@ contract CompliantToken is ERC20Capped, Pausable {
 
     function transferFrom(address from, address to, uint256 value) whenNotPaused public returns (bool) {
 
-        (bool success, string memory message) = _constraints.check(msg.sender, msg.sender, to, value);
+        (bool success, string memory message) = _constraints.check(msg.sender, from, to, value);
 
         // check the constraints contract, if this transfer is valid
         require(success, message);
@@ -93,5 +93,6 @@ contract CompliantToken is ERC20Capped, Pausable {
         // proceed to call the standard transfer function of our parent contract
         return super.transferFrom(from, to, value);
     }
+
 }
 
