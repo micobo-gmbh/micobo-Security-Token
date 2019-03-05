@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 contract AdministrationProxy {
 
+
     address public administrationLogic;
 
     constructor (address _impl) public {
@@ -31,6 +32,14 @@ contract AdministrationProxy {
         return true;
     }
 
+    /**
+    * @dev This is the fallback function, it will be called when this contract receives a call to an unknown function
+    * We use this intentionally to route function calls to our updatable logic contract.
+    * This happens using assembly code and specifically the delegatecall opcode.
+    * We essentially copy the calldata sent to this contract, perform the delegatecall, copy the returndata and return it.
+    * The special thing to understand here is that the storage variables being manipulated reside in THIS contract
+    * which is the whole point, because it is why we can update the logic contract without losing our data!
+    */
     function() external {
         require(msg.sig != 0x0);
         address _impl = administrationLogic;

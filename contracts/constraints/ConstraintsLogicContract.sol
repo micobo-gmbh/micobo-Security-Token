@@ -5,6 +5,11 @@ contract ConstraintsLogicContract {
     // this needs to match the proxy's storage order
     address public constraintsLogicContract;
 
+
+    /**
+    * @dev every user has their own mapping that can be filled with information
+    * entry keys are uints derived from the `Code` enum and point to uint values which can represent anything
+    */
     mapping(address => mapping(uint => uint)) userList;
 
     event Authorised(

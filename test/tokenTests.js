@@ -60,6 +60,12 @@ contract('Test Compliant Token', async (accounts) => {
 
 		// TODO get the error messages thrown by require
 
+		try {
+			await compliantTokenInterface.transfer(accounts[1], 5)
+		} catch (e) {
+			console.log(e);
+		}
+
 		await truffleAssert.fails(
 			compliantTokenInterface.transfer(accounts[1], 5)
 		)
