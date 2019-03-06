@@ -14,6 +14,7 @@ contract MinterRole {
         return _minters.has(account);
     }
 
+    // onlyMinter removed to be overwritten by onlyAdmin
     function addMinter(address account) public {
         _addMinter(account);
     }
@@ -27,6 +28,7 @@ contract MinterRole {
         emit MinterAdded(account);
     }
 
+    // this is made public for admin to access it
     function removeMinter(address account) public {
         _minters.remove(account);
         emit MinterRemoved(account);

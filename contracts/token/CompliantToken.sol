@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol';
-import 'openzeppelin-solidity/contracts/lifecycle/Pausable.sol';
+import './ERC20Capped.sol';
+import './Pausable.sol';
 
 import "../constraints/ConstraintsInterface.sol";
 import "../administration/AdministrationInterface.sol";
@@ -22,12 +22,12 @@ contract CompliantToken is ERC20Capped, Pausable {
      */
     AdministrationInterface public _admin;
 
+
     // ERC20Detailed
 
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-
 
 
     // we hand over the _cap to ERC20Capped's constructor
@@ -37,7 +37,8 @@ contract CompliantToken is ERC20Capped, Pausable {
         string memory symbol,
         uint8 decimals,
         uint cap,
-        ConstraintsInterface constraints
+        ConstraintsInterface constraints,
+        AdministrationInterface admin
 
     ) ERC20Capped(cap) public {
 
@@ -46,6 +47,7 @@ contract CompliantToken is ERC20Capped, Pausable {
         _decimals = decimals;
 
         _constraints = constraints;
+        _admin = admin;
     }
 
     /**
@@ -92,6 +94,34 @@ contract CompliantToken is ERC20Capped, Pausable {
 
         // proceed to call the standard transfer function of our parent contract
         return super.transferFrom(from, to, value);
+    }
+
+
+    // MINTER
+
+    modifier onlyMinter() {
+        require(_admin.isMinter(msg.sender));
+        _;
+    }
+
+    function mint(address to, uint256 value) onlyMinter public returns (bool) {
+        super.mint(to, value);
+    }
+
+
+    // MINTER
+
+    modifier onlyPauser() {
+        require(_admin.isPauser(msg.sender));
+        _;
+    }
+
+    function pause() public onlyPauser whenNotPaused {
+        super.pause();
+    }
+
+    function unpause() public onlyPauser whenPaused {
+        super.unpause();
     }
 
 }

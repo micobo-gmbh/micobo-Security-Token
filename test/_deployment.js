@@ -7,13 +7,16 @@ const ConstraintsProxy = artifacts.require('ConstraintsProxy')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')
 const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
+const AdministrationInterface = artifacts.require('AdministrationInterface')
+const AdministrationLogic = artifacts.require('AdministrationLogic')
+const AdministrationProxy = artifacts.require('AdministrationProxy')
 
 
 const aos_conf = require('../AOS-config');
 
 
 contract('Test Deployment', async (accounts) => {
-	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface
+	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface, adminLogic, adminProxy, adminInterface
 
 
 	// deepEqual compares with '==='
@@ -42,6 +45,14 @@ contract('Test Deployment', async (accounts) => {
 		)
 	})
 
+	it("deploy an admin contract and proxy", async () => {
+		adminLogic = await AdministrationLogic.new()
+
+		adminProxy = await AdministrationProxy.new(adminLogic.address)
+
+		adminInterface = await AdministrationInterface.at(adminProxy.address)
+	})
+
 	it("deploys a token contract", async () => {
 
 		compliantToken = await CompliantToken.new(
@@ -49,7 +60,8 @@ contract('Test Deployment', async (accounts) => {
 			aos_conf.symbol,
 			aos_conf.decimals,
 			aos_conf.cap,
-			constraintsProxy.address)
+			constraintsProxy.address,
+			adminProxy.address)
 
 		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 
@@ -58,5 +70,7 @@ contract('Test Deployment', async (accounts) => {
 			aos_conf.name
 		)
 	})
+
+
 
 })

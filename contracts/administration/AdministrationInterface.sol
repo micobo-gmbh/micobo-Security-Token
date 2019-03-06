@@ -22,4 +22,16 @@ contract AdministrationInterface {
     function renounceMinter() external;
 
     function removeMinter(address account) external;
+
+
+    // PAUSER
+
+    function isPauser(address account) external view returns (bool);
+
+    function addPauser(address account) external;
+
+    function renouncePauser() external;
+
+    function _removePauser(address account) external;
+
 }
