@@ -12,7 +12,7 @@ contract AdminRole {
 
     Roles.Role private _admins;
 
-    constructor () internal {
+    constructor (address admin) internal {
         _addAdmin(msg.sender);
         owner = msg.sender;
     }
