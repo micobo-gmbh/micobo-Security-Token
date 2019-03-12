@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
-contract ConstraintsInterface {
+interface ConstraintsInterface {
 
-    address public constraintsLogicContract;
+    function constraintsLogicContractAddress() external view returns (address);
 
-    function editUserList(address user, uint key, uint value) public;
+    function editUserList(address user, uint key, uint value) external;
 
-    function getUserListEntry(address user, uint key) public view returns (uint value);
+    function getUserListEntry(address user, uint key) external view returns (uint value);
 
-    function check(address _msg_sender, address _from, address _to, uint256 _value) public returns (bool authorized, string memory message);
+    function check(address _msg_sender, address _from, address _to, uint256 _value) external returns (bool authorized, string memory message);
 
 }

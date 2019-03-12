@@ -1,12 +1,22 @@
 pragma solidity ^0.5.0;
 
+interface AdministrationInterfaceForProxy {
+    function isConstraintsUpdater(address account) external returns (bool);
+}
+
 contract ConstraintsProxy {
 
+    address private constraintsLogicContract;
 
-    address public constraintsLogicContract;
+    AdministrationInterfaceForProxy public _admin;
 
-    constructor (address _impl) public {
-        constraintsLogicContract = _impl;
+    constructor (address constraintsAddress, AdministrationInterfaceForProxy adminAddress) public {
+        constraintsLogicContract = constraintsAddress;
+        _admin = adminAddress;
+    }
+
+    function constraintsLogicContractAddress() public view returns (address) {
+        return constraintsLogicContract;
     }
 
     /**
@@ -25,8 +35,12 @@ contract ConstraintsProxy {
         _;
     }
 
+    modifier onlyConstraintsUpdater () {
+        require(_admin.isConstraintsUpdater(msg.sender));
+        _;
+    }
 
-    function updateLogicContract(address newLogic) isContract(newLogic) public returns (bool) {
+    function updateLogicContract(address newLogic) isContract(newLogic) onlyConstraintsUpdater public returns (bool) {
 
         constraintsLogicContract = newLogic;
         return true;

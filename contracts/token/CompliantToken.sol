@@ -7,18 +7,17 @@ import "../constraints/ConstraintsInterface.sol";
 import "../administration/AdministrationInterface.sol";
 
 
-
 // AosToken implements the ERC20 token standard
 
 contract CompliantToken is ERC20Capped, Pausable {
 
     /**
-     * @dev The Constraints Master Contract
+     * @dev The Constraints Master Contract (Proxy)
      */
     ConstraintsInterface public _constraints;
 
     /**
-     * @dev The Administration Master Contract
+     * @dev The Administration Master Contract (Proxy)
      */
     AdministrationInterface public _admin;
 
@@ -109,7 +108,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
 
-    // MINTER
+    // PAUSER
 
     modifier onlyPauser() {
         require(_admin.isPauser(msg.sender));

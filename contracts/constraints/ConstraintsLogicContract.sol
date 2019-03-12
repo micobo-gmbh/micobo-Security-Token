@@ -1,9 +1,16 @@
 pragma solidity ^0.5.0;
 
+import "../administration/AdministrationInterface.sol";
+
 contract ConstraintsLogicContract {
 
     // this needs to match the proxy's storage order
     address public constraintsLogicContract;
+
+    /**
+     * @dev The Administration Master Contract (Proxy)
+     */
+    AdministrationInterface public _admin;
 
 
     /**
@@ -24,7 +31,16 @@ contract ConstraintsLogicContract {
         RECEIVE
     }
 
-    function editUserList(address user, uint key, uint value) public returns (bool) {
+    constructor (AdministrationInterface admin) public {
+        _admin = admin;
+    }
+
+    modifier onlyConstraintEditor() {
+        require(_admin.isConstraintEditor(msg.sender));
+        _;
+    }
+
+    function editUserList(address user, uint key, uint value) onlyConstraintEditor public returns (bool) {
         userList[user][key] = value;
         return true;
     }

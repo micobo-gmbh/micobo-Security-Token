@@ -14,6 +14,8 @@ const truffleAssert = require('truffle-assertions')
 
 const aos_conf = require('../AOS-config')
 
+// TODO redesign tests for new admin func
+
 
 contract('Test Constraint Contract', async (accounts) => {
 	let constraintsLogic, constraintsProxy, constraintsInterface, newConstraintsLogicContract, compliantToken, compliantTokenInterface

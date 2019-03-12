@@ -1,37 +1,22 @@
 pragma solidity ^0.5.0;
 
-contract AdministrationInterface {
+interface AdministrationInterface {
 
+    function administrationLogicAddress() external view returns (address);
 
-    // ADMIN
+    function add(uint8 role, address account) external;
+
+    function remove(uint8 role, address account) external;
+
+    function renounce(uint8 role) external;
+
 
     function isAdmin(address account) external view returns (bool);
 
-    function addAdmin(address account) external;
-
-    function renounceAdmin() external;
-
-
-
-    // MINTER
-
     function isMinter(address account) external view returns (bool);
-
-    function addMinter(address account) external;
-
-    function renounceMinter() external;
-
-    function removeMinter(address account) external;
-
-
-    // PAUSER
 
     function isPauser(address account) external view returns (bool);
 
-    function addPauser(address account) external;
-
-    function renouncePauser() external;
-
-    function _removePauser(address account) external;
+    function isConstraintEditor(address account) external view returns (bool);
 
 }

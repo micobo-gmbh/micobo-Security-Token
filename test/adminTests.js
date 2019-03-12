@@ -1,5 +1,5 @@
 /*
-	Test if all contracts can be deployed and are linked correctly
+	Test admin contract functionality
  */
 
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
@@ -12,57 +12,44 @@ const AdministrationLogic = artifacts.require('AdministrationLogic')
 const AdministrationProxy = artifacts.require('AdministrationProxy')
 
 
-const aos_conf = require('../AOS-config');
+const truffleAssert = require('truffle-assertions')
+
+const aos_conf = require('../AOS-config')
+
+// TODO redesign tests for new admin func
 
 
-contract('Test Deployment', async (accounts) => {
-	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface, adminLogic,
-		adminProxy, adminInterface
-
+contract('Test Admin Contract', async (accounts) => {
+	let constraintsLogic,
+		constraintsProxy,
+		constraintsInterface,
+		compliantToken,
+		compliantTokenInterface,
+		adminLogic,
+		adminProxy,
+		adminInterface
 
 	// deepEqual compares with '==='
 
-	it("deploy an admin contract and proxy", async () => {
+	before(async () => {
+
+		// ADMIN
 		adminLogic = await AdministrationLogic.new()
 
 		adminProxy = await AdministrationProxy.new(adminLogic.address)
 
 		adminInterface = await AdministrationInterface.at(adminProxy.address)
 
-		assert.deepEqual(
-			await adminInterface.administrationLogicAddress(),
-			adminLogic.address
-		)
-	})
 
-	it("deploys constraints logic", async () => {
-		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-		})
-	})
-
-	it("deploys constraints proxy", async () => {
-		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-			constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
-		})
-	})
-
-	it("proxy saves correct logic address", async () => {
+		// CONSTRAINTS
 		constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
 
 		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
 
 		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
 
-		assert.deepEqual(
-			await constraintsInterface.constraintsLogicContractAddress(),
-			constraintsLogic.address
-		)
-	})
 
-	it("deploys a token contract", async () => {
-
+		// TOKEN
 		compliantToken = await CompliantToken.new(
 			aos_conf.name,
 			aos_conf.symbol,
@@ -72,14 +59,37 @@ contract('Test Deployment', async (accounts) => {
 			adminProxy.address)
 
 		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
+	})
+
+
+	it("adds msg.sender as admin", async () => {
+
+		console.log(accounts[0])
+
+		let r = await adminInterface.isAdmin(accounts[0])
+		console.log(r)
 
 		assert.deepEqual(
-			(await compliantTokenInterface.name()).toString(10),
-			aos_conf.name
+			await adminInterface.isAdmin(accounts[0]),
+			true
 		)
 	})
 
 
+	/*
+	add and remove roles (only admin)
+	roles can be renounced by their bearers
+	see if roles have been added successfully
+	only pauser can pause contract
+	only updaters can update logic (2)
+	only minter can mint tokens
+	 */
+
+	/*
+	i can update the admin contract and data will not be lost
+	show update schemes where a new role is introduced
+	i can update admin logic without compromising other contracts security!!!
+	 */
 
 
 })

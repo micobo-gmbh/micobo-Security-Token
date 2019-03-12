@@ -1,12 +1,20 @@
 pragma solidity ^0.5.0;
 
+
 contract AdministrationProxy {
 
+    address private administrationLogic;
 
-    address public administrationLogic;
+    mapping(uint8 => mapping (address => bool)) _roles;
 
     constructor (address _impl) public {
         administrationLogic = _impl;
+
+        _roles[0][msg.sender] = true;
+    }
+
+    function administrationLogicAddress() public view returns (address) {
+        return administrationLogic;
     }
 
     /**
@@ -25,8 +33,13 @@ contract AdministrationProxy {
         _;
     }
 
+    modifier onlyAdminUpdater () {
+        require(_roles[1][msg.sender] == true);
+        _;
+    }
 
-    function updateLogicContract(address newLogic) isContract(newLogic) public returns (bool) {
+
+    function updateLogicContract(address newLogic) isContract(newLogic) onlyAdminUpdater public returns (bool) {
 
         administrationLogic = newLogic;
         return true;
