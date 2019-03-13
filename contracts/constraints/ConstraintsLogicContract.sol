@@ -31,12 +31,8 @@ contract ConstraintsLogicContract {
         RECEIVE
     }
 
-    constructor (AdministrationInterface admin) public {
-        _admin = admin;
-    }
-
     modifier onlyConstraintEditor() {
-        require(_admin.isConstraintEditor(msg.sender));
+        require(_admin.isConstraintsEditor(msg.sender));
         _;
     }
 

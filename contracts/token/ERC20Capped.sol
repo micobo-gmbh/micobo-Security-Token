@@ -22,7 +22,8 @@ contract ERC20Capped is ERC20Mintable {
     }
 
     function _mint(address account, uint256 value) internal {
+
         require(totalSupply().add(value) <= _cap);
-        super._mint(account, value);
+        super.mint(account, value);
     }
 }

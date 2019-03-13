@@ -1,5 +1,10 @@
 pragma solidity ^0.5.0;
 
+
+// we use a new interface here,
+// because we will only ever need the isConstraintsUpdater function here
+// and can hereby avoid a dependency
+
 interface AdministrationInterfaceForProxy {
     function isConstraintsUpdater(address account) external returns (bool);
 }

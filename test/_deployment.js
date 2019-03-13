@@ -1,7 +1,3 @@
-/*
-	Test if all contracts can be deployed and are linked correctly
- */
-
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
 const ConstraintsProxy = artifacts.require('ConstraintsProxy')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
@@ -11,75 +7,71 @@ const AdministrationInterface = artifacts.require('AdministrationInterface')
 const AdministrationLogic = artifacts.require('AdministrationLogic')
 const AdministrationProxy = artifacts.require('AdministrationProxy')
 
-
 const aos_conf = require('../AOS-config');
 
 
-contract('Test Deployment', async (accounts) => {
-	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface, adminLogic,
-		adminProxy, adminInterface
+
+deployAllContracts = async () => {
+
+	let constraintsLogic,
+		constraintsProxy,
+		constraintsInterface,
+		compliantToken,
+		compliantTokenInterface,
+		adminLogic,
+		adminProxy,
+		adminInterface
+
+	// ADMIN
+	adminLogic = await AdministrationLogic.new()
+
+	adminProxy = await AdministrationProxy.new(adminLogic.address)
+
+	adminInterface = await AdministrationInterface.at(adminProxy.address)
 
 
-	// deepEqual compares with '==='
+	// CONSTRAINTS
+	constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
 
-	it("deploy an admin contract and proxy", async () => {
-		adminLogic = await AdministrationLogic.new()
+	constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
 
-		adminProxy = await AdministrationProxy.new(adminLogic.address)
-
-		adminInterface = await AdministrationInterface.at(adminProxy.address)
-
-		assert.deepEqual(
-			await adminInterface.administrationLogicAddress(),
-			adminLogic.address
-		)
-	})
-
-	it("deploys constraints logic", async () => {
-		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-		})
-	})
-
-	it("deploys constraints proxy", async () => {
-		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-			constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
-		})
-	})
-
-	it("proxy saves correct logic address", async () => {
-		constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-
-		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
-
-		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
-
-		assert.deepEqual(
-			await constraintsInterface.constraintsLogicContractAddress(),
-			constraintsLogic.address
-		)
-	})
-
-	it("deploys a token contract", async () => {
-
-		compliantToken = await CompliantToken.new(
-			aos_conf.name,
-			aos_conf.symbol,
-			aos_conf.decimals,
-			aos_conf.cap,
-			constraintsProxy.address,
-			adminProxy.address)
-
-		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
-
-		assert.deepEqual(
-			(await compliantTokenInterface.name()).toString(10),
-			aos_conf.name
-		)
-	})
+	constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
 
 
+	// TOKEN
+	compliantToken = await CompliantToken.new(
+		aos_conf.name,
+		aos_conf.symbol,
+		aos_conf.decimals,
+		aos_conf.cap,
+		constraintsProxy.address,
+		adminProxy.address)
 
+	compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 
-})
+	return {
+		constraintsLogic,
+		constraintsProxy,
+		constraintsInterface,
+		compliantToken,
+		compliantTokenInterface,
+		adminLogic,
+		adminProxy,
+		adminInterface
+	}
+}
+
+const Role = {
+	ADMIN: 0,
+	ADMIN_UPDATER: 1,
+	CONSTRAINTS_UPDATER: 2,
+	MINTER: 3,
+	PAUSER: 4,
+	CONSTRAINTS_EDITOR: 5,
+	SOME_NEW_ROLE: 6
+}
+
+module.exports = {
+	deployAllContracts,
+	Role
+}

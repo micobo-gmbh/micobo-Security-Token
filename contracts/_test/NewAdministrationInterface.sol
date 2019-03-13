@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-interface AdministrationInterface {
+interface NewAdministrationInterface {
 
     function administrationLogicAddress() external view returns (address);
 
@@ -22,5 +22,8 @@ interface AdministrationInterface {
     function isConstraintsUpdater(address account) external view returns (bool);
 
     function isAdminUpdater(address account) external view returns (bool);
+
+    // new
+    function isSomeNewRole(address account) external view returns (bool);
 
 }

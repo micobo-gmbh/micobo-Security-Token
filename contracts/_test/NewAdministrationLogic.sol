@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 
-contract AdministrationLogic {
+contract NewAdministrationLogic {
 
     // this needs to match the proxy's storage order
     address public administrationLogic;
@@ -20,7 +20,9 @@ contract AdministrationLogic {
         CONSTRAINTS_UPDATER,
         MINTER,
         PAUSER,
-        CONSTRAINTS_EDITOR
+        CONSTRAINTS_EDITOR,
+
+        SOME_NEW_ROLE
     }
 
     // updating rights are managed by makingthe proxy contracts ownable!
@@ -113,6 +115,11 @@ contract AdministrationLogic {
 
     function isAdminUpdater(address account) public view returns (bool) {
         return _has(uint8(Role.ADMIN_UPDATER), account);
+    }
+
+
+    function isSomeNewRole(address account) public view returns (bool) {
+        return _has(uint8(Role.SOME_NEW_ROLE), account);
     }
 
 }

@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+// TODO update to reflect new CT contract
+
 /**
  * @title AOS-Token-ConstraintsInterface
  */

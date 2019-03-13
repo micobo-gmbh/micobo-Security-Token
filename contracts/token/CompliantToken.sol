@@ -104,7 +104,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
     function mint(address to, uint256 value) onlyMinter public returns (bool) {
-        super.mint(to, value);
+        super._mint(to, value);
     }
 
 
