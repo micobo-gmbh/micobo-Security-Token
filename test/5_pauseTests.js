@@ -1,4 +1,4 @@
-const {deployAllContracts, Role} = require('./_deployment.js');
+const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
 
@@ -124,9 +124,9 @@ contract('Test Pausing', async (accounts) => {
 		await contracts.adminInterface.add(Role.CONSTRAINTS_EDITOR, constraintsEditor)
 
 		// add whitelist entries so it will not fail because of that
-		await contracts.constraintsInterface.editUserList(accounts[0], 0, 1, {from: constraintsEditor})
+		await contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
 
-		await contracts.constraintsInterface.editUserList(accounts[1], 1, 1, {from: constraintsEditor})
+		await contracts.constraintsInterface.editUserList(accounts[1], Code.RECEIVE, 1, {from: constraintsEditor})
 
 
 		// pause it

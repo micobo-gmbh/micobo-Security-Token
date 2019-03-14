@@ -4,7 +4,7 @@
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
 const NewConstraintsLogicContract = artifacts.require('NewConstraintsLogicContract')
 
-const {deployAllContracts, Role} = require('./_deployment.js');
+const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
 
@@ -28,7 +28,7 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		// should fail because is not ConstraintsEditor
 		await truffleAssert.fails(
-			contracts.constraintsInterface.editUserList(accounts[0], 0, 1)
+			contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1)
 		)
 
 		// constraintsEditor
@@ -36,12 +36,12 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		// now it should work
 		await truffleAssert.passes(
-			contracts.constraintsInterface.editUserList(accounts[0], 0, 1, {from: constraintsEditor})
+			contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
 		)
 
 		// The proxy's UserList entry "0" is "1", after being changed by the logic lib using "delegatecall"
 		assert.deepEqual(
-			(await contracts.constraintsInterface.getUserListEntry(accounts[0], 0)).toString(10),
+			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.SEND)).toString(10),
 			'1'
 		)
 	})
@@ -73,35 +73,55 @@ contract('Test Constraint Contract', async (accounts) => {
 
 
 	it("keeps the storage unaffected by new logic contract", async () => {
-		await contracts.constraintsInterface.editUserList(accounts[0], 1, 1, {from: constraintsEditor})
+		await contracts.constraintsInterface.editUserList(accounts[0], Code.RECEIVE, 1, {from: constraintsEditor})
 
-		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
+		constraintsLogicContract = await ConstraintsLogic.new()
 
-		await contracts.constraintsProxy.updateLogicContract(newConstraintsLogicContract.address, {from: constraintsUpdater})
+		await contracts.constraintsProxy.updateLogicContract(constraintsLogicContract.address, {from: constraintsUpdater})
 
 		assert.deepEqual(
-			(await contracts.constraintsInterface.getUserListEntry(accounts[0], 1)).toString(10),
+			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.RECEIVE)).toString(10),
 			'1'
 		)
 	})
 
 
 	it("new different contract keeps storage and extends functionality", async () => {
+		// make me minter
+		await contracts.adminInterface.add(Role.MINTER, accounts[0])
 
+		// mint tokens for me
+		await contracts.compliantTokenInterface.mint(accounts[0], 1000);
+
+		// add whitelist entries
+		await contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
+
+		await contracts.constraintsInterface.editUserList(accounts[1], Code.RECEIVE, 1, {from: constraintsEditor})
+
+		// transfer should work
+		await truffleAssert.passes(
+			contracts.compliantTokenInterface.transfer(accounts[1], 5)
+		)
+
+		// deploy NewConstraintsLogicContract
 		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
 
 		await contracts.constraintsProxy.updateLogicContract(newConstraintsLogicContract.address, {from: constraintsUpdater})
 
 
-		// add whitelist entries
-		await contracts.constraintsInterface.editUserList(accounts[0], 0, 1, {from: constraintsEditor})
-
-		await contracts.constraintsInterface.editUserList(accounts[1], 1, 1, {from: constraintsEditor})
-
 		// should throw because of new 1234 constraint
 		await truffleAssert.fails(
 			contracts.compliantTokenInterface.transfer(accounts[1], 5)
 		)
+
+		// now edit the new constraint to be 1234
+		await contracts.constraintsInterface.editUserList(accounts[0], Code.SOME_NEW_CODE, 1234, {from: constraintsEditor})
+
+		// now it should work again
+		await truffleAssert.passes(
+			contracts.compliantTokenInterface.transfer(accounts[1], 5)
+		)
+
 	})
 
 })

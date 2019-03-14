@@ -2,7 +2,7 @@ const truffleAssert = require('truffle-assertions')
 
 const aos_conf = require('../AOS-config')
 
-const {deployAllContracts, Role} = require('./_deployment.js');
+const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
 
 contract('Test Compliant Token', async (accounts) => {
@@ -56,9 +56,9 @@ contract('Test Compliant Token', async (accounts) => {
 		await contracts.adminInterface.add(Role.CONSTRAINTS_EDITOR, constraintsEditor)
 
 		// add whitelist entries
-		await contracts.constraintsInterface.editUserList(accounts[0], 0, 1, {from: constraintsEditor})
+		await contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
 
-		await contracts.constraintsInterface.editUserList(accounts[1], 1, 1, {from: constraintsEditor})
+		await contracts.constraintsInterface.editUserList(accounts[1], Code.RECEIVE, 1, {from: constraintsEditor})
 
 		await contracts.compliantTokenInterface.transfer(accounts[1], 5)
 

@@ -61,6 +61,12 @@ deployAllContracts = async () => {
 	}
 }
 
+const Code = {
+	SEND: 0,
+	RECEIVE: 1,
+	SOME_NEW_CODE: 2
+}
+
 const Role = {
 	ADMIN: 0,
 	ADMIN_UPDATER: 1,
@@ -73,5 +79,6 @@ const Role = {
 
 module.exports = {
 	deployAllContracts,
-	Role
+	Role,
+	Code
 }

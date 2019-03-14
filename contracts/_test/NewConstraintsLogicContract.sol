@@ -63,17 +63,17 @@ contract NewConstraintsLogicContract {
         // so we return the error message explicitly
 
         // SEND(0) == 1   check if from address can send
-        if (userList[_from][uint(Code.SEND)] != 1) {
+        if (userList[_from][uint(Code.SEND)] == 0) {
             return (false, "_from address cannot send");
         }
 
         // RECEIVE(1) == 1   check if to address can receive
-        if (userList[_to][uint(Code.RECEIVE)] != 1) {
+        if (userList[_to][uint(Code.RECEIVE)] == 0) {
             return (false, "_to address cannot receive");
         }
 
         // SOME_NEW_CODE(2) == 1234   check if this entry is 1234
-        if (userList[_from][uint(Code.SOME_NEW_CODE)] == 1234) {
+        if (userList[_from][uint(Code.SOME_NEW_CODE)] != 1234) {
         return (false, "some_new_code is not 1234 for _from address, sorry man!");
         }
 
