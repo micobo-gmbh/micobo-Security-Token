@@ -44,8 +44,6 @@ contract NewAdministrationLogic {
 
     function remove(uint8 role, address account) _onlyAdmins public {
 
-        // TODO prevent last admin from being deleted?
-
         _remove(role, account);
     }
 

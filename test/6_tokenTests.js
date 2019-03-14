@@ -5,9 +5,6 @@ const aos_conf = require('../AOS-config')
 const {deployAllContracts, Role} = require('./_deployment.js');
 
 
-// TODO
-
-
 contract('Test Compliant Token', async (accounts) => {
 
 	let contracts
@@ -43,7 +40,7 @@ contract('Test Compliant Token', async (accounts) => {
 
 	it("cannot send token if account is not whitelisted", async () => {
 
-		// TODO get the error messages thrown by require
+		// TODO get the error messages thrown by require --> geth doesn't provide reason
 
 		await truffleAssert.fails(
 			contracts.compliantTokenInterface.transfer(accounts[1], 5)

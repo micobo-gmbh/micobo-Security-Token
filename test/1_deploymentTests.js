@@ -32,7 +32,7 @@ contract('Test Deployment', async (accounts) => {
 		adminInterface = await AdministrationInterface.at(adminProxy.address)
 
 		assert.deepEqual(
-			await adminInterface.administrationLogicAddress(),
+			await adminProxy.administrationLogicAddress(),
 			adminLogic.address
 		)
 	})
@@ -58,7 +58,7 @@ contract('Test Deployment', async (accounts) => {
 		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
 
 		assert.deepEqual(
-			await constraintsInterface.constraintsLogicContractAddress(),
+			await constraintsProxy.constraintsLogicAddress(),
 			constraintsLogic.address
 		)
 	})

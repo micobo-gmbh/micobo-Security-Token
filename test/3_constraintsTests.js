@@ -66,7 +66,7 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		// The new ConstraintsLogicContract address has been saved to the proxy's storage
 		assert.deepEqual(
-			await contracts.constraintsProxy.constraintsLogicContractAddress(),
+			await contracts.constraintsProxy.constraintsLogicAddress(),
 			contracts.constraintsLogic.address
 		)
 	})

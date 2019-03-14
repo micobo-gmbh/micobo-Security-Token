@@ -11,17 +11,17 @@ interface AdministrationInterfaceForProxy {
 
 contract ConstraintsProxy {
 
-    address private constraintsLogicContract;
+    address private constraintsLogic;
 
     AdministrationInterfaceForProxy public _admin;
 
-    constructor (address constraintsAddress, AdministrationInterfaceForProxy adminAddress) public {
-        constraintsLogicContract = constraintsAddress;
+    constructor (address _impl, AdministrationInterfaceForProxy adminAddress) public {
+        constraintsLogic = _impl;
         _admin = adminAddress;
     }
 
-    function constraintsLogicContractAddress() public view returns (address) {
-        return constraintsLogicContract;
+    function constraintsLogicAddress() public view returns (address) {
+        return constraintsLogic;
     }
 
     /**
@@ -47,7 +47,7 @@ contract ConstraintsProxy {
 
     function updateLogicContract(address newLogic) isContract(newLogic) onlyConstraintsUpdater public returns (bool) {
 
-        constraintsLogicContract = newLogic;
+        constraintsLogic = newLogic;
         return true;
     }
 
@@ -56,12 +56,12 @@ contract ConstraintsProxy {
     * We use this intentionally to route function calls to our updatable logic contract.
     * This happens using assembly code and specifically the delegatecall opcode.
     * We essentially copy the calldata sent to this contract, perform the delegatecall, copy the returndata and return it.
-    * The special thing to understand here is that the storage variables being manipulated reside in THIS contract
+    * The special thing to understand here is that the storage variables being manipulated resides in THIS contract
     * which is the whole point, because it is why we can update the logic contract without losing our data!
     */
     function() external {
         require(msg.sig != 0x0);
-        address _impl = constraintsLogicContract;
+        address _impl = constraintsLogic;
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)

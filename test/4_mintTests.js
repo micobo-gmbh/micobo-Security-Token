@@ -8,7 +8,6 @@ const {deployAllContracts, Role} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
 
-// TODO split minting into more than one test case
 
 contract('Test Minting', async (accounts) => {
 	let contracts
@@ -48,18 +47,6 @@ contract('Test Minting', async (accounts) => {
 			1000
 		)
 
-
-		assert.deepEqual(
-			(await contracts.compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
-			0
-		)
-
-		await contracts.compliantTokenInterface.mint(accounts[1], 1000, {from: minter});
-
-		assert.deepEqual(
-			(await contracts.compliantTokenInterface.balanceOf(accounts[1])).toNumber(),
-			1000
-		)
 	})
 
 

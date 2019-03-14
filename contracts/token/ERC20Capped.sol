@@ -1,12 +1,12 @@
 pragma solidity ^0.5.0;
 
-import "./ERC20Mintable.sol";
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 
 /**
  * @title Capped token
  * @dev Mintable token with a token cap.
  */
-contract ERC20Capped is ERC20Mintable {
+contract ERC20Capped is ERC20 {
     uint256 private _cap;
 
     constructor (uint256 cap) public {
@@ -24,6 +24,6 @@ contract ERC20Capped is ERC20Mintable {
     function _mint(address account, uint256 value) internal {
 
         require(totalSupply().add(value) <= _cap);
-        super.mint(account, value);
+        super._mint(account, value);
     }
 }

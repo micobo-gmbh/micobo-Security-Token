@@ -2,8 +2,6 @@ pragma solidity ^0.5.0;
 
 interface ConstraintsInterface {
 
-    function constraintsLogicContractAddress() external view returns (address);
-
     function editUserList(address user, uint key, uint value) external;
 
     function getUserListEntry(address user, uint key) external view returns (uint value);

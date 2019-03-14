@@ -4,7 +4,7 @@ import "../administration/AdministrationInterface.sol";
 
 contract ConstraintsLogicContract {
 
-    // this needs to match the proxy's storage order
+    // this and _admin need to match the proxy's storage order
     address public constraintsLogicContract;
 
     /**
