@@ -1,8 +1,11 @@
 pragma solidity ^0.5.0;
 
 import "../administration/AdministrationInterface.sol";
+import "../constraints/ConstraintsInterface.sol";
 
-contract NewConstraintsLogicContract {
+// we inherit the old contracts interface to make sure we don't break anything
+
+contract NewConstraintsLogicContract is ConstraintsInterface{
 
     // this needs to match the proxy's storage order
     address public constraintsLogicContract;
