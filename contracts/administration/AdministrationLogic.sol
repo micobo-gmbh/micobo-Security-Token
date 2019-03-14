@@ -23,7 +23,7 @@ contract AdministrationLogic {
         CONSTRAINTS_EDITOR
     }
 
-    // updating rights are managed by makingthe proxy contracts ownable!
+    // updating rights are managed by making the proxy contracts ownable!
 
     event RoleAdded(uint8 role, address account);
     event RoleRemoved(uint8 role, address account);

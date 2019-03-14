@@ -10,6 +10,7 @@ contract AdministrationProxy {
     constructor (address _impl) public {
         administrationLogic = _impl;
 
+        // hard-coded admin role
         _roles[0][msg.sender] = true;
     }
 
@@ -34,6 +35,8 @@ contract AdministrationProxy {
     }
 
     modifier onlyAdminUpdater () {
+
+        // hard-coded adminUpdater role
         require(_roles[1][msg.sender] == true);
         _;
     }

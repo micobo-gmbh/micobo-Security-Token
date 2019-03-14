@@ -32,7 +32,7 @@ contract('Test Minting', async (accounts) => {
 
 		// should fail because is not minter
 		await truffleAssert.fails(
-			contracts.compliantTokenInterface.mint(accounts[0], 1000)
+			contracts.compliantTokenInterface.mint(accounts[0], 1000, {from: minter})
 		)
 
 		// make minter
