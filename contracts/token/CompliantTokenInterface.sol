@@ -101,9 +101,10 @@ interface CompliantTokenInterface {
 
     // Pausable
 
-
+    /*
     event Paused(address account);
     event Unpaused(address account);
+    */
 
     /*
     bool private _paused;

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 
-contract NewAdministrationLogic {
+contract NewAdministrationLogic  {
 
     // this needs to match the proxy's storage order
     address public administrationLogic;

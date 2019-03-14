@@ -6,29 +6,44 @@ There are 4 main components:
 
 1. _AOS Token Contract_  
 2. _Constraint Logic Contract_ (CLC)  
-3. _Dividend Contract_         (DC)  
-4. _Administration Contract_
+3. _Administration Logic Contract_ (ALC)
+4. _Dividend Contract_         (DC)  
+
 
 ##
 
-   CLC and CD will both be made **updatable** through the use of proxy contracts.  
+   CLC and ALC an will both be made **updatable** through the use of proxy contracts.  
    This means that their storage data will persist when new versions are deployed.
-   
-##
-
-The Administration contract can endow addresses with one or more of these **abilities**:
-
-- **update** CLC or DC
-- **pause** AOS Token Contract
-- **edit constraints** in CLC (such as whitelist etc)
-
-
 
 #
 ### Architecture
 
 ![architecture](./resources/Azhos_Architecture.jpg "AOS Architecture")
 
+
+#
+
+#### Administration Logic Contract
+
+The Administration contract can endow addresses with one **Role** or more:
+
+- ADMIN  
+- ADMIN_UPDATER  
+- CONSTRAINTS_UPDATER  
+- MINTER  
+- PAUSER  
+- CONSTRAINTS_EDITOR 
+
+#
+
+#### Constraints Logic Contract
+
+The Constraints Logic Contract checks constraints when tokens are transferred.  
+Currently, we have checks implemented for _sending_ and _receiving_ tokens.  
+These are reflected in the **Code** enum:  
+  
+- SEND  
+- RECEIVE
 
 #
 ### Updatable contracts
@@ -53,16 +68,19 @@ We can identify 7 main interactions:
 
 **User Interaction**  
     1. transfer AOS token  
-    2. claim dividend 
+    2. claim dividend
  
 **Updates**  
     3. update CLC   
-    4. update DC
+    4. update ALC
 
 **Admin**  
-    5. transfer admin ownership  
-    6. edit authorized addresses  
-    7. edit userList (i.e. whitelist)
+    5. edit roles  
+    6. renounce role  
+    7. edit userList (i.e. whitelist)  
+    8. minting  
+    9. pausing and unpausing
+    
 
 ##
 #### 1. transfer AOS token
@@ -91,41 +109,30 @@ We then register the new contract address with the master contract (proxy).
 ![contract_update](./resources/contract_update.jpg "update contstraints logic contract")
 
 ##
-#### 4. update dividend contract
-
-Updating the dividend contract includes providing the new contract with enough funds to satisfy all token holders' claims.  
+#### 4. update admin contract
 
 The process is almost identical to the one showing the constraint logic contract update, so it is omitted here.
 
 ##
-#### 5. transfer admin ownership
+#### 5. edit roles
 
-Ownership can only be transferred, not granted.  
-There can be group of owners at the inception of the _Administration_ contract.  
-This achieves a diversification of both risk (loss of private key) and responsibility (bad actor).
-
-Transferring ownership from one address to a new one is achieved by simply calling the   
+Roles can be edited only by the admin using
 ```
-transferOwnership(address to)
+function add(uint8 role, address account) _onlyAdmins public
 ```
- function, given that the caller is an owner himself.
+and
+```
+function remove(uint8 role, address account) _onlyAdmins public
+```
+which can be found in the admin contract
 
 ##
-#### 6. edit authorized addresses
+#### 6. renounce role
 
-Owners are authorised to edit the various mappings regulating administrative abilities.
-
-In order to change an entry, owners can call one of the  
-
+Every bearer of a role can renounce that role any time by calling
 ```
-edit<Role>(address a, bool authorised) 
+function renounce(uint8 role) public
 ```
-functions in the Administration Contract (see [Architecture](#architecture))  
-\<Role> can be replaced by:  
-- ConstraintLogicUpdater  
-- DividendLogicUpdater  
-- ConstraintsEditor (i.e. whitelist)  
-- TokenPauser
 
 ##
 #### 7. edit userList (whitelist)
@@ -140,6 +147,24 @@ function in the CLC like this:
 ![userlist_edit](./resources/userlist_edit.jpg "edit userList (whitelist)")
 
 ##
+#### 8. minting
+
+Only accounts bearing the role of **MINTER** can mint tokens using this function in the CompliantToken:
+```
+function mint(address to, uint256 value) external returns (bool);
+```
+
+##
+#### 9. pausing and unpausing
+
+Only accounts bearing the role of **PAUSER** can pause or unpause the token contract  
+using these functions in the CompliantToken:
+```
+function pause() external;
+
+function unpause() external;
+```
+
 
 #
 ### Contract descriptions
