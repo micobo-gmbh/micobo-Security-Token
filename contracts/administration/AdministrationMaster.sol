@@ -1,27 +1,21 @@
 pragma solidity ^0.5.0;
 
 
-// we use a new interface here,
-// because we will only ever need the isConstraintsUpdater function here
-// and can hereby avoid a dependency
+contract AdministrationMaster {
 
-interface AdministrationInterfaceForProxy {
-    function isConstraintsUpdater(address account) external returns (bool);
-}
+    address private administrationLogic;
 
-contract ConstraintsProxy {
+    mapping(uint8 => mapping (address => bool)) _roles;
 
-    address private constraintsLogic;
+    constructor (address _impl) public {
+        administrationLogic = _impl;
 
-    AdministrationInterfaceForProxy public _admin;
-
-    constructor (address _impl, AdministrationInterfaceForProxy adminAddress) public {
-        constraintsLogic = _impl;
-        _admin = adminAddress;
+        // hard-coded admin role
+        _roles[0][msg.sender] = true;
     }
 
-    function constraintsLogicAddress() public view returns (address) {
-        return constraintsLogic;
+    function administrationLogicAddress() public view returns (address) {
+        return administrationLogic;
     }
 
     /**
@@ -40,14 +34,17 @@ contract ConstraintsProxy {
         _;
     }
 
-    modifier onlyConstraintsUpdater () {
-        require(_admin.isConstraintsUpdater(msg.sender));
+    modifier onlyAdminUpdater () {
+
+        // hard-coded adminUpdater role
+        require(_roles[1][msg.sender] == true);
         _;
     }
 
-    function updateLogicContract(address newLogic) isContract(newLogic) onlyConstraintsUpdater public returns (bool) {
 
-        constraintsLogic = newLogic;
+    function updateLogicContract(address newLogic) isContract(newLogic) onlyAdminUpdater public returns (bool) {
+
+        administrationLogic = newLogic;
         return true;
     }
 
@@ -56,12 +53,12 @@ contract ConstraintsProxy {
     * We use this intentionally to route function calls to our updatable logic contract.
     * This happens using assembly code and specifically the delegatecall opcode.
     * We essentially copy the calldata sent to this contract, perform the delegatecall, copy the returndata and return it.
-    * The special thing to understand here is that the storage variables being manipulated resides in THIS contract
+    * The special thing to understand here is that the storage variables being manipulated reside in THIS contract
     * which is the whole point, because it is why we can update the logic contract without losing our data!
     */
     function() external {
         require(msg.sig != 0x0);
-        address _impl = constraintsLogic;
+        address _impl = administrationLogic;
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)

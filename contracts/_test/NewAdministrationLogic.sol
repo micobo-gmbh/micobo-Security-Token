@@ -6,7 +6,7 @@ import "../administration/AdministrationInterface.sol";
 
 contract NewAdministrationLogic is AdministrationInterface {
 
-    // this needs to match the proxy's storage order
+    // this needs to match the master's storage order
     address public administrationLogic;
 
     /**
@@ -28,7 +28,7 @@ contract NewAdministrationLogic is AdministrationInterface {
         SOME_NEW_ROLE
     }
 
-    // updating rights are managed by makingthe proxy contracts ownable!
+    // updating rights are managed by makingthe master contracts ownable!
 
     event RoleAdded(uint8 role, address account);
     event RoleRemoved(uint8 role, address account);

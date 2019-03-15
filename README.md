@@ -12,7 +12,7 @@ There are 4 main components:
 
 ##
 
-   CLC and ALC an will both be made **updatable** through the use of proxy contracts.  
+   CLC and ALC an will both be made **updatable** through the use of master contracts.  
    This means that their storage data will persist when new versions are deployed.
 
 #
@@ -51,7 +51,7 @@ These are reflected in the **Code** enum:
 The contracts we call _logic_ contracts are treated as Solidity [_libraries_](https://solidity.readthedocs.io/en/latest/contracts.html?#libraries).  
 This means that they are exclusively used to perform tasks for other contracts, in this case the _master_ contracts.  
 
-Even though the master contract (proxy) does not contain any of the variable definitions or functions,  
+Even though the master contract does not contain any of the variable definitions or functions,  
 it assumes these as its own when using "delegatecall" to use our library/logic contract.  
 
 So i.e. the _userList_ mapping is actually saved in the master contract's storage and we are using the logic contract's functions to alter it.
@@ -85,7 +85,7 @@ We can identify these main interactions:
 ##
 #### 1. transfer AOS token
 
-Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the proxy contract (here Master Contract)
+Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the master contract (here Master Contract)
 
 ![transfer_token](./resources/token_transfer.jpg "transfer AOS token")
 
@@ -104,7 +104,7 @@ A call to determine the callers token balance (greyed out here) is not planned f
 
 Given the necessary authorisation, we can update the Constraints Logic Contract.  
 We need to deploy the new version, which has to inherit the old one.  
-We then register the new contract address with the master contract (proxy).
+We then register the new contract address with the master contract.
 
 ![contract_update](./resources/contract_update.jpg "update contstraints logic contract")
 

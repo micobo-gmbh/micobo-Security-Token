@@ -1,11 +1,11 @@
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
-const ConstraintsProxy = artifacts.require('ConstraintsProxy')
+const ConstraintsMaster = artifacts.require('ConstraintsMaster')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')
 const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 const AdministrationInterface = artifacts.require('AdministrationInterface')
 const AdministrationLogic = artifacts.require('AdministrationLogic')
-const AdministrationProxy = artifacts.require('AdministrationProxy')
+const AdministrationMaster = artifacts.require('AdministrationMaster')
 
 const aos_conf = require('../AOS-config');
 
@@ -25,7 +25,7 @@ deployAllContracts = async () => {
 	// ADMIN
 	adminLogic = await AdministrationLogic.new()
 
-	adminProxy = await AdministrationProxy.new(adminLogic.address)
+	adminProxy = await AdministrationMaster.new(adminLogic.address)
 
 	adminInterface = await AdministrationInterface.at(adminProxy.address)
 
@@ -33,7 +33,7 @@ deployAllContracts = async () => {
 	// CONSTRAINTS
 	constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
 
-	constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
+	constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
 
 	constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
 

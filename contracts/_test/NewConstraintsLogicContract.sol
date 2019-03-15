@@ -7,7 +7,7 @@ import "../constraints/ConstraintsInterface.sol";
 
 contract NewConstraintsLogicContract is ConstraintsInterface{
 
-    // this needs to match the proxy's storage order
+    // this needs to match the master's storage order
     address public constraintsLogicContract;
 
     /**

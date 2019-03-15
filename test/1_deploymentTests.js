@@ -3,13 +3,13 @@
  */
 
 const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
-const ConstraintsProxy = artifacts.require('ConstraintsProxy')
+const ConstraintsMaster = artifacts.require('ConstraintsMaster')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')
 const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
 const AdministrationInterface = artifacts.require('AdministrationInterface')
 const AdministrationLogic = artifacts.require('AdministrationLogic')
-const AdministrationProxy = artifacts.require('AdministrationProxy')
+const AdministrationMaster = artifacts.require('AdministrationMaster')
 
 
 const aos_conf = require('../AOS-config');
@@ -24,10 +24,10 @@ contract('Test Deployment', async (accounts) => {
 
 	// deepEqual compares with '==='
 
-	it("deploy an admin contract and proxy", async () => {
+	it("deploy an admin contract and master", async () => {
 		adminLogic = await AdministrationLogic.new()
 
-		adminProxy = await AdministrationProxy.new(adminLogic.address)
+		adminProxy = await AdministrationMaster.new(adminLogic.address)
 
 		adminInterface = await AdministrationInterface.at(adminProxy.address)
 
@@ -43,17 +43,17 @@ contract('Test Deployment', async (accounts) => {
 		})
 	})
 
-	it("deploys constraints proxy", async () => {
+	it("deploys constraints master", async () => {
 		await assert.doesNotThrow(async () => {
 			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-			constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
+			constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
 		})
 	})
 
-	it("proxy saves correct logic address", async () => {
+	it("master saves correct logic address", async () => {
 		constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
 
-		constraintsProxy = await ConstraintsProxy.new(constraintsLogic.address, adminProxy.address)
+		constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
 
 		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
 

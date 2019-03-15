@@ -39,7 +39,7 @@ contract('Test Constraint Contract', async (accounts) => {
 			contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
 		)
 
-		// The proxy's UserList entry "0" is "1", after being changed by the logic lib using "delegatecall"
+		// The master's UserList entry "0" is "1", after being changed by the logic lib using "delegatecall"
 		assert.deepEqual(
 			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.SEND)).toString(10),
 			'1'
@@ -64,7 +64,7 @@ contract('Test Constraint Contract', async (accounts) => {
 			contracts.constraintsProxy.updateLogicContract(contracts.constraintsLogic.address, {from: constraintsUpdater})
 		)
 
-		// The new ConstraintsLogicContract address has been saved to the proxy's storage
+		// The new ConstraintsLogicContract address has been saved to the master's storage
 		assert.deepEqual(
 			await contracts.constraintsProxy.constraintsLogicAddress(),
 			contracts.constraintsLogic.address

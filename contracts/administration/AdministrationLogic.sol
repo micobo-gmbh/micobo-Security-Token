@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 
 contract AdministrationLogic {
 
-    // this needs to match the proxy's storage order
+    // this needs to match the master's storage order
     address public administrationLogic;
 
     /**
@@ -22,8 +22,6 @@ contract AdministrationLogic {
         PAUSER,
         CONSTRAINTS_EDITOR
     }
-
-    // updating rights are managed by making the proxy contracts ownable!
 
     event RoleAdded(uint8 role, address account);
     event RoleRemoved(uint8 role, address account);

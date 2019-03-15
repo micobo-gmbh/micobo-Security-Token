@@ -1,9 +1,3 @@
-const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
-const ConstraintsProxy = artifacts.require('ConstraintsProxy')
-const ConstraintsInterface = artifacts.require('ConstraintsInterface')
-const CompliantToken = artifacts.require('CompliantToken')
-const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
-
 const {deployAllContracts, Role} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
