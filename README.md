@@ -178,6 +178,8 @@ All functionality of the smart contracts is tested in mulitple test classes foun
 The tests are kept completely as atomic (specific) and autonomous as possible.  
 Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
 
+**To use truffle tests on your own testchain, change the** ``.test_mnemonic`` **file to containt your own mnemonic key!**  
+Also make sure that your testnet is running on port ```:8545```
 
 
 ### Diagrams
