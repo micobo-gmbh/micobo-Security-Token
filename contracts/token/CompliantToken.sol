@@ -7,8 +7,6 @@ import "../constraints/ConstraintsInterface.sol";
 import "../administration/AdministrationInterface.sol";
 
 
-// AosToken implements the ERC20 token standard
-
 contract CompliantToken is ERC20Capped, Pausable {
 
     /**
@@ -47,6 +45,17 @@ contract CompliantToken is ERC20Capped, Pausable {
 
         _constraints = constraints;
         _admin = admin;
+    }
+
+
+    modifier onlyPauser() {
+        require(_admin.isPauser(msg.sender));
+        _;
+    }
+
+    modifier onlyMinter() {
+        require(_admin.isMinter(msg.sender));
+        _;
     }
 
     /**
@@ -96,24 +105,14 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
 
-    // MINTER
-
-    modifier onlyMinter() {
-        require(_admin.isMinter(msg.sender));
-        _;
-    }
+    // minting
 
     function mint(address to, uint256 value) onlyMinter public returns (bool) {
         super._mint(to, value);
     }
 
 
-    // PAUSER
-
-    modifier onlyPauser() {
-        require(_admin.isPauser(msg.sender));
-        _;
-    }
+    // pausing
 
     function pause() public onlyPauser whenNotPaused {
         super.pause();
