@@ -50,8 +50,8 @@ module.exports = {
 
 				return new HDWalletProvider(mnemonic, "http://localhost:8545", 0, 3);
 			},
-			network_id: '1234',
-			gas: 8000000,
+			network_id: '*',
+			gas: 4500000,
 		},
 
 		rinkeby: {
