@@ -1,10 +1,10 @@
-## Azhos Smart Contracts
+## European Security Token
 
 ### Components
 
 There are 4 main components:
 
-1. _AOS Token Contract_  
+1. _Token Contract_  
 2. _Constraint Logic Contract_ (CLC)  
 3. _Administration Logic Contract_ (ALC)
 4. _Dividend Contract_         (DC)  
@@ -18,7 +18,7 @@ There are 4 main components:
 #
 ### Architecture
 
-![architecture](./resources/Azhos_Architecture.jpg "AOS Architecture")
+![architecture](resources/Architecture.jpg "Architecture")
 
 
 #
@@ -67,7 +67,7 @@ This gives us the ability to update the logic contract whenever we want!
 We can identify these main interactions:  
 
 **User Interaction**  
-    1. transfer AOS token  
+    1. transfer tokens  
     2. claim dividend
  
 **Updates**  
@@ -83,11 +83,11 @@ We can identify these main interactions:
     
 
 ##
-#### 1. transfer AOS token
+#### 1. transfer tokens
 
 Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the master contract (here Master Contract)
 
-![transfer_token](./resources/token_transfer.jpg "transfer AOS token")
+![transfer_token](./resources/token_transfer.jpg "transfer tokens")
 
 
 ##
@@ -168,9 +168,10 @@ function unpause() external;
 
 #
 ### Contract descriptions
-#### AOS Token
-TODO
 
+####  Token
+
+TODO
 
 ### Tests
 
