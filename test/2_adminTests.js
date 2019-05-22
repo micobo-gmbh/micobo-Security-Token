@@ -145,16 +145,16 @@ contract('Test Admin Contract', async (accounts) => {
 
 		// default account cannot update
 		await truffleAssert.fails(
-			contracts.adminProxy.updateLogicContract(newAdministrationLogic.address)
+			contracts.adminMaster.updateLogicContract(newAdministrationLogic.address)
 		)
 
 		// it should pass when using adminUpdater
 		await truffleAssert.passes(
-			contracts.adminProxy.updateLogicContract(newAdministrationLogic.address, {from: adminUpdater})
+			contracts.adminMaster.updateLogicContract(newAdministrationLogic.address, {from: adminUpdater})
 		)
 
 		// load new interface
-		newAdministrationInterface = await NewAdministrationInterface.at(contracts.adminProxy.address)
+		newAdministrationInterface = await NewAdministrationInterface.at(contracts.adminMaster.address)
 
 		// see if we can use new Role
 		await truffleAssert.passes(

@@ -10,12 +10,12 @@ import "../administration/AdministrationInterface.sol";
 contract CompliantToken is ERC20Capped, Pausable {
 
     /**
-     * @dev The Constraints Master Contract (Proxy)
+     * @dev The Constraints Master Contract
      */
     ConstraintsInterface public _constraints;
 
     /**
-     * @dev The Administration Master Contract (Proxy)
+     * @dev The Administration Master Contract
      */
     AdministrationInterface public _admin;
 

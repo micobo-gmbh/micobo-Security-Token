@@ -53,7 +53,7 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		// should fail because is not constraintsUpdater
 		await truffleAssert.fails(
-			contracts.constraintsProxy.updateLogicContract(contracts.constraintsLogic.address)
+			contracts.constraintsMaster.updateLogicContract(contracts.constraintsLogic.address)
 		)
 
 		// make constraintsUpdater
@@ -61,12 +61,12 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		// now it should pass
 		await truffleAssert.passes(
-			contracts.constraintsProxy.updateLogicContract(contracts.constraintsLogic.address, {from: constraintsUpdater})
+			contracts.constraintsMaster.updateLogicContract(contracts.constraintsLogic.address, {from: constraintsUpdater})
 		)
 
 		// The new ConstraintsLogicContract address has been saved to the master's storage
 		assert.deepEqual(
-			await contracts.constraintsProxy.constraintsLogicAddress(),
+			await contracts.constraintsMaster.constraintsLogicAddress(),
 			contracts.constraintsLogic.address
 		)
 	})
@@ -77,7 +77,7 @@ contract('Test Constraint Contract', async (accounts) => {
 
 		constraintsLogicContract = await ConstraintsLogic.new()
 
-		await contracts.constraintsProxy.updateLogicContract(constraintsLogicContract.address, {from: constraintsUpdater})
+		await contracts.constraintsMaster.updateLogicContract(constraintsLogicContract.address, {from: constraintsUpdater})
 
 		assert.deepEqual(
 			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.RECEIVE)).toString(10),
@@ -106,7 +106,7 @@ contract('Test Constraint Contract', async (accounts) => {
 		// deploy NewConstraintsLogicContract
 		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
 
-		await contracts.constraintsProxy.updateLogicContract(newConstraintsLogicContract.address, {from: constraintsUpdater})
+		await contracts.constraintsMaster.updateLogicContract(newConstraintsLogicContract.address, {from: constraintsUpdater})
 
 
 		// should throw because of new 1234 constraint

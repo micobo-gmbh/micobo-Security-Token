@@ -8,7 +8,7 @@ contract ConstraintsLogicContract {
     address public constraintsLogicContract;
 
     /**
-     * @dev The Administration Master Contract (Proxy)
+     * @dev The Administration Master Contract
      */
     AdministrationInterface public _admin;
 

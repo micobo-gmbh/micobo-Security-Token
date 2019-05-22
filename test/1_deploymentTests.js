@@ -18,8 +18,8 @@ const deployAllContracts = require('./_deployment.js').deployAllContracts;
 
 
 contract('Test Deployment', async (accounts) => {
-	let constraintsLogic, constraintsProxy, constraintsInterface, compliantToken, compliantTokenInterface, adminLogic,
-		adminProxy, adminInterface
+	let constraintsLogic, constraintsMaster, constraintsInterface, compliantToken, compliantTokenInterface, adminLogic,
+		adminMaster, adminInterface
 
 
 	// deepEqual compares with '==='
@@ -27,38 +27,38 @@ contract('Test Deployment', async (accounts) => {
 	it("deploy an admin contract and master", async () => {
 		adminLogic = await AdministrationLogic.new()
 
-		adminProxy = await AdministrationMaster.new(adminLogic.address)
+		adminMaster = await AdministrationMaster.new(adminLogic.address)
 
-		adminInterface = await AdministrationInterface.at(adminProxy.address)
+		adminInterface = await AdministrationInterface.at(adminMaster.address)
 
 		assert.deepEqual(
-			await adminProxy.administrationLogicAddress(),
+			await adminMaster.administrationLogicAddress(),
 			adminLogic.address
 		)
 	})
 
 	it("deploys constraints logic", async () => {
 		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
+			constraintsLogic = await ConstraintsLogic.new(adminMaster.address)
 		})
 	})
 
 	it("deploys constraints master", async () => {
 		await assert.doesNotThrow(async () => {
-			constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
-			constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
+			constraintsLogic = await ConstraintsLogic.new(adminMaster.address)
+			constraintsMaster = await ConstraintsMaster.new(constraintsLogic.address, adminMaster.address)
 		})
 	})
 
 	it("master saves correct logic address", async () => {
-		constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
+		constraintsLogic = await ConstraintsLogic.new(adminMaster.address)
 
-		constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
+		constraintsMaster = await ConstraintsMaster.new(constraintsLogic.address, adminMaster.address)
 
-		constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
+		constraintsInterface = await ConstraintsInterface.at(constraintsMaster.address)
 
 		assert.deepEqual(
-			await constraintsProxy.constraintsLogicAddress(),
+			await constraintsMaster.constraintsLogicAddress(),
 			constraintsLogic.address
 		)
 	})
@@ -70,8 +70,8 @@ contract('Test Deployment', async (accounts) => {
 			aos_conf.symbol,
 			aos_conf.decimals,
 			aos_conf.cap,
-			constraintsProxy.address,
-			adminProxy.address)
+			constraintsMaster.address,
+			adminMaster.address)
 
 		compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 

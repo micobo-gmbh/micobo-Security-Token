@@ -14,28 +14,28 @@ const aos_conf = require('../AOS-config');
 deployAllContracts = async () => {
 
 	let constraintsLogic,
-		constraintsProxy,
+		constraintsMaster,
 		constraintsInterface,
 		compliantToken,
 		compliantTokenInterface,
 		adminLogic,
-		adminProxy,
+		adminMaster,
 		adminInterface
 
 	// ADMIN
 	adminLogic = await AdministrationLogic.new()
 
-	adminProxy = await AdministrationMaster.new(adminLogic.address)
+	adminMaster = await AdministrationMaster.new(adminLogic.address)
 
-	adminInterface = await AdministrationInterface.at(adminProxy.address)
+	adminInterface = await AdministrationInterface.at(adminMaster.address)
 
 
 	// CONSTRAINTS
-	constraintsLogic = await ConstraintsLogic.new(adminProxy.address)
+	constraintsLogic = await ConstraintsLogic.new(adminMaster.address)
 
-	constraintsProxy = await ConstraintsMaster.new(constraintsLogic.address, adminProxy.address)
+	constraintsMaster = await ConstraintsMaster.new(constraintsLogic.address, adminMaster.address)
 
-	constraintsInterface = await ConstraintsInterface.at(constraintsProxy.address)
+	constraintsInterface = await ConstraintsInterface.at(constraintsMaster.address)
 
 
 	// TOKEN
@@ -44,19 +44,19 @@ deployAllContracts = async () => {
 		aos_conf.symbol,
 		aos_conf.decimals,
 		aos_conf.cap,
-		constraintsProxy.address,
-		adminProxy.address)
+		constraintsMaster.address,
+		adminMaster.address)
 
 	compliantTokenInterface = await CompliantTokenInterface.at(compliantToken.address)
 
 	return {
 		constraintsLogic,
-		constraintsProxy,
+		constraintsMaster,
 		constraintsInterface,
 		compliantToken,
 		compliantTokenInterface,
 		adminLogic,
-		adminProxy,
+		adminMaster,
 		adminInterface
 	}
 }
