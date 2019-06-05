@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 /**
- * @title AOS-Token-ConstraintsInterface
+ * @title CompliantTokenInterface
  * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
  */
