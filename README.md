@@ -1,4 +1,4 @@
-## Compliant Security Token
+## European Security Token
 
 ### Components
 
