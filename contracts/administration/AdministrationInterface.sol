@@ -21,4 +21,7 @@ interface AdministrationInterface {
 
     function isAdminUpdater(address account) external view returns (bool);
 
+    function isBurner(address account) external view returns (bool);
+
+
 }

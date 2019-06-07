@@ -58,6 +58,11 @@ contract CompliantToken is ERC20Capped, Pausable {
         _;
     }
 
+    modifier onlyBurner() {
+        require(_admin.isBurner(msg.sender));
+        _;
+    }
+
     /**
      * @return the name of the token.
      */
@@ -109,6 +114,18 @@ contract CompliantToken is ERC20Capped, Pausable {
 
     function mint(address to, uint256 value) onlyMinter public returns (bool) {
         super._mint(to, value);
+    }
+
+
+    // burning
+
+    /**
+     * @dev Destroys `amount` tokens from the target address.
+     *
+     * See `ERC20._burn`.
+     */
+    function destroy(address target, uint256 amount) onlyBurner public {
+        _burn(target, amount);
     }
 
 

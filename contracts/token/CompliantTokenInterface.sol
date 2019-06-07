@@ -100,6 +100,17 @@ interface CompliantTokenInterface {
 
 
 
+    // Burnable
+
+    /*
+    function destroy(address target, uint256 amount) onlyBurner public {
+        _burn(target, amount);
+    }
+    */
+    function destroy(address target, uint256 amount)  external;
+
+
+
 
     // Pausable
 

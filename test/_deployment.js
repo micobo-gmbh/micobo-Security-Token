@@ -74,7 +74,8 @@ const Role = {
 	MINTER: 3,
 	PAUSER: 4,
 	CONSTRAINTS_EDITOR: 5,
-	SOME_NEW_ROLE: 6
+	BURNER: 6,
+	SOME_NEW_ROLE: 7
 }
 
 module.exports = {
