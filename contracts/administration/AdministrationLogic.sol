@@ -20,7 +20,8 @@ contract AdministrationLogic {
         CONSTRAINTS_UPDATER,
         MINTER,
         PAUSER,
-        CONSTRAINTS_EDITOR
+        CONSTRAINTS_EDITOR,
+        BURNER
     }
 
     event RoleAdded(uint8 role, address account);
@@ -111,6 +112,10 @@ contract AdministrationLogic {
 
     function isAdminUpdater(address account) public view returns (bool) {
         return _has(uint8(Role.ADMIN_UPDATER), account);
+    }
+
+    function isBurner(address account) public view returns (bool) {
+        return _has(uint8(Role.BURNER), account);
     }
 
 }
