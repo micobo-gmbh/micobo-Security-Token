@@ -24,6 +24,7 @@ contract NewAdministrationLogic is AdministrationInterface {
         MINTER,
         PAUSER,
         CONSTRAINTS_EDITOR,
+        BURNER,
 
         SOME_NEW_ROLE
     }
@@ -116,6 +117,10 @@ contract NewAdministrationLogic is AdministrationInterface {
 
     function isAdminUpdater(address account) public view returns (bool) {
         return _has(uint8(Role.ADMIN_UPDATER), account);
+    }
+
+    function isBurner(address account) public view returns (bool) {
+        return _has(uint8(Role.BURNER), account);
     }
 
 
