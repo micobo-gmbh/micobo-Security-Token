@@ -40,9 +40,6 @@ contract AdministrationLogic {
     }
 
     function remove(uint8 role, address account) _onlyAdmins public {
-
-        // TODO prevent last admin from being deleted?
-
         _remove(role, account);
     }
 
@@ -73,6 +70,8 @@ contract AdministrationLogic {
      */
     function _remove(uint8 role, address account) internal {
         require(account != address(0));
+        // cannot remove ADMIN
+        require(role != Role.ADMIN);
         require(_has(role, account));
 
         _roles[role][account] = false;

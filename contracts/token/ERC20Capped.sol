@@ -5,6 +5,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 /**
  * @title Capped token
  * @dev Mintable token with a token cap.
+ * Cap cannot be changed afterwards.
  */
 contract ERC20Capped is ERC20 {
     uint256 private _cap;

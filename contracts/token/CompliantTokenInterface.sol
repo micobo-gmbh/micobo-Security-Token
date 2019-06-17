@@ -8,6 +8,12 @@ pragma solidity ^0.5.0;
 
 interface CompliantTokenInterface {
 
+    event Paused(address account);
+    event Unpaused(address account);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
 
     // ERC20Detailed
 
@@ -191,8 +197,6 @@ interface CompliantTokenInterface {
     }
     */
     function unpause() external;
-
-
 
 }
 

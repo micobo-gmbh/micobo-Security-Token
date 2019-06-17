@@ -2,6 +2,11 @@ pragma solidity ^0.5.0;
 
 interface NewAdministrationInterface {
 
+    event RoleAdded(uint8 role, address account);
+    event RoleRemoved(uint8 role, address account);
+    event RoleRenounced(uint8 role, address account);
+
+
     function administrationLogicAddress() external view returns (address);
 
     function add(uint8 role, address account) external;
