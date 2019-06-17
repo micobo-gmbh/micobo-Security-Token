@@ -5,10 +5,10 @@ import "../constraints/ConstraintsInterface.sol";
 
 // we inherit the old contracts interface to make sure we don't break anything
 
-contract NewConstraintsLogicContract is ConstraintsInterface{
+contract NewConstraintsLogic is ConstraintsInterface{
 
     // this needs to match the master's storage order
-    address public constraintsLogicContract;
+    address public constraintsLogic;
 
     /**
      * @dev The Administration Master Contract

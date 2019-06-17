@@ -1,4 +1,4 @@
-const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
+const ConstraintsLogic = artifacts.require('ConstraintsLogic')
 const ConstraintsMaster = artifacts.require('ConstraintsMaster')
 const ConstraintsInterface = artifacts.require('ConstraintsInterface')
 const CompliantToken = artifacts.require('CompliantToken')

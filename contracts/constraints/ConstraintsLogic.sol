@@ -2,10 +2,10 @@ pragma solidity ^0.5.0;
 
 import "../administration/AdministrationInterface.sol";
 
-contract ConstraintsLogicContract {
+contract ConstraintsLogic {
 
     // this and _admin need to match the master's storage order
-    address public constraintsLogicContract;
+    address public constraintsLogic;
 
     /**
      * @dev The Administration Master Contract

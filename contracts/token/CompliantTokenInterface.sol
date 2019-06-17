@@ -8,12 +8,6 @@ pragma solidity ^0.5.0;
 
 interface CompliantTokenInterface {
 
-    event Paused(address account);
-    event Unpaused(address account);
-
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
 
     // ERC20Detailed
 
@@ -56,6 +50,7 @@ interface CompliantTokenInterface {
     function balanceOf(address who) external view returns (uint256);
 
     function allowance(address owner, address spender) external view returns (uint256);
+
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -112,7 +107,7 @@ interface CompliantTokenInterface {
         _burn(target, amount);
     }
     */
-    function destroy(address target, uint256 amount)  external;
+    function destroy(address target, uint256 amount) external;
 
 
 
@@ -197,6 +192,11 @@ interface CompliantTokenInterface {
     }
     */
     function unpause() external;
+
+
+    event Paused(address account);
+
+    event Unpaused(address account);
 
 }
 

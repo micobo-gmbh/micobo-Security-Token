@@ -1,8 +1,8 @@
 /*
 	Test constraint contract functionality and updatability
  */
-const ConstraintsLogic = artifacts.require('ConstraintsLogicContract')
-const NewConstraintsLogicContract = artifacts.require('NewConstraintsLogicContract')
+const ConstraintsLogic = artifacts.require('ConstraintsLogic')
+const NewConstraintsLogic = artifacts.require('NewConstraintsLogic')
 
 const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
@@ -64,7 +64,7 @@ contract('Test Constraint Contract', async (accounts) => {
 			contracts.constraintsMaster.updateLogicContract(contracts.constraintsLogic.address, {from: constraintsUpdater})
 		)
 
-		// The new ConstraintsLogicContract address has been saved to the master's storage
+		// The new ConstraintsLogic address has been saved to the master's storage
 		assert.deepEqual(
 			await contracts.constraintsMaster.constraintsLogicAddress(),
 			contracts.constraintsLogic.address
@@ -75,9 +75,9 @@ contract('Test Constraint Contract', async (accounts) => {
 	it("keeps the storage unaffected by new logic contract", async () => {
 		await contracts.constraintsInterface.editUserList(accounts[0], Code.RECEIVE, 1, {from: constraintsEditor})
 
-		constraintsLogicContract = await ConstraintsLogic.new()
+		constraintsLogic = await ConstraintsLogic.new()
 
-		await contracts.constraintsMaster.updateLogicContract(constraintsLogicContract.address, {from: constraintsUpdater})
+		await contracts.constraintsMaster.updateLogicContract(constraintsLogic.address, {from: constraintsUpdater})
 
 		assert.deepEqual(
 			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.RECEIVE)).toString(10),
@@ -103,10 +103,10 @@ contract('Test Constraint Contract', async (accounts) => {
 			contracts.compliantTokenInterface.transfer(accounts[1], 5)
 		)
 
-		// deploy NewConstraintsLogicContract
-		newConstraintsLogicContract = await NewConstraintsLogicContract.new()
+		// deploy NewConstraintsLogic
+		newConstraintsLogic = await NewConstraintsLogic.new()
 
-		await contracts.constraintsMaster.updateLogicContract(newConstraintsLogicContract.address, {from: constraintsUpdater})
+		await contracts.constraintsMaster.updateLogicContract(newConstraintsLogic.address, {from: constraintsUpdater})
 
 
 		// should throw because of new 1234 constraint

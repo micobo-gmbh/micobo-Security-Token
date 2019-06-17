@@ -19,8 +19,9 @@
  */
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
+
 // const infuraKey = "fj4jll3k.....";
-//
+
 const fs = require('fs');
 const mnemonic = fs.readFileSync(".test_mnemonic").toString().trim();
 
@@ -54,6 +55,7 @@ module.exports = {
 			gas: 8000000,
 		},
 
+		/*
 		rinkeby: {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af");
@@ -62,6 +64,7 @@ module.exports = {
 			gas: 4500000,
 			gasPrice: 10000000000,
 		}
+		*/
 
 		// //Another network with more advanced options...
 		// advanced: {
@@ -94,7 +97,7 @@ module.exports = {
 
 	// Set default mocha options here, use special reporters etc.
 	mocha: {
-		reporter: 'eth-gas-reporter',
+		// reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
 			gasPrice: 6

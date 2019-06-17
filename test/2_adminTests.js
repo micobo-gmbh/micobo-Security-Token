@@ -23,7 +23,7 @@ contract('Test Admin Contract', async (accounts) => {
 	})
 
 
-	it("adds msg.sender as admin", async () => {
+	it("msg.sender (contract deployer) is admin", async () => {
 
 		assert.deepEqual(
 			await contracts.adminInterface.isAdmin(accounts[0]),
@@ -64,6 +64,16 @@ contract('Test Admin Contract', async (accounts) => {
 			false
 		)
 
+	})
+
+	it("cannot remove own ADMIN role", async () => {
+		await truffleAssert.fails(
+			contracts.adminInterface.remove(Role.ADMIN, accounts[0])
+		)
+
+		await truffleAssert.fails(
+			contracts.adminInterface.renounce(Role.ADMIN)
+		)
 	})
 
 

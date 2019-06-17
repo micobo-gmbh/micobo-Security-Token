@@ -9,7 +9,7 @@ contract AdministrationLogic {
     /**
      * @title _roles
      * @dev mapping for managing addresses assigned to a role.
-     * also cannot be changed, just list administrationLogic
+     * cannot be changed, just like administrationLogic
      */
     mapping(uint8 => mapping(address => bool)) _roles;
 
@@ -70,8 +70,8 @@ contract AdministrationLogic {
      */
     function _remove(uint8 role, address account) internal {
         require(account != address(0));
-        // cannot remove ADMIN
-        require(role != Role.ADMIN);
+        // cannot remove own ADMIN role
+        require(!(role == uint8(Role.ADMIN) && account == msg.sender));
         require(_has(role, account));
 
         _roles[role][account] = false;
