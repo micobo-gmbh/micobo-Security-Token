@@ -13,7 +13,7 @@ contract('Test Compliant Token', async (accounts) => {
 
 	before(async () => {
 
-		contracts = await deployAllContracts()
+		contracts = await deployAllContracts(accounts[0])
 
 		// make me minter
 		await contracts.adminInterface.add(Role.MINTER, accounts[0])

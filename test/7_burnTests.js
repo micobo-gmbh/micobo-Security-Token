@@ -13,7 +13,7 @@ contract('Test Burning', async (accounts) => {
 
 	before(async () => {
 
-		contracts = await deployAllContracts()
+		contracts = await deployAllContracts(accounts[0])
 
 	})
 

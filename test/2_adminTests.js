@@ -18,7 +18,7 @@ contract('Test Admin Contract', async (accounts) => {
 
 	before(async () => {
 
-		contracts = await deployAllContracts()
+		contracts = await deployAllContracts(accounts[0])
 
 	})
 

@@ -12,7 +12,7 @@ contract('Test Minting', async (accounts) => {
 
 	before(async () => {
 
-		contracts = await deployAllContracts()
+		contracts = await deployAllContracts(accounts[0])
 
 	})
 

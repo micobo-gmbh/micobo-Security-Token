@@ -27,7 +27,7 @@ contract('Test Deployment', async (accounts) => {
 	it("deploy an admin contract and master", async () => {
 		adminLogic = await AdministrationLogic.new()
 
-		adminMaster = await AdministrationMaster.new(adminLogic.address)
+		adminMaster = await AdministrationMaster.new(adminLogic.address, accounts[0])
 
 		adminInterface = await AdministrationInterface.at(adminMaster.address)
 
@@ -83,7 +83,7 @@ contract('Test Deployment', async (accounts) => {
 
 	// test this function to know it will work for all the other test cases
 	it("successfully deploys all contracts in a row", async () => {
-		await deployAllContracts()
+		await deployAllContracts(accounts[0])
 	})
 
 })

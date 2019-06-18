@@ -37,7 +37,7 @@ contract NewAdministrationLogic is AdministrationInterface {
 
 
     modifier _onlyAdmins() {
-        require(_has(uint8(Role.ADMIN), msg.sender));
+        require(_has(uint8(Role.ADMIN), msg.sender), 'only ADMIN allowed');
         _;
     }
 
@@ -52,7 +52,7 @@ contract NewAdministrationLogic is AdministrationInterface {
     }
 
     function renounce(uint8 role) public {
-        require(_has(role, msg.sender));
+        require(_has(role, msg.sender), 'msg.sender does not have this role');
 
         _remove(role, msg.sender);
 
@@ -65,8 +65,8 @@ contract NewAdministrationLogic is AdministrationInterface {
      * @dev give an account access to a role
      */
     function _add(uint8 role, address account) internal {
-        require(account != address(0));
-        require(!_has(role, account));
+        require(account != address(0), 'zero address');
+        require(!_has(role, account), 'already has this role');
 
         _roles[role][account] = true;
 
@@ -77,8 +77,8 @@ contract NewAdministrationLogic is AdministrationInterface {
      * @dev remove an account's access to a role
      */
     function _remove(uint8 role, address account) internal {
-        require(account != address(0));
-        require(_has(role, account));
+        require(account != address(0), 'zero address');
+        require(_has(role, account), 'does not have this role');
 
         _roles[role][account] = false;
 
@@ -90,7 +90,7 @@ contract NewAdministrationLogic is AdministrationInterface {
      * @return bool
      */
     function _has(uint8 role, address account) internal view returns (bool) {
-        require(account != address(0));
+        require(account != address(0), 'zero address');
         return _roles[role][account];
     }
 

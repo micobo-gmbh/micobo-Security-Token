@@ -39,7 +39,7 @@ contract NewConstraintsLogic is ConstraintsInterface{
     }
 
     modifier onlyConstraintEditor() {
-        require(_admin.isConstraintsEditor(msg.sender));
+        require(_admin.isConstraintsEditor(msg.sender), 'only CONSTRAINTS_EDITOR allowed');
         _;
     }
 

@@ -1,9 +1,12 @@
 pragma solidity ^0.5.0;
 
 /**
- * @title AOS-Token-ConstraintsInterface
+ * @title Interface for using the Compliant Token
  * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
+ *
+ * Comments show excerpts or the whole content of functions
+ * to better illustrate their inner workings here!
  */
 
 interface CompliantTokenInterface {
@@ -65,7 +68,7 @@ interface CompliantTokenInterface {
     uint256 private _cap;
 
     constructor (uint256 cap) public {
-        require(cap > 0);
+        require(cap > 0, 'cap must be greater than zero');
         _cap = cap;
     }
 
@@ -81,14 +84,14 @@ interface CompliantTokenInterface {
     /**
     function _mint(address account, uint256 value) internal {
 
-        require(totalSupply().add(value) <= _cap);
+        require(totalSupply().add(value) <= _cap, 'totalSupply would exceed cap');
         super._mint(account, value);
     }
     */
 
     /**
     modifier onlyMinter() {
-        require(_admin.isMinter(msg.sender));
+        require(_admin.isMinter(msg.sender), 'only MINTER allowed');
         _;
     }
 
@@ -140,7 +143,7 @@ interface CompliantTokenInterface {
      * @dev Modifier to make a function callable only when the contract is not paused.
 
     modifier whenNotPaused() {
-        require(!_paused);
+        require(!_paused, 'contract is paused');
         _;
     }
     */
@@ -149,7 +152,7 @@ interface CompliantTokenInterface {
      * @dev Modifier to make a function callable only when the contract is paused.
 
     modifier whenPaused() {
-        require(_paused);
+        require(_paused, 'contract is not paused');
         _;
     }
     */
@@ -174,7 +177,7 @@ interface CompliantTokenInterface {
 
     /**
     modifier onlyPauser() {
-        require(_admin.isPauser(msg.sender));
+        require(_admin.isPauser(msg.sender), 'only PAUSER allowed');
         _;
     }
     */

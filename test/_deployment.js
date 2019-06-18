@@ -11,7 +11,7 @@ const aos_conf = require('../AOS-config');
 
 
 
-deployAllContracts = async () => {
+deployAllContracts = async (admin) => {
 
 	let constraintsLogic,
 		constraintsMaster,
@@ -25,7 +25,7 @@ deployAllContracts = async () => {
 	// ADMIN
 	adminLogic = await AdministrationLogic.new()
 
-	adminMaster = await AdministrationMaster.new(adminLogic.address)
+	adminMaster = await AdministrationMaster.new(adminLogic.address, admin)
 
 	adminInterface = await AdministrationInterface.at(adminMaster.address)
 
