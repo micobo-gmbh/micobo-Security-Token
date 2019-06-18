@@ -25,8 +25,8 @@
   "devDependencies": {
     "eth-gas-reporter": "^0.2.0",
     "truffle": "^5.0.22",
-		"truffle-security": "^1.5.1",
-		"truffle-assertions": "^0.8.2",
-		"truffle-hdwallet-provider": "^1.0.10"
+    "truffle-security": "^1.5.1",
+    "truffle-assertions": "^0.8.2",
+    "truffle-hdwallet-provider": "^1.0.10"
   }
 }

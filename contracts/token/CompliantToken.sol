@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.0;
 
 import './ERC20Capped.sol';
 import './Pausable.sol';
