@@ -32,7 +32,8 @@ contract AdministrationMaster {
     mapping(uint8 => mapping (address => bool)) _roles;
 
     /**
-     * @param _impl the address of the admin logic contract, admin the address of the first ADMIN
+     * @param _impl the address of the admin logic contract
+     * @param admin the address of the first ADMIN
      * @dev Sets the address for the administrationLogic contract as well as the first ADMIN
      * The administrationLogic address can be updated later on.
      * The ADMIN can only be deleted by another ADMIN.

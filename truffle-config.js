@@ -117,5 +117,7 @@ module.exports = {
 			 evmVersion: "byzantium"
 			}
 		}
-	}
+	},
+
+	plugins: [ "truffle-security" ]
 }

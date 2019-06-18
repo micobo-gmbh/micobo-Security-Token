@@ -56,7 +56,9 @@ contract ConstraintsLogic {
     }
 
     /**
-     * @param user the address for which information is being added, key, value
+     * @param user the address for which information is being added
+     * @param key the key to bbe edited
+     * @param value the new value
      * @dev This function allows the modification of the 'userList'
      * @return true is the edit was successful
      */
@@ -70,7 +72,8 @@ contract ConstraintsLogic {
     }
 
     /**
-     * @param user the account that is being queried, key the key that is being queried
+     * @param user the account that is being queried
+     * @param key the key that is being queried
      * @dev Returns the value to the given key and user from 'userList'
      * @return the corresponding value from 'userList'
      */
@@ -79,7 +82,10 @@ contract ConstraintsLogic {
     }
 
     /**
-     * @param _msg_sender sender of the transaction, _from, _to, _value
+     * @param _msg_sender sender of the transaction
+     * @param _from the source account of the token transfer
+     * @param _to the target account of the token transfer
+     * @param _value the amount of tokens being transferred
      * @dev This function is being called by 'transfer' and 'transferFrom' to check for constraints
      * @return authorized true if all requirements have been met and false if not, message
      */

@@ -34,7 +34,12 @@ contract CompliantToken is ERC20Capped, Pausable {
     uint8 private _decimals;
 
     /**
-     * @param name, symbol, decimals, cap, constraints contract address, admin contract address
+     * @param name name of the token
+     * @param symbol token symbol
+     * @param decimals token decimals
+     * @param cap token cap
+     * @param constraints contract address
+     * @param admin contract address
      * @dev Sets the values for `name`, `symbol`, `decimals`, 'cap', 'constraints' and 'admin'.
      * All 6 of these values are immutable: they can only be set once during construction.
      *
@@ -106,7 +111,8 @@ contract CompliantToken is ERC20Capped, Pausable {
 
 
     /**
-     * @param to the target address, value the amount to be transferred
+     * @param to the target address
+     * @param value the amount to be transferred
      * @dev overriding the transfer function adding "whenNotPaused" and "check()"
      * @return true if the transfer succeeded
      */
@@ -125,7 +131,9 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
     /**
-     * @param from the source address, to the target address, value the amount to be transferred
+     * @param from the source address
+     * @param to the target address
+     * @param value the amount to be transferred
      * @dev overriding the transferFrom function adding "whenNotPaused" and "check()"
      * @return true if the transfer succeeded
      */
@@ -144,7 +152,8 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
     /**
-     * @param to the target address, value the amount to be minted
+     * @param to the target address
+     * @param value the amount to be minted
      * @dev Overrides mint function adding onlyMinter modifier
      *
      * See `ERC20._mint`.
@@ -154,7 +163,8 @@ contract CompliantToken is ERC20Capped, Pausable {
     }
 
     /**
-     * @param target the address from which tokens are burned, amount the amount to be burned
+     * @param target the address from which tokens are burned
+     * @param amount the amount to be burned
      * @dev Exposes _burn function adding onlyBurner modifier
      *
      * it is called 'destroy' to signify its ability to burn tokens of any address!

@@ -26,7 +26,8 @@ contract ConstraintsMaster {
     AdministrationInterfaceForMaster public _admin;
 
     /**
-     * @param _impl the constraints logic address, the admin master(proxy) address
+     * @param _impl the constraints logic address
+     * @param adminAddress the admin master(proxy) address
      * @dev Sets the addresses for the ConstraintsLogic and the AdminMaster contract
      * The first can be updated, while the latter cannot be changed later on.
      */

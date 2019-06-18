@@ -58,7 +58,8 @@ contract AdministrationLogic {
     }
 
     /**
-     * @param role role that is being assigned, account the address that is being assigned a role
+     * @param role role that is being assigned
+     * @param account the address that is being assigned a role
      * @dev Assigns a role to an account
      */
     function add(uint8 role, address account) _onlyAdmins public {
@@ -66,7 +67,8 @@ contract AdministrationLogic {
     }
 
     /**
-     * @param role role that is being removed, account the address that a role is removed from
+     * @param role role that is being removed
+     * @param account the address that a role is removed from
      * @dev Removes a role from an account
      */
     function remove(uint8 role, address account) _onlyAdmins public {
