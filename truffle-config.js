@@ -63,6 +63,16 @@ module.exports = {
 			gas: 8000000,
 		},
 
+		gas_report: {
+			host: '127.0.0.1',
+			port: 7545,
+			from: '0xd905ea0D68005336B11F1902907D167B1E22bAc4',
+			network_id: '*',
+			gas: 6721975,
+    },
+
+
+
 		/*
 		rinkeby: {
 			provider: () => {
@@ -74,16 +84,7 @@ module.exports = {
 		}
 		*/
 
-		// //Another network with more advanced options...
-		// advanced: {
-		// 	port: 8777,             // Custom port
-		// 	network_id: 1342,       // Custom network
-		// 	gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
-		// 	gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
-		// 	from: base.accounts[0],             // Account to send txs from (default: accounts[0])
-		// 	websockets: true        // Enable EventEmitter interface for web3 (default: false)
-		// },
-
+		
 		// Useful for deploying to a public network.
 		// NB: It's important to wrap the provider as a function.
 		// ropsten: {
@@ -105,7 +106,7 @@ module.exports = {
 
 	// Set default mocha options here, use special reporters etc.
 	mocha: {
-		// reporter: 'eth-gas-reporter',
+		reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
 			gasPrice: 6
