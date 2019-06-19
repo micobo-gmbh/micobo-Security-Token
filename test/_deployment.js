@@ -7,7 +7,7 @@ const AdministrationInterface = artifacts.require('AdministrationInterface')
 const AdministrationLogic = artifacts.require('AdministrationLogic')
 const AdministrationMaster = artifacts.require('AdministrationMaster')
 
-const aos_conf = require('../AOS-config');
+const aos_conf = require('../token-config');
 
 
 

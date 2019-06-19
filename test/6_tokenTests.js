@@ -1,6 +1,6 @@
 const truffleAssert = require('truffle-assertions')
 
-const aos_conf = require('../AOS-config')
+const aos_conf = require('../token-config')
 
 const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
