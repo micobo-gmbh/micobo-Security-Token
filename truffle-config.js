@@ -55,6 +55,14 @@ module.exports = {
 			gas: 8000000,
 		},
 
+		test: {
+			provider: () => {
+				return new HDWalletProvider(mnemonic, "http://localhost:8545", 0, 3);
+			},
+			network_id: '*',
+			gas: 8000000,
+		},
+
 		/*
 		rinkeby: {
 			provider: () => {

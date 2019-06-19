@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "test": "truffle test --network test",
+		"deploy": "truffle migrate --reset"
   },
   "repository": {
     "type": "git",
