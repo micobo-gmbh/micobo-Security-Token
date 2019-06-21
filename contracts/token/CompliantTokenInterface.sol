@@ -54,7 +54,6 @@ interface CompliantTokenInterface {
 
     function allowance(address owner, address spender) external view returns (uint256);
 
-
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);

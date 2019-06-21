@@ -20,7 +20,6 @@ There are 4 main components:
 
 ![architecture](resources/Architecture.jpg "Architecture")
 
-
 #
 #
 ## Tests
@@ -104,7 +103,7 @@ This gives us the ability to update the logic contract whenever we want!
 We can identify these main interactions:  
 
 **User Interaction**  
-    1. transfer token  
+    1. transfer tokens  
     2. claim dividend
  
 **Updates**  
@@ -120,11 +119,11 @@ We can identify these main interactions:
     
 
 ##
-#### 1. transfer token
+#### 1. transfer tokens
 
 Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the master contract (here Master Contract)
 
-![transfer_token](./resources/token_transfer.jpg "transfer token")
+![transfer_token](./resources/token_transfer.jpg "transfer tokens")
 
 
 ##
@@ -202,8 +201,7 @@ function pause() external;
 function unpause() external;
 ```
 
-
-#  
+#
 ### Diagrams
 
 All diagrams were made with the free software [draw.io](draw.io)  

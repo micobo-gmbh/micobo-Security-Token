@@ -1,7 +1,7 @@
 {
-  "name": "european_security_token",
+  "name": "european-security-token",
   "version": "0.1.0",
-  "description": "EST smart contracts",
+  "description": "EST - European Security Token",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com:micoboteam/european-security-token.git"
+    "url": "git+ssh://git@gitlab.com/micoboteam/european-security-token.git"
   },
   "author": "Simon Dosch",
   "license": "ISC",
