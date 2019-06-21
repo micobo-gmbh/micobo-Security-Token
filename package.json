@@ -1,25 +1,26 @@
 {
-  "name": "azhos_smart_contracts",
+  "name": "european_security_token",
   "version": "0.1.0",
-  "description": "Azhos AOS smart contracts",
+  "description": "EST smart contracts",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "truffle test --network test",
+		"gas_report": "truffle test --network gas_report",
 		"deploy": "truffle migrate --reset"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/micoboteam/azhos_smart_contracts.git"
+    "url": "git+ssh://git@gitlab.com:micoboteam/european-security-token.git"
   },
   "author": "Simon Dosch",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/micoboteam/azhos_smart_contracts/issues"
+    "url": "https://gitlab.com:micoboteam/european-security-token/issues"
   },
-  "homepage": "https://gitlab.com/micoboteam/azhos_smart_contracts#readme",
+  "homepage": "europeansecuritytoken.com",
   "dependencies": {
     "openzeppelin-solidity": "^2.3.0"
   },

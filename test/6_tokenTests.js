@@ -1,6 +1,6 @@
 const truffleAssert = require('truffle-assertions')
 
-const aos_conf = require('../token-config')
+const conf = require('../token-config')
 
 const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
@@ -25,13 +25,13 @@ contract('Test Compliant Token', async (accounts) => {
 
 	it("gives me all the correct token informations", async () => {
 
-		assert.deepEqual((await contracts.compliantTokenInterface.name.call()), aos_conf.name)
+		assert.deepEqual((await contracts.compliantTokenInterface.name.call()), conf.name)
 
-		assert.deepEqual((await contracts.compliantTokenInterface.symbol()), aos_conf.symbol)
+		assert.deepEqual((await contracts.compliantTokenInterface.symbol()), conf.symbol)
 
-		assert.deepEqual((await contracts.compliantTokenInterface.decimals()).toNumber(), aos_conf.decimals)
+		assert.deepEqual((await contracts.compliantTokenInterface.decimals()).toNumber(), conf.decimals)
 
-		assert.deepEqual((await contracts.compliantTokenInterface.cap()).toNumber(), aos_conf.cap)
+		assert.deepEqual((await contracts.compliantTokenInterface.cap()).toNumber(), conf.cap)
 
 		assert.deepEqual((await contracts.compliantTokenInterface.totalSupply()).toNumber(), 2000)
 

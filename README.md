@@ -1,4 +1,4 @@
-## Azhos Smart Contracts
+## European Security Token - EST
 
 ### Components
 
@@ -18,7 +18,7 @@ There are 4 main components:
 #
 ### Architecture
 
-![architecture](./resources/Azhos_Architecture.jpg "Architecture")
+![architecture](resources/Architecture.jpg "Architecture")
 
 
 #
@@ -36,6 +36,20 @@ Use the test script to run all tests:
 ```
 npm run test
 ```
+#
+
+#### Gas report
+
+Replace the eth address in ``token-config.json`` in the ``gas_report`` network with your
+Ganache address to run the tests with the gas-reporter.  
+
+We use Ganache here because it lets us test without using the HD Wallet Provider.  
+HD Wallet Provider only allows async calls which does not work for the gas-reporter.
+
+```
+npm run gas_report
+```
+
 #
 ## Deployment
 

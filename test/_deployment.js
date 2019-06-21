@@ -7,7 +7,7 @@ const AdministrationInterface = artifacts.require('AdministrationInterface')
 const AdministrationLogic = artifacts.require('AdministrationLogic')
 const AdministrationMaster = artifacts.require('AdministrationMaster')
 
-const aos_conf = require('../token-config');
+const conf = require('../token-config');
 
 
 
@@ -40,10 +40,10 @@ deployAllContracts = async (admin) => {
 
 	// TOKEN
 	compliantToken = await CompliantToken.new(
-		aos_conf.name,
-		aos_conf.symbol,
-		aos_conf.decimals,
-		aos_conf.cap,
+		conf.name,
+		conf.symbol,
+		conf.decimals,
+		conf.cap,
 		constraintsMaster.address,
 		adminMaster.address)
 

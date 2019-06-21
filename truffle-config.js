@@ -66,6 +66,8 @@ module.exports = {
 		gas_report: {
 			host: '127.0.0.1',
 			port: 7545,
+
+			// !!! replace this with your Ganache address
 			from: '0xd905ea0D68005336B11F1902907D167B1E22bAc4',
 			network_id: '*',
 			gas: 6721975,
