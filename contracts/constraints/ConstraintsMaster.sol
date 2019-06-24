@@ -26,6 +26,14 @@ contract ConstraintsMaster {
     AdministrationInterfaceForMaster public _admin;
 
     /**
+     * @dev Emitted whenever the constraints logic address is updated
+     */
+    event ConstraintsLogicUpdate(
+        address msg_sender,
+        address newLogic
+    );
+
+    /**
      * @param _impl the constraints logic address
      * @param adminAddress the admin master(proxy) address
      * @dev Sets the addresses for the ConstraintsLogic and the AdminMaster contract
@@ -84,6 +92,7 @@ contract ConstraintsMaster {
         returns (bool)
     {
         constraintsLogic = newLogic;
+        emit ConstraintsLogicUpdate(msg.sender, newLogic);
         return true;
     }
 

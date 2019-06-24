@@ -3,7 +3,7 @@ pragma solidity 0.5.0;
 interface AdministrationInterface {
 
     event AdminLogicUpdate(address msg_sender, address newLogic);
-    
+
     event RoleAdded(uint8 role, address account);
     event RoleRemoved(uint8 role, address account);
     event RoleRenounced(uint8 role, address account);
