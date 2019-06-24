@@ -201,8 +201,18 @@ function pause() external;
 function unpause() external;
 ```
 
+
 #
-### Diagrams
+## Gas Consumption
+
+#### Gas report for each function and deployemnt
+![est_gas_report](./resources/est_gas_report.png "EST gas report")
+#
+#### Gas consumption for test cases
+![est_gas_test](./resources/est_gas_test.png "EST gas tests")
+
+#
+#### Diagrams
 
 All diagrams were made with the free software [draw.io](draw.io)  
 Simply open the corresponding XML file in the editor and export into JPEG to update any diagram.
