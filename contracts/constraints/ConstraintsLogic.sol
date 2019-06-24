@@ -28,6 +28,16 @@ contract ConstraintsLogic {
     mapping(address => mapping(uint => uint)) userList;
 
     /**
+     * @dev Emitted whenever the userList is edited
+     */
+    event UserListEdit(
+        address msg_sender,
+        address indexed user,
+        uint indexed key,
+        uint value
+    );
+
+    /**
      * @dev Emitted whenever a transaction is authorized by the 'check()' function
      */
     event Authorised(
@@ -63,11 +73,12 @@ contract ConstraintsLogic {
      * @return true is the edit was successful
      */
     function editUserList(address user, uint key, uint value)
-        onlyConstraintEditor
-        public
-        returns (bool)
+    onlyConstraintEditor
+    public
+    returns (bool)
     {
         userList[user][key] = value;
+        emit UserListEdit(msg.sender, user, key, value);
         return true;
     }
 

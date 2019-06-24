@@ -2,8 +2,8 @@ pragma solidity 0.5.0;
 
 interface ConstraintsInterface {
 
+    event UserListEdit(address msg_sender, address user, uint key, uint value);
     event Authorised(address msg_sender, address from, address to, uint256 value);
-
 
     function editUserList(address user, uint key, uint value) external;
 
