@@ -103,16 +103,17 @@ interface CompliantTokenInterface {
     event AdminLogicUpdate(address msg_sender, address newLogic);
 
 
-
     // Burnable
 
     /*
-    function destroy(address target, uint256 amount) onlyBurner public {
+
+  function destroy(address target, uint256 amount) onlyBurner public {
         _burn(target, amount);
     }
     */
     function destroy(address target, uint256 amount) external;
 
+    event Destroyed(address indexed msg_sender, address indexed target, uint amount);
 
 
 

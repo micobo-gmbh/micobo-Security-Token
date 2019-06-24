@@ -43,6 +43,15 @@ contract CompliantToken is ERC20Capped, Pausable {
     );
 
     /**
+     * @dev Emitted whenever the destroy function is successfully called
+     */
+    event Destroyed(
+        address indexed msg_sender,
+        address indexed target,
+        uint amount
+    );
+
+    /**
      * @param name name of the token
      * @param symbol token symbol
      * @param decimals token decimals
@@ -183,6 +192,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      */
     function destroy(address target, uint256 amount) onlyBurner public {
         _burn(target, amount);
+        emit Destroyed(msg.sender, target, amount);
     }
 
     /**
