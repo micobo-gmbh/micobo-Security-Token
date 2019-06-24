@@ -32,6 +32,14 @@ contract AdministrationMaster {
     mapping(uint8 => mapping (address => bool)) _roles;
 
     /**
+     * @dev Emitted whenever the admin logic address is updated
+     */
+    event AdminLogicUpdate(
+        address msg_sender,
+        address newLogic
+    );
+
+    /**
      * @param _impl the address of the admin logic contract
      * @param admin the address of the first ADMIN
      * @dev Sets the address for the administrationLogic contract as well as the first ADMIN
@@ -95,6 +103,7 @@ contract AdministrationMaster {
         returns (bool)
     {
         administrationLogic = newLogic;
+        emit AdminLogicUpdate(msg.sender, newLogic);
         return true;
     }
 
