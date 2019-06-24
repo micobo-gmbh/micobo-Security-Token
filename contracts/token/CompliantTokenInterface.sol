@@ -100,6 +100,8 @@ interface CompliantTokenInterface {
     */
     function mint(address to, uint256 value) external returns (bool);
 
+    event AdminLogicUpdate(address msg_sender, address newLogic);
+
 
 
     // Burnable
@@ -115,11 +117,6 @@ interface CompliantTokenInterface {
 
 
     // Pausable
-
-    /*
-    event Paused(address account);
-    event Unpaused(address account);
-    */
 
     /*
     bool private _paused;

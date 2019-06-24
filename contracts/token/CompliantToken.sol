@@ -34,6 +34,15 @@ contract CompliantToken is ERC20Capped, Pausable {
     uint8 private _decimals;
 
     /**
+     * @dev Emitted whenever the mint function is successfully called
+     */
+    event Minted(
+        address indexed msg_sender,
+        address indexed to,
+        uint value
+    );
+
+    /**
      * @param name name of the token
      * @param symbol token symbol
      * @param decimals token decimals
@@ -160,6 +169,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      */
     function mint(address to, uint256 value) onlyMinter public {
         super._mint(to, value);
+        emit Minted(msg.sender, to , value);
     }
 
     /**
