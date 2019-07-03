@@ -23,7 +23,7 @@ const HDWalletProvider = require('truffle-hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 
 const fs = require('fs');
-const mnemonic = fs.readFileSync(".test_mnemonic").toString().trim();
+const mnemonic = fs.readFileSync(".mnemonic").toString().trim();
 
 module.exports = {
 	/**
@@ -43,6 +43,7 @@ module.exports = {
 		// tab if you use this network and you must also set the `host`, `port` and `network_id`
 		// options below to some value.
 
+
 		development: {
 			provider: () => {
 
@@ -55,6 +56,7 @@ module.exports = {
 			gas: 8000000,
 		},
 
+		// this network is used only for testing, the migration scripts will be skipped
 		test: {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "http://localhost:8545", 0, 3);
@@ -63,6 +65,7 @@ module.exports = {
 			gas: 8000000,
 		},
 
+		// this network is specifically for the eth_gas_reporter
 		gas_report: {
 			host: '127.0.0.1',
 			port: 7545,

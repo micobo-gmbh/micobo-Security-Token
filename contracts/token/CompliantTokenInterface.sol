@@ -100,7 +100,7 @@ interface CompliantTokenInterface {
     */
     function mint(address to, uint256 value) external returns (bool);
 
-    event AdminLogicUpdate(address msg_sender, address newLogic);
+    event Minted(address indexed msg_sender, address indexed to, uint value);
 
 
     // Burnable
