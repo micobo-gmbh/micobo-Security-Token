@@ -22,17 +22,17 @@ contract AdministrationLogic {
     /**
      * @dev Emitted whenever a new role was assigned to an account
      */
-    event RoleAdded(uint8 role, address account);
+    event RoleAdded(uint8 indexed role, address indexed account);
 
     /**
      * @dev Emitted whenever a role was taken from an account
      */
-    event RoleRemoved(uint8 role, address account);
+    event RoleRemoved(uint8 indexed role, address indexed account);
 
     /**
      * @dev Emitted whenever an account renounced a role
      */
-    event RoleRenounced(uint8 role, address account);
+    event RoleRenounced(uint8 indexed role, address indexed account);
 
     /**
      * @dev Enum provides uint8 values corresponding to a Role
