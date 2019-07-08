@@ -73,9 +73,9 @@ contract ConstraintsLogic {
      * @return true is the edit was successful
      */
     function editUserList(address user, uint key, uint value)
-    onlyConstraintEditor
-    public
-    returns (bool)
+        onlyConstraintEditor
+        public
+        returns (bool)
     {
         userList[user][key] = value;
         emit UserListEdit(msg.sender, user, key, value);
