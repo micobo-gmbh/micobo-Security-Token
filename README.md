@@ -18,7 +18,7 @@ There are 4 main components:
 #
 ### Architecture
 
-![architecture](resources/Architecture.jpg "Architecture")
+![architecture](./resources/Architecture.jpg "Architecture")
 
 
 #
