@@ -1,4 +1,4 @@
-## European Security Token - EST
+## European Security Token
 
 ### Components
 
@@ -20,6 +20,7 @@ There are 4 main components:
 
 ![architecture](resources/Architecture.jpg "Architecture")
 
+
 #
 #
 ## Tests
@@ -35,7 +36,6 @@ Use the test script to run all tests:
 ```
 npm run test
 ```
-#
 
 #### Gas report
 
@@ -103,27 +103,28 @@ This gives us the ability to update the logic contract whenever we want!
 We can identify these main interactions:  
 
 **User Interaction**  
-    1. transfer tokens  
+    1. transfer token  
     2. claim dividend
  
 **Updates**  
-    3. update CLC   
-    4. update ALC
+    3. update Constraints Logic Contract   
+    4. update Administration Logic Contract
 
 **Admin**  
     5. edit roles  
     6. renounce role  
     7. edit userList (i.e. whitelist)  
     8. minting  
-    9. pausing and unpausing
+    9. pausing and unpausing  
+    10. burning
     
 
 ##
-#### 1. transfer tokens
+#### 1. transfer token
 
 Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the master contract (here Master Contract)
 
-![transfer_token](./resources/token_transfer.jpg "transfer tokens")
+![transfer_token](./resources/token_transfer.jpg "transfer token")
 
 
 ##
@@ -201,6 +202,19 @@ function pause() external;
 function unpause() external;
 ```
 
+##
+#### 10. burning
+
+Only accounts bearing the role of **BURNER** can burn/destroy tokens:
+```
+function destroy(address target, uint256 amount) external;
+```
+
+
+```destroy()``` calls the internal ERC20 ```_burn()``` function directly.  
+
+It is called destroy to signify its ability to **burn tokens of any user**, not just of the sender's address.   
+ 
 
 #
 ## Gas Consumption
@@ -211,7 +225,8 @@ function unpause() external;
 #### Gas consumption for test cases
 ![est_gas_test](./resources/est_gas_test.png "EST gas tests")
 
-#
+
+#  
 #### Diagrams
 
 All diagrams were made with the free software [draw.io](draw.io)  
