@@ -4,6 +4,7 @@ interface ConstraintsInterface {
 
     event AdminLogicUpdate(address msg_sender, address newLogic);
 
+
     event UserListEdit(address msg_sender, address indexed user, uint indexed key, uint value);
     event Authorised(address indexed msg_sender, address indexed from, address indexed to, uint256 value);
 
@@ -12,11 +13,11 @@ interface ConstraintsInterface {
     function getUserListEntry(address user, uint key) external view returns (uint value);
 
     function check(
-        address _msg_sender,
-        address _from,
-        address _to,
-        uint256 _value
+        address msg_sender,
+        address from,
+        address to,
+        uint256 value
     )
-        external
-        returns (bool authorized, string memory message);
+    external
+    returns (bool authorized, string memory message);
 }

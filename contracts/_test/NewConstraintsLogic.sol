@@ -8,7 +8,7 @@ import "../constraints/ConstraintsInterface.sol";
 contract NewConstraintsLogic is ConstraintsInterface{
 
     // this needs to match the master's storage order
-    address public constraintsLogic;
+    address public _constraintsLogic;
 
     /**
      * @dev The Administration Master Contract
@@ -20,7 +20,7 @@ contract NewConstraintsLogic is ConstraintsInterface{
     * @dev every user has their own mapping that can be filled with information
     * entry keys are uints derived from the `Code` enum and point to uint values which can represent anything
     */
-    mapping(address => mapping(uint => uint)) userList;
+    mapping(address => mapping(uint => uint)) _userList;
 
     event Authorised(
         address msg_sender,
@@ -44,19 +44,19 @@ contract NewConstraintsLogic is ConstraintsInterface{
     }
 
     function editUserList(address user, uint key, uint value) onlyConstraintEditor public returns (bool) {
-        userList[user][key] = value;
+        _userList[user][key] = value;
         return true;
     }
 
     function getUserListEntry(address user, uint key) public view returns (uint value) {
-        return userList[user][key];
+        return _userList[user][key];
     }
 
     function check(
-        address _msg_sender,
-        address _from,
-        address _to,
-        uint256 _value)
+        address msg_sender,
+        address from,
+        address to,
+        uint256 value)
     public returns (
         bool authorized,
         string memory message)
@@ -66,21 +66,21 @@ contract NewConstraintsLogic is ConstraintsInterface{
         // so we return the error message explicitly
 
         // SEND(0) == 1   check if from address can send
-        if (userList[_from][uint(Code.SEND)] == 0) {
+        if (_userList[from][uint(Code.SEND)] == 0) {
             return (false, "_from address cannot send");
         }
 
         // RECEIVE(1) == 1   check if to address can receive
-        if (userList[_to][uint(Code.RECEIVE)] == 0) {
+        if (_userList[to][uint(Code.RECEIVE)] == 0) {
             return (false, "_to address cannot receive");
         }
 
         // SOME_NEW_CODE(2) == 1234   check if this entry is 1234
-        if (userList[_from][uint(Code.SOME_NEW_CODE)] != 1234) {
-        return (false, "some_new_code is not 1234 for _from address, sorry man!");
+        if (_userList[from][uint(Code.SOME_NEW_CODE)] != 1234) {
+            return (false, "some_new_code is not 1234 for _from address, sorry man!");
         }
 
-        emit Authorised(_msg_sender, _from, _to, _value);
+        emit Authorised(msg_sender, from, to, value);
         return (true, "authorized");
     }
 

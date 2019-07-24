@@ -54,6 +54,7 @@ interface CompliantTokenInterface {
 
     function allowance(address owner, address spender) external view returns (uint256);
 
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -100,21 +101,19 @@ interface CompliantTokenInterface {
     */
     function mint(address to, uint256 value) external returns (bool);
 
-    event Minted(address indexed msg_sender, address indexed to, uint value);
+    event Minted(address msg_sender, address newLogic);
 
 
     // Burnable
 
     /*
-
-  function destroy(address target, uint256 amount) onlyBurner public {
-        _burn(target, amount);
+    function destroy(address target, uint256 value) onlyBurner public {
+        _burn(target, value);
     }
     */
-    function destroy(address target, uint256 amount) external;
+    function destroy(address target, uint256 value) external;
 
-    event Destroyed(address indexed msg_sender, address indexed target, uint amount);
-
+    event Destroyed(address indexed msg_sender, address indexed target, uint value);
 
 
     // Pausable

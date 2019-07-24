@@ -48,7 +48,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     event Destroyed(
         address indexed msg_sender,
         address indexed target,
-        uint amount
+        uint value
     );
 
     /**
@@ -71,8 +71,8 @@ contract CompliantToken is ERC20Capped, Pausable {
         ConstraintsInterface constraints,
         AdministrationInterface admin
     )
-        ERC20Capped(cap)
-        public
+    ERC20Capped(cap)
+    public
     {
         _name = name;
         _symbol = symbol;
@@ -135,9 +135,9 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @return true if the transfer succeeded
      */
     function transfer(address to, uint256 value)
-        whenNotPaused
-        public
-        returns (bool)
+    whenNotPaused
+    public
+    returns (bool)
     {
         (bool success, string memory message) = _constraints.check(msg.sender, msg.sender, to, value);
 
@@ -156,9 +156,9 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @return true if the transfer succeeded
      */
     function transferFrom(address from, address to, uint256 value)
-        whenNotPaused
-        public
-        returns (bool)
+    whenNotPaused
+    public
+    returns (bool)
     {
         (bool success, string memory message) = _constraints.check(msg.sender, from, to, value);
 
@@ -183,16 +183,16 @@ contract CompliantToken is ERC20Capped, Pausable {
 
     /**
      * @param target the address from which tokens are burned
-     * @param amount the amount to be burned
+     * @param value the amount to be burned
      * @dev Exposes _burn function adding onlyBurner modifier
      *
      * it is called 'destroy' to signify its ability to burn tokens of any address!
      *
      * See `ERC20._burn`.
      */
-    function destroy(address target, uint256 amount) onlyBurner public {
-        _burn(target, amount);
-        emit Destroyed(msg.sender, target, amount);
+    function destroy(address target, uint256 value) onlyBurner public {
+        _burn(target, value);
+        emit Destroyed(msg.sender, target, value);
     }
 
     /**

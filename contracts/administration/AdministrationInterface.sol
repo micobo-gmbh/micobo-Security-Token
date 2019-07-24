@@ -4,6 +4,7 @@ interface AdministrationInterface {
 
     event AdminLogicUpdate(address msg_sender, address newLogic);
 
+
     event RoleAdded(uint8 indexed role, address indexed account);
     event RoleRemoved(uint8 indexed role, address indexed account);
     event RoleRenounced(uint8 indexed role, address indexed account);

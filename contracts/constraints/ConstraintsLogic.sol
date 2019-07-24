@@ -12,7 +12,7 @@ contract ConstraintsLogic {
      * @dev this and _admin need to match the master's storage order
      * so they occupy the same storage space
      */
-    address public constraintsLogic;
+    address public _constraintsLogic;
 
     /**
      * @dev The Administration Master Contract
@@ -25,10 +25,10 @@ contract ConstraintsLogic {
      * @dev every user has their own mapping that can be filled with information
      * entry keys are uints derived from the `Code` enum and point to uint values which can represent anything
      */
-    mapping(address => mapping(uint => uint)) userList;
+    mapping(address => mapping(uint => uint)) _userList;
 
     /**
-     * @dev Emitted whenever the userList is edited
+     * @dev Emitted whenever the _userList is edited
      */
     event UserListEdit(
         address msg_sender,
@@ -36,6 +36,7 @@ contract ConstraintsLogic {
         uint indexed key,
         uint value
     );
+
 
     /**
      * @dev Emitted whenever a transaction is authorized by the 'check()' function
@@ -73,11 +74,11 @@ contract ConstraintsLogic {
      * @return true is the edit was successful
      */
     function editUserList(address user, uint key, uint value)
-        onlyConstraintEditor
-        public
-        returns (bool)
+    onlyConstraintEditor
+    public
+    returns (bool)
     {
-        userList[user][key] = value;
+        _userList[user][key] = value;
         emit UserListEdit(msg.sender, user, key, value);
         return true;
     }
@@ -89,22 +90,22 @@ contract ConstraintsLogic {
      * @return the corresponding value from 'userList'
      */
     function getUserListEntry(address user, uint key) public view returns (uint value) {
-        return userList[user][key];
+        return _userList[user][key];
     }
 
     /**
-     * @param _msg_sender sender of the transaction
-     * @param _from the source account of the token transfer
-     * @param _to the target account of the token transfer
-     * @param _value the amount of tokens being transferred
+     * @param msg_sender sender of the transaction
+     * @param from the source account of the token transfer
+     * @param to the target account of the token transfer
+     * @param value the amount of tokens being transferred
      * @dev This function is being called by 'transfer' and 'transferFrom' to check for constraints
      * @return authorized true if all requirements have been met and false if not, message
      */
     function check(
-        address _msg_sender,
-        address _from,
-        address _to,
-        uint256 _value)
+        address msg_sender,
+        address from,
+        address to,
+        uint256 value)
     public returns (
         bool authorized,
         string memory message)
@@ -115,16 +116,16 @@ contract ConstraintsLogic {
         // instead we return the error message explicitly
 
         // SEND(0) == 1   check if from address can send
-        if (userList[_from][uint(Code.SEND)] != 1) {
+        if (_userList[from][uint(Code.SEND)] != 1) {
             return (false, "_from address cannot send");
         }
 
         // RECEIVE(1) == 1   check if to address can receive
-        if (userList[_to][uint(Code.RECEIVE)] != 1) {
+        if (_userList[to][uint(Code.RECEIVE)] != 1) {
             return (false, "_to address cannot receive");
         }
 
-        emit Authorised(_msg_sender, _from, _to, _value);
+        emit Authorised(msg_sender, from, to, value);
         return (true, "authorized");
     }
 

@@ -7,12 +7,12 @@ import "../administration/AdministrationInterface.sol";
 contract NewAdministrationLogic is AdministrationInterface {
 
     // this needs to match the master's storage order
-    address public administrationLogic;
+    address public _administrationLogic;
 
     /**
      * @title _roles
      * @dev mapping for managing addresses assigned to a role.
-     * also cannot be changed, just list administrationLogic
+     * also cannot be changed, just like _administrationLogic
      */
     mapping(uint8 => mapping(address => bool)) _roles;
 

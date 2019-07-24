@@ -10,12 +10,12 @@ contract AdministrationLogic {
      * @dev this needs to match the master's storage order
      * so it occupies the same storage space
      */
-    address public administrationLogic;
+    address public _administrationLogic;
 
     /**
      * @title _roles
      * @dev mapping for managing addresses assigned to a role.
-     * cannot be changed, just like administrationLogic
+     * cannot be changed, just like _administrationLogic
      */
     mapping(uint8 => mapping(address => bool)) _roles;
 

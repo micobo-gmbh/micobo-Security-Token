@@ -11,14 +11,14 @@ interface AdministrationInterfaceForMaster {
 
 /**
  * @author Simon Dosch
- * @title The proxy contract storing the userList mapping and linking to the constraints logic
+ * @title The proxy contract storing the _userList mapping and linking to the constraints logic
  */
 contract ConstraintsMaster {
 
     /**
-     * @dev The Constraints Logic Contract
+     * @dev The Constraints Logic Contract address
      */
-    address private constraintsLogic;
+    address private _constraintsLogic;
 
     /**
      * @dev The Administration Interface used only for this contract
@@ -26,7 +26,7 @@ contract ConstraintsMaster {
     AdministrationInterfaceForMaster public _admin;
 
     /**
-     * @dev Emitted whenever the constraints logic address is updated
+     * @dev Emitted whenever the _constraintsLogic address is updated
      */
     event ConstraintsLogicUpdate(
         address msg_sender,
@@ -34,13 +34,13 @@ contract ConstraintsMaster {
     );
 
     /**
-     * @param _impl the constraints logic address
+     * @param impl the _constraintsLogic address
      * @param adminAddress the admin master(proxy) address
      * @dev Sets the addresses for the ConstraintsLogic and the AdminMaster contract
      * The first can be updated, while the latter cannot be changed later on.
      */
-    constructor (address _impl, AdministrationInterfaceForMaster adminAddress) public {
-        constraintsLogic = _impl;
+    constructor (address impl, AdministrationInterfaceForMaster adminAddress) public {
+        _constraintsLogic = impl;
         _admin = adminAddress;
     }
 
@@ -49,7 +49,7 @@ contract ConstraintsMaster {
      * @return the address of the contract currently set as the ConstraintsLogic contract
      */
     function constraintsLogicAddress() public view returns (address) {
-        return constraintsLogic;
+        return _constraintsLogic;
     }
 
     /**
@@ -86,12 +86,12 @@ contract ConstraintsMaster {
      * We check if there is a real contract at the given address with 'isContract()'
      */
     function updateLogicContract(address newLogic)
-        isContract(newLogic)
-        onlyConstraintsUpdater
-        public
-        returns (bool)
+    isContract(newLogic)
+    onlyConstraintsUpdater
+    public
+    returns (bool)
     {
-        constraintsLogic = newLogic;
+        _constraintsLogic = newLogic;
         emit ConstraintsLogicUpdate(msg.sender, newLogic);
         return true;
     }
@@ -111,7 +111,7 @@ contract ConstraintsMaster {
     function() external {
         require(msg.sig != 0x0, 'no function identifier');
 
-        address _impl = constraintsLogic;
+        address _impl = _constraintsLogic;
 
         assembly {
             let ptr := mload(0x40)
