@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "truffle test --network test",
-		"gas_report": "truffle test --network gas_report",
-		"deploy": "truffle migrate --reset"
+    "gas_report": "truffle test --network gas_report",
+    "deploy": "truffle migrate --reset"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,10 @@
     "openzeppelin-solidity": "^2.3.0"
   },
   "devDependencies": {
-    "eth-gas-reporter": "^0.2.0",
-    "truffle": "^5.0.22",
-    "truffle-security": "^1.5.1",
+    "eth-gas-reporter": "^0.2.6",
+    "truffle": "^5.0.28",
+    "truffle-security": "^1.5.2",
     "truffle-assertions": "^0.8.2",
-    "truffle-hdwallet-provider": "^1.0.10"
+    "truffle-hdwallet-provider": "^1.0.14"
   }
 }
