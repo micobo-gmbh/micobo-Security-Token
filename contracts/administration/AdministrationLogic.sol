@@ -10,7 +10,7 @@ contract AdministrationLogic {
      * @dev this needs to match the master's storage order
      * so it occupies the same storage space
      */
-    address public _administrationLogic;
+    address private _administrationLogic;
 
     /**
      * @title _roles

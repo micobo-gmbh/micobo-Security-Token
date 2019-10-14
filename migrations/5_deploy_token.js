@@ -6,11 +6,6 @@ const config = require('../token-config')
 
 
 module.exports = async (deployer, network) => {
-
-	// Don't execute when only testing
-	if (network === 'test') {
-		return;
-	}
 	
 	let c = await ConstraintsMaster.deployed()
 

@@ -12,7 +12,7 @@ contract ConstraintsLogic {
      * @dev this and _admin need to match the master's storage order
      * so they occupy the same storage space
      */
-    address public _constraintsLogic;
+    address private _constraintsLogic;
 
     /**
      * @dev The Administration Master Contract

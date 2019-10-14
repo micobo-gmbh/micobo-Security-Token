@@ -18,7 +18,7 @@
  *
  */
 
-const HDWalletProvider = require('truffle-hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 // const infuraKey = "fj4jll3k.....";
 
@@ -43,40 +43,12 @@ module.exports = {
 		// tab if you use this network and you must also set the `host`, `port` and `network_id`
 		// options below to some value.
 
-
 		development: {
-			provider: () => {
-
-				// this uses our mnemonic to create a whole wallet of hierarchically deterministic addresses we can use
-				// our default address is address 0 and we create 3 accounts in total (this is sufficent for testing)
-
-				return new HDWalletProvider(mnemonic, "http://localhost:8545", 0, 3);
-			},
+			host: 'localhost',
+			port: '8545',
 			network_id: '*',
-			gas: 8000000,
+			gas: 8000000
 		},
-
-		// this network is used only for testing, the migration scripts will be skipped
-		test: {
-			provider: () => {
-				return new HDWalletProvider(mnemonic, "http://localhost:8545", 0, 3);
-			},
-			network_id: '*',
-			gas: 8000000,
-		},
-
-		// this network is specifically for the eth_gas_reporter
-		gas_report: {
-			host: '127.0.0.1',
-			port: 7545,
-
-			// !!! replace this with your Ganache address
-			from: '0xd905ea0D68005336B11F1902907D167B1E22bAc4',
-			network_id: '*',
-			gas: 6721975,
-    },
-
-
 
 		/*
 		rinkeby: {
@@ -89,7 +61,7 @@ module.exports = {
 		}
 		*/
 
-		
+
 		// Useful for deploying to a public network.
 		// NB: It's important to wrap the provider as a function.
 		// ropsten: {
@@ -124,14 +96,14 @@ module.exports = {
 			version: "0.5.0",    // Fetch exact version from solc-bin (default: truffle's version)
 			docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {          // See the solidity docs for advice about optimization and evmVersion
-			 optimizer: {
-			   enabled: false,
-			   runs: 200
-			 },
-			 evmVersion: "byzantium"
+				optimizer: {
+					enabled: false,
+					runs: 200
+				},
+				evmVersion: "byzantium"
 			}
 		}
 	},
 
-	plugins: [ "truffle-security" ]
+	plugins: ["truffle-security"]
 }
