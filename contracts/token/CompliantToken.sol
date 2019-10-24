@@ -3,14 +3,19 @@ pragma solidity 0.5.0;
 import './ERC20Capped.sol';
 import './Pausable.sol';
 
-import "../constraints/ConstraintsInterface.sol";
-import "../administration/AdministrationInterface.sol";
+import '../constraints/ConstraintsInterface.sol';
+import '../administration/AdministrationInterface.sol';
+
+import 'openzeppelin-solidity/contracts/introspection/IERC1820Registry.sol';
+
 
 /**
  * @author Simon Dosch
  * @title The main token contract
  */
 contract CompliantToken is ERC20Capped, Pausable {
+
+    IERC1820Registry constant private ERC1820_REGISTRY = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
 
     /**
      * @dev The Constraints Master Contract
@@ -80,6 +85,8 @@ contract CompliantToken is ERC20Capped, Pausable {
 
         _constraints = constraints;
         _admin = admin;
+
+        ERC1820_REGISTRY.setInterfaceImplementer(address(this), keccak256("ERC20Token"), address(this));
     }
 
     /**
