@@ -113,7 +113,7 @@ We can identify these main interactions:
 **Admin**  
     5. edit roles  
     6. renounce role  
-    7. edit userList (i.e. whitelist)  
+    7. edit constraintsList (i.e. whitelist)  
     8. minting  
     9. pausing and unpausing  
     10. burning
@@ -172,16 +172,16 @@ function renounce(uint8 role) public
 ```
 
 ##
-#### 7. edit userList (whitelist)
+#### 7. edit constraintsList (whitelist)
 
-An authorized actor can make changes in the userList mapping of the CLC.  
+An authorized actor can make changes in the constraintsList mapping of the CLC.  
 For example, an addition to the whitelist can be made by calling the 
 ```
 editUserList(address user, uint key, uint value)
 ```
 function in the CLC like this:
 
-![userlist_edit](./resources/userlist_edit.jpg "edit userList (whitelist)")
+![userlist_edit](./resources/userlist_edit.jpg "edit constraintsList (whitelist)")
 
 ##
 #### 8. minting

@@ -24,7 +24,7 @@ contract('Test Constraint Contract', async (accounts) => {
 	})
 
 
-	it("can edit and get userList entries when ConstraintsEditor", async () => {
+	it("can edit and get constraintsList entries when ConstraintsEditor", async () => {
 
 		// should fail because is not ConstraintsEditor
 		await truffleAssert.fails(
@@ -39,7 +39,7 @@ contract('Test Constraint Contract', async (accounts) => {
 			contracts.constraintsInterface.editUserList(accounts[0], Code.SEND, 1, {from: constraintsEditor})
 		)
 
-		// The master's UserList entry "0" is "1", after being changed by the logic lib using "delegatecall"
+		// The master's constraintsList entry "0" is "1", after being changed by the logic lib using "delegatecall"
 		assert.deepEqual(
 			(await contracts.constraintsInterface.getUserListEntry(accounts[0], Code.SEND)).toString(10),
 			'1'

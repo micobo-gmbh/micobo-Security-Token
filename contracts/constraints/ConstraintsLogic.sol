@@ -22,17 +22,17 @@ contract ConstraintsLogic {
 
 
     /**
-     * @dev every user has their own mapping that can be filled with information
+     * @dev every account has their own mapping that can be filled with information
      * entry keys are uints derived from the `Code` enum and point to uint values which can represent anything
      */
-    mapping(address => mapping(uint => uint)) _userList;
+    mapping(address => mapping(uint => uint)) _constraintsList;
 
     /**
-     * @dev Emitted whenever the _userList is edited
+     * @dev Emitted whenever the _constraintsList is edited
      */
-    event UserListEdit(
+    event ConstraintsListEdit(
         address msg_sender,
-        address indexed user,
+        address indexed account,
         uint indexed key,
         uint value
     );
@@ -67,30 +67,32 @@ contract ConstraintsLogic {
     }
 
     /**
-     * @param user the address for which information is being added
+     * @param account the address for which information is being added
      * @param key the key to bbe edited
      * @param value the new value
-     * @dev This function allows the modification of the 'userList'
+     * @dev This function allows the modification of the '_constraintsList'
      * @return true is the edit was successful
      */
-    function editUserList(address user, uint key, uint value)
+    function editConstraintsList(address account, uint key, uint value)
     onlyConstraintEditor
     public
     returns (bool)
     {
-        _userList[user][key] = value;
-        emit UserListEdit(msg.sender, user, key, value);
+        _constraintsList[account][key] = value;
+        emit ConstraintsListEdit(msg.sender, account, key, value);
         return true;
     }
 
+
+
     /**
-     * @param user the account that is being queried
+     * @param account the account that is being queried
      * @param key the key that is being queried
-     * @dev Returns the value to the given key and user from 'userList'
-     * @return the corresponding value from 'userList'
+     * @dev Returns the value to the given key and address from '_constraintsList'
+     * @return the corresponding value from '_constraintsList'
      */
-    function getUserListEntry(address user, uint key) public view returns (uint value) {
-        return _userList[user][key];
+    function getUserListEntry(address account, uint key) public view returns (uint value) {
+        return _constraintsList[account][key];
     }
 
     /**
@@ -116,12 +118,12 @@ contract ConstraintsLogic {
         // instead we return the error message explicitly
 
         // SEND(0) == 1   check if from address can send
-        if (_userList[from][uint(Code.SEND)] != 1) {
+        if (_constraintsList[from][uint(Code.SEND)] != 1) {
             return (false, "_from address cannot send");
         }
 
         // RECEIVE(1) == 1   check if to address can receive
-        if (_userList[to][uint(Code.RECEIVE)] != 1) {
+        if (_constraintsList[to][uint(Code.RECEIVE)] != 1) {
             return (false, "_to address cannot receive");
         }
 
