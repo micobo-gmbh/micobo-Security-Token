@@ -6,14 +6,15 @@ import './Pausable.sol';
 import '../constraints/ConstraintsInterface.sol';
 import '../administration/AdministrationInterface.sol';
 
-import 'openzeppelin-solidity/contracts/introspection/IERC1820Registry.sol';
+import '@openzeppelin/contracts/introspection/IERC1820Registry.sol';
+import "@openzeppelin/contracts/GSN/GSNRecipient.sol";
 
 
 /**
  * @author Simon Dosch
  * @title The main token contract
  */
-contract CompliantToken is ERC20Capped, Pausable {
+contract CompliantToken is ERC20Capped, Pausable, GSNRecipient {
 
     IERC1820Registry constant private ERC1820_REGISTRY = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
 
@@ -93,7 +94,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @dev Modifier to make a function callable only when the calles is a PAUSER
      */
     modifier onlyPauser() {
-        require(_admin.isPauser(msg.sender), 'only PAUSER allowed');
+        require(_admin.isPauser(_msgSender()), 'only PAUSER allowed');
         _;
     }
 
@@ -101,7 +102,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @dev Modifier to make a function callable only when the calles is a MINTER
      */
     modifier onlyMinter() {
-        require(_admin.isMinter(msg.sender), 'only MINTER allowed');
+        require(_admin.isMinter(_msgSender()), 'only MINTER allowed');
         _;
     }
 
@@ -109,8 +110,24 @@ contract CompliantToken is ERC20Capped, Pausable {
      * @dev Modifier to make a function callable only when the calles is a BURNER
      */
     modifier onlyBurner() {
-        require(_admin.isBurner(msg.sender), 'only BURNER allowed');
+        require(_admin.isBurner(_msgSender()), 'only BURNER allowed');
         _;
+    }
+
+    // GSN
+    // accept all requests
+    function acceptRelayedCall(
+        address,
+        address,
+        bytes calldata,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        bytes calldata,
+        uint256
+    ) external view returns (uint256, bytes memory) {
+        return _approveRelayedCall();
     }
 
     /**
@@ -146,7 +163,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     public
     returns (bool)
     {
-        (bool success, string memory message) = _constraints.check(msg.sender, msg.sender, to, value);
+        (bool success, string memory message) = _constraints.check(_msgSender(), _msgSender(), to, value);
 
         // check the constraints contract, if this transfer is valid
         require(success, message);
@@ -167,7 +184,7 @@ contract CompliantToken is ERC20Capped, Pausable {
     public
     returns (bool)
     {
-        (bool success, string memory message) = _constraints.check(msg.sender, from, to, value);
+        (bool success, string memory message) = _constraints.check(_msgSender(), from, to, value);
 
         // check the constraints contract, if this transfer is valid
         require(success, message);
@@ -185,7 +202,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      */
     function mint(address to, uint256 value) onlyMinter public {
         super._mint(to, value);
-        emit Minted(msg.sender, to , value);
+        emit Minted(_msgSender(), to , value);
     }
 
     /**
@@ -199,7 +216,7 @@ contract CompliantToken is ERC20Capped, Pausable {
      */
     function destroy(address target, uint256 value) onlyBurner public {
         _burn(target, value);
-        emit Destroyed(msg.sender, target, value);
+        emit Destroyed(_msgSender(), target, value);
     }
 
     /**

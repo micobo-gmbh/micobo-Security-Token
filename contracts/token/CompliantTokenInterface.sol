@@ -44,6 +44,7 @@ interface CompliantTokenInterface {
 
     function transfer(address to, uint256 value) external returns (bool);
 
+    // TODO this is not implemented!
     function approve(address spender, uint256 value) external returns (bool);
 
     function transferFrom(address from, address to, uint256 value) external returns (bool);

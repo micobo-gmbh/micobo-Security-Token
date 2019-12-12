@@ -22,7 +22,7 @@
   },
   "homepage": "europeansecuritytoken.com",
   "dependencies": {
-    "openzeppelin-solidity": "^2.3.0"
+    "@openzeppelin/contracts": "^2.4.0"
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "^1.0.21",
