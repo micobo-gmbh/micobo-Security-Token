@@ -1,17 +1,21 @@
-pragma solidity 0.5.0;
+pragma solidity ^0.5.0;
 
-/**
- * @author openzeppelin
- * @title Pausable
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-contract Pausable {
+import "../IConstraintsModule.sol";
+import "../../ISecurityToken.sol";
+
+contract OffChainValidator is IConstraintsModule {
+
+    // TODO
+
+    string private module_name;
+
+    event Authorised(
+        address msg_sender,
+        address from,
+        address to,
+        uint256 value,
+        string module_name
+    );
 
     /**
      * @dev Emitted when the pause is triggered by a pauser (`account`).
@@ -26,14 +30,45 @@ contract Pausable {
     bool private _paused;
 
 
-    /**
-     * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-     * to the deployer.
-     */
-    constructor () internal {
+    address _owner;
+
+    ISecurityToken _token;
+
+    constructor(
+        address owner,
+        ISecurityToken tokenAddress
+    ) public {
+        _owner = owner;
+        _token = tokenAddress;
         _paused = false;
     }
 
+    function isValid(
+        address msg_sender,
+        bytes32 partition,
+        address operator,
+        address from,
+        address to,
+        uint256 value,
+        bytes memory data,
+        bytes memory operatorData
+    )
+    public
+    view
+    returns (
+        bool valid,
+        string memory message
+    )
+    {
+
+        require(!_paused);
+
+        return (valid, message);
+    }
+
+
+
+    // MODULE FUNCTIONS
 
     /**
      * @dev Returns true if the contract is paused, and false otherwise.
@@ -62,6 +97,7 @@ contract Pausable {
      * @dev Called by a pauser to pause, triggers stopped state.
      */
     function pause() public whenNotPaused {
+        require(_token.hasRole(3, msg.sender));
         _paused = true;
         emit Paused(msg.sender);
     }
@@ -70,10 +106,9 @@ contract Pausable {
      * @dev Called by a pauser to unpause, returns to normal state.
      */
     function unpause() public whenPaused {
+        require(_token.hasRole(3, msg.sender));
         _paused = false;
         emit Unpaused(msg.sender);
     }
+
 }
-
-
-

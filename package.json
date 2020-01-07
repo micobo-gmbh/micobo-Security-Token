@@ -22,7 +22,8 @@
   },
   "homepage": "europeansecuritytoken.com",
   "dependencies": {
-    "@openzeppelin/contracts": "^2.4.0"
+    "@openzeppelin/contracts": "^2.4.0",
+    "erc1820": "^0.0.2"
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "^1.0.21",
