@@ -2,12 +2,15 @@ pragma solidity 0.5.0;
 
 
 import "@openzeppelin/contracts/GSN/GSNRecipient.sol";
-
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "./ISecurityToken.sol";
 import "./tokens/IERC1400Raw.sol";
 
-contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
+contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
+
+    using SafeMath for uint256;
 
     ISecurityToken _securityToken;
 
@@ -17,9 +20,9 @@ contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
     mapping(address => mapping(address => uint256)) internal _allowed;
 
 
-    constructor(ISecurityToken securityTokenAddress, bytes32 partitionId) public {
+    constructor(address securityTokenAddress, bytes32 partitionId) public {
 
-        _securityToken = securityTokenAddress;
+        _securityToken = ISecurityToken(securityTokenAddress);
         _partitionId = partitionId;
     }
 
@@ -59,7 +62,7 @@ contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
 
     function transferFrom(address from, address to, uint256 value) external returns (bool) {
         // check if is operator by partition or has enough allowance here
-        require(_securityToken._isOperatorForPartition(_partitionId, _msgSender(), from)
+        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from)
             || (value <= _allowed[from][_msgSender()]), "A7");
         // Transfer Blocked - Identity restriction
 
@@ -103,7 +106,7 @@ contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
     // ERC20  function balanceOf(address owner) external view returns (uint256); // 4/13
 
     function granularity() external view returns (uint256) {
-        return _securityToken.granularity;
+        return _securityToken.granularity();
     }
 
     function controllers() external view returns (address[] memory) {
@@ -133,7 +136,7 @@ contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
     external
     {
         // check if is operator by partition or has enough allowance here
-        require(_securityToken._isOperatorForPartition(_partitionId, _msgSender(), from)
+        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from)
             || (value <= _allowed[from][_msgSender()]), "A7");
         // Transfer Blocked - Identity restriction
 
@@ -168,6 +171,32 @@ contract SecurityTokenERC20Partition is IERC20, IERC1400Raw, GSNRecipient {
     event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
+
+
+    // GSN
+
+    function acceptRelayedCall(
+        address relay,
+        address from,
+        bytes calldata encodedFunction,
+        uint256 transactionFee,
+        uint256 gasPrice,
+        uint256 gasLimit,
+        uint256 nonce,
+        bytes calldata approvalData,
+        uint256 maxPossibleCharge
+    ) external view returns (uint256, bytes memory) {
+        // TODO zero means accepting --> add some constraints
+        return(0, "");
+    }
+
+    function _preRelayedCall(bytes memory context) internal returns (bytes32) {
+        return "";
+    }
+
+    function _postRelayedCall(bytes memory context, bool success, uint256 actualCharge, bytes32 preRetVal) internal {
+
+    }
 }
 
 

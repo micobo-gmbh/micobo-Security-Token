@@ -1,7 +1,7 @@
 {
-  "name": "european-security-token",
-  "version": "0.1.0",
-  "description": "EST - European Security Token",
+  "name": "security-token",
+  "version": "0.2.0",
+  "description": "micobo security token",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/micoboteam/european-security-token.git"
+    "url": "git+ssh://git@gitlab.com/micoboteam/security-token.git"
   },
   "author": "Simon Dosch",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com:micoboteam/european-security-token/issues"
+    "url": "https://gitlab.com:micoboteam/security-token/issues"
   },
-  "homepage": "europeansecuritytoken.com",
+  "homepage": "",
   "dependencies": {
     "@openzeppelin/contracts": "^2.4.0",
     "erc1820": "^0.0.2"

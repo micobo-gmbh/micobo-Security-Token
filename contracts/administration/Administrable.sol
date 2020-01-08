@@ -34,7 +34,7 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
     mapping(uint8 => mapping(address => bool)) internal _roles;
 
     // Array of controllers. [GLOBAL - NOT TOKEN-HOLDER-SPECIFIC]
-    // @dev We only ADD role 0 holders to this Array. Look up entries to see if they are still ADMIN
+    // @dev We only ADD role 0 holders to this Array. Look up entries to see if they are still CONTROLLER
     address[] internal _controllers;
 
     /**
@@ -61,6 +61,9 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
     }
 
     constructor (address[] memory controllers) public {
+        for (uint i = 0; i < controllers.length; i++) {
+            _add(1, controllers[i]);
+        }
         _controllers = controllers;
     }
 
@@ -103,8 +106,8 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
         require(account != address(0), 'zero address');
         require(!hasRole(role, account), 'account already has this role');
 
-        // TODO right now we only add to the _controllers array. Maybe find a way to also delete entries dynamically
-        if(role == 0) {
+        // we only add here, controllers view function checks for entry validity
+        if (role == 1) {
             _controllers.push(account);
         }
 
@@ -141,4 +144,29 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
         return _roles[role][account];
     }
 
+
+    // GSN
+
+    function acceptRelayedCall(
+        address relay,
+        address from,
+        bytes calldata encodedFunction,
+        uint256 transactionFee,
+        uint256 gasPrice,
+        uint256 gasLimit,
+        uint256 nonce,
+        bytes calldata approvalData,
+        uint256 maxPossibleCharge
+    ) external view returns (uint256, bytes memory) {
+        // TODO zero means accepting --> add some constraints
+        return(0, "");
+    }
+
+    function _preRelayedCall(bytes memory context) internal returns (bytes32) {
+        return "";
+    }
+
+    function _postRelayedCall(bytes memory context, bool success, uint256 actualCharge, bytes32 preRetVal) internal {
+
+    }
 }

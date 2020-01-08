@@ -5,7 +5,6 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "erc1820/contracts/ERC1820Client.sol";
 
 import "./IERC1400Raw.sol";
@@ -18,7 +17,8 @@ import "../constraints/Constrainable.sol";
  * @dev ERC1400Raw logic
  */
 
-// TODO do we really need the Sender - Recipient stuff?
+// TODO do we need the Sender - Recipient check?
+// keep it for now
 
 contract ERC1400Raw is
 IERC1400Raw,
@@ -149,7 +149,15 @@ ERC1820Client
      * @return List of addresses of all the controllers.
      */
     function controllers() external view returns (address[] memory) {
-        return _controllers;
+        address[] memory controllers = _controllers;
+
+        // only return active entries (we only add to _controllers in Administrable)
+        for(uint i = 0; i < _controllers.length; i++) {
+            if(hasRole(1, _controllers[i])) {
+                delete controllers[i];
+            }
+        }
+        return controllers;
     }
 
     /**

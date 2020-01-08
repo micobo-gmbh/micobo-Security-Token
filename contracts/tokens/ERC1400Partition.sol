@@ -47,13 +47,13 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
   // Mapping from partition to controllers for the partition. [NOT TOKEN-HOLDER-SPECIFIC]
   mapping (bytes32 => address[]) internal _controllersByPartition;
 
-  // TODO how can we deal with this? bring it into Administrable?
   // --> we can leave this here, partition controllers can be set by the admin just like other roles
-  // we could still put this array in Administrable
-
   // Mapping from (partition, operator) to PartitionController status. [NOT TOKEN-HOLDER-SPECIFIC]
   mapping (bytes32 => mapping (address => bool)) internal _isControllerByPartition;
   /****************************************************************************/
+
+
+  SecurityTokenPartition[] internal _partitionProxies;
 
   /**
    * [ERC1400Partition CONSTRUCTOR]
@@ -79,17 +79,33 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     ERC1400Raw(name, symbol, granularity, controllers, certificateSigner)
   {
     _defaultPartitions = defaultPartitions;
+
+    for (uint i = 0; i < defaultPartitions.length; i++) {
+      addPartition(defaultPartitions[i]);
+    }
   }
 
-  // for ERC20 compatibilityx via proxy
-  function totalSupplyByPartition (bytes32 partition) public returns (uint256) {
-    return _totalSupplyByPartition(partition);
+  /********************** NEW FUNCTIONS **************************/
+
+  // for ERC20 compatibility via proxy
+  function totalSupplyByPartition (bytes32 partition) public view returns (uint256) {
+    return _totalSupplyByPartition[partition];
   }
 
-  function addPartition (bytes32 partition) public returns (address partitionAddress) {
-    // TODO
-    // add to partition array etc
-    // return new SecurityTokenPartition(address(this), partition);
+  // add a new Partition proxy contract
+  function addPartition (bytes32 partition) onlyRole(0) public returns (SecurityTokenPartition partitionAddress) {
+    // partition is added to _totalPartitions when tokens are being added (i.e. minted) to it
+
+    return _addPartition(partition);
+  }
+
+  function _addPartition (bytes32 partition) internal returns (SecurityTokenPartition newPartition) {
+
+    newPartition = new SecurityTokenPartition(address(this), partition);
+
+    _partitionProxies.push(newPartition);
+
+    return newPartition;
   }
 
   /********************** ERC1400Partition EXTERNAL FUNCTIONS **************************/

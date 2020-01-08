@@ -1,15 +1,10 @@
 /*
-	Test if all contracts can be deployed and are linked correctly
+	Test if all contracts can be deployed
  */
 
-const ConstraintsLogic = artifacts.require('ConstraintsLogic')
-const ConstraintsMaster = artifacts.require('ConstraintsMaster')
-const ConstraintsInterface = artifacts.require('ConstraintsInterface')
-const CompliantToken = artifacts.require('CompliantToken')
-const CompliantTokenInterface = artifacts.require('CompliantTokenInterface')
-const AdministrationInterface = artifacts.require('AdministrationInterface')
-const AdministrationLogic = artifacts.require('AdministrationLogic')
-const AdministrationMaster = artifacts.require('AdministrationMaster')
+const ERC1400ERC20 = artifacts.require('ERC1400ERC20')
+const ISecurityToken = artifacts.require('ISecurityToken')
+const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 
 const conf = require('../token-config');

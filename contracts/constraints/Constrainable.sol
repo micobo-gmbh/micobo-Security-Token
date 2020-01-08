@@ -74,12 +74,9 @@ contract Constrainable is Administrable {
     }
 
     /**
-     * @dev we are not going to have too many entries in this array,
-     * so simply replacing the whole thing is easier than deleting from an array
-     * only ADMIN
-     // TODO acutally let's implement a delete function like in ERC1400Partition
+     * Adding a constraint module
      */
-    function addModule(IConstraintsModule module) onlyRole(0) public {
+    function addModule(IConstraintsModule module) onlyRole(6) public {
 
         /**
          * @dev See if the new address is home to a contract
@@ -95,5 +92,19 @@ contract Constrainable is Administrable {
         require(length > 0, 'no contract at this address');
 
         _modules.push(module);
+    }
+
+    /**
+     * Removing a constraint module
+     */
+    function removeModule(uint256 index) onlyRole(6) public {
+
+        if (index >= _modules.length) return;
+
+        // replace selected module with last one
+        _modules[index] = _modules[_modules.length - 1];
+
+        // delete now duplicate last entry and shorten array
+        _modules.length--;
     }
 }

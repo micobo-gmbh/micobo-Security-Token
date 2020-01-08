@@ -16,8 +16,6 @@ import "./ERC1400ERC20Capped.sol";
  */
 contract ERC1400ERC20 is IERC20, ERC1400ERC20Capped {
 
-  // TODO maybe add old mint function that only mints the first defaultPartition
-
   // Mapping from (tokenHolder, spender) to allowed value.
   mapping (address => mapping (address => uint256)) internal _allowed;
 

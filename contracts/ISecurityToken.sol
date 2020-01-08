@@ -79,6 +79,9 @@ interface ISecurityToken {
     //******************/
     // ERC1400Partition INTERFACE
 
+    // New
+    function totalSupplyByPartition (bytes32 partition) external view returns (uint256);
+
     // Token Information
     function balanceOfByPartition(bytes32 partition, address tokenHolder) external view returns (uint256); // 1/10
     function partitionsOf(address tokenHolder) external view returns (bytes32[] memory); // 2/10
@@ -176,14 +179,12 @@ interface ISecurityToken {
 
     function modules() external view returns (IConstraintsModule[] memory);
     function addModule(IConstraintsModule module) external;
-    function removeModule(uint256 index) external; // TODO
+    function removeModule(uint256 index) external;
 
 
     //******************/
     // GSNRecipient INTERFACE
     //******************/
-
-    // TODO configure this
 
     function getHubAddr() external view returns (address);
 
