@@ -234,7 +234,6 @@ contract ERC1400 is IERC1400, ERC1400Partition {
     )
     internal
     view
-    isValidTransaction(partition, operator, from, to, value, data, operatorData)
     returns (byte, bytes32, bytes32)
     {
         if (!_isOperatorForPartition(partition, operator, from))
@@ -248,6 +247,9 @@ contract ERC1400 is IERC1400, ERC1400Partition {
         if (to == address(0))
             return (hex"A6", "", partition);
         // Transfer Blocked - Receiver not eligible
+
+        validateTransaction(partition, operator, from, to, value, data, operatorData);
+
 
         address senderImplementation;
         address recipientImplementation;

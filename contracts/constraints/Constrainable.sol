@@ -19,28 +19,8 @@ contract Constrainable is Administrable {
     // we need to keep this modifier open though, so the internal transfer functions can dynamically use this
     // even when some variables remain empty
 
-    modifier isValidTransaction(
-        bytes32 partition,
-        address operator,
-        address from,
-        address to,
-        uint256 value,
-        bytes memory data,
-        bytes memory operatorData
-    ) {
-        callConstraintModules(
-            partition,
-            operator,
-            from,
-            to,
-            value,
-            data,
-            operatorData
-        );
-        _;
-    }
 
-    function callConstraintModules(
+    function validateTransaction(
         bytes32 partition,
         address operator,
         address from,

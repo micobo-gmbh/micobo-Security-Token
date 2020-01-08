@@ -328,7 +328,6 @@ ERC1820Client
         bool preventLocking
     )
     internal
-    isValidTransaction(partition, operator, from, to, value, data, operatorData)
     nonReentrant
     {
         require(_isMultiple(value), "A9");
@@ -337,6 +336,9 @@ ERC1820Client
         // Transfer Blocked - Receiver not eligible
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
+
+        validateTransaction(partition, operator, from, to, value, data, operatorData);
+
 
         _callSender(partition, operator, from, to, value, data, operatorData);
 
@@ -362,7 +364,6 @@ ERC1820Client
     internal
     nonReentrant
     onlyRole(4)
-    isValidTransaction(partition, operator, from, address(0), value, data, operatorData)
     {
         require(_isMultiple(value), "A9");
         // Transfer Blocked - Token granularity
@@ -370,6 +371,9 @@ ERC1820Client
         // Transfer Blocked - Sender not eligible
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
+
+        validateTransaction(partition, operator, from, address(0), value, data, operatorData);
+
 
         _callSender(partition, operator, from, address(0), value, data, operatorData);
 
@@ -470,12 +474,14 @@ ERC1820Client
     internal
     nonReentrant
     onlyRole(2)
-    isValidTransaction(partition, operator, address(0), to, value, data, operatorData)
     {
         require(_isMultiple(value), "A9");
         // Transfer Blocked - Token granularity
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
+
+        validateTransaction(partition, operator, address(0), to, value, data, operatorData);
+
 
         _totalSupply = _totalSupply.add(value);
         _balances[to] = _balances[to].add(value);
