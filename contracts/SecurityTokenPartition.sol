@@ -1,20 +1,20 @@
-pragma solidity 0.5.0;
+pragma solidity 0.5.9;
 
+import "../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
+import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "@openzeppelin/contracts/GSN/GSNRecipient.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/ISecurityToken.sol";
+import "./interfaces/IERC1400Raw.sol";
+import "./interfaces/ISecurityTokenPartition.sol";
 
-import "./ISecurityToken.sol";
-import "./tokens/IERC1400Raw.sol";
-
-contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
+contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw, GSNRecipient {
 
     using SafeMath for uint256;
 
-    ISecurityToken _securityToken;
+    ISecurityToken internal _securityToken;
 
-    bytes32 _partitionId;
+    bytes32 internal _partitionId;
 
     // Mapping from (tokenHolder, spender) to allowed value.
     mapping(address => mapping(address => uint256)) internal _allowed;
@@ -22,8 +22,18 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
 
     constructor(address securityTokenAddress, bytes32 partitionId) public {
 
+        // TODO maybe set interface implementation 1820 for ERC20 here?
+
         _securityToken = ISecurityToken(securityTokenAddress);
         _partitionId = partitionId;
+    }
+
+    function securityTokenAddress() external returns (ISecurityToken) {
+        return _securityToken;
+    }
+
+    function partitionId() external returns (bytes32) {
+        return _partitionId;
     }
 
 
@@ -40,7 +50,7 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
     }
 
     function decimals() external view returns (uint8) {
-        return _securityToken.decimals();
+        return uint8(18);
     }
 
     //******************/
@@ -132,7 +142,7 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
     }
 
     // this is where the operator functionality is used
-    function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
+    function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata /*operatorData*/)
     external
     {
         // check if is operator by partition or has enough allowance here
@@ -150,13 +160,7 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
         _securityToken.transferByPartition(_partitionId, to, value, data);
     }
 
-    function redeem(uint256 value, bytes calldata data) external {
-        _securityToken.redeemByPartition(_partitionId, value, data);
-    }
-
-    function redeemFrom(address from, uint256 value, bytes calldata data, bytes calldata operatorData) external {
-        _securityToken.operatorRedeemByPartition(_partitionId, from, value, data, '');
-    }
+    // only BURNERS can redeem tokens
 
     event TransferWithData(
         address indexed operator,
@@ -176,25 +180,30 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNRecipient {
     // GSN
 
     function acceptRelayedCall(
-        address relay,
-        address from,
-        bytes calldata encodedFunction,
-        uint256 transactionFee,
-        uint256 gasPrice,
-        uint256 gasLimit,
-        uint256 nonce,
-        bytes calldata approvalData,
-        uint256 maxPossibleCharge
+        address /*relay*/,
+        address /*from*/,
+        bytes calldata /*encodedFunction*/,
+        uint256 /*transactionFee*/,
+        uint256 /*gasPrice*/,
+        uint256 /*gasLimit*/,
+        uint256 /*nonce*/,
+        bytes calldata /*approvalData*/,
+        uint256 /*maxPossibleCharge*/
     ) external view returns (uint256, bytes memory) {
         // TODO zero means accepting --> add some constraints
         return(0, "");
     }
 
-    function _preRelayedCall(bytes memory context) internal returns (bytes32) {
+    function _preRelayedCall(bytes memory /*context*/) internal returns (bytes32) {
         return "";
     }
 
-    function _postRelayedCall(bytes memory context, bool success, uint256 actualCharge, bytes32 preRetVal) internal {
+    function _postRelayedCall(
+        bytes memory /*context*/,
+        bool /*success*/,
+        uint256 /*actualCharge*/,
+        bytes32 /*preRetVal*/
+    ) internal {
 
     }
 }

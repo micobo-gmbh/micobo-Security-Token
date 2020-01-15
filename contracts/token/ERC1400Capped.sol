@@ -2,16 +2,16 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity ^0.5.0;
+pragma solidity 0.5.9;
 
-import "./IERC1400.sol";
+import "../interfaces/IERC1400Capped.sol";
 import "./ERC1400Partition.sol";
 
 /**
  * @title ERC1400
  * @dev ERC1400 logic
  */
-contract ERC1400 is IERC1400, ERC1400Partition {
+contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
 
     struct Doc {
         string docURI;
@@ -27,11 +27,17 @@ contract ERC1400 is IERC1400, ERC1400Partition {
     /**
      * @dev Modifier to verify if token is issuable.
      */
-    modifier issuableToken() {
-        require(_isIssuable, "A8");
-        // Transfer Blocked - Token restriction
-        _;
-    }
+
+
+    //**************CAPPED*******************
+
+    uint256 private _cap;
+
+    mapping(bytes32 => uint256) private _capByPartition;
+
+
+    //**************CAPPED*******************
+
 
     /**
      * [ERC1400 CONSTRUCTOR]
@@ -40,58 +46,54 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param name Name of the token.
      * @param symbol Symbol of the token.
      * @param granularity Granularity of the token.
-     * @param controllers Array of initial controllers.
-     * @param certificateSigner Address of the off-chain service which signs the
-     * conditional ownership certificates required for token transfers, issuance,
-     * redemption (Cf. CertificateController.sol).
+     * @param adminContract Address of the Admin contract.
      */
     constructor(
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address[] memory controllers,
-        address certificateSigner,
-        bytes32[] memory defaultPartitions
+        address adminContract
     )
     public
-    ERC1400Partition(name, symbol, granularity, controllers, certificateSigner, defaultPartitions)
+    ERC1400Partition(name, symbol, granularity, adminContract)
     {
-        setInterfaceImplementation("ERC1400Token", address(this));
-        _isControllable = true;
+        // TODO activate when live
+        // setInterfaceImplementation("ERC1400Token", address(this));
         _isIssuable = true;
     }
+
 
     /********************** ERC1400 EXTERNAL FUNCTIONS **************************/
 
     /**
      * [ERC1400 INTERFACE (1/9)]
      * @dev Access a document associated with the token.
-     * @param name Short name (represented as a bytes32) associated to the document.
+     * @param documentName Short name (represented as a bytes32) associated to the document.
      * @return Requested document + document hash.
      */
-    function getDocument(bytes32 name) external view returns (string memory, bytes32) {
-        require(bytes(_documents[name].docURI).length != 0);
+    function getDocument(bytes32 documentName) external view returns (string memory, bytes32) {
+        require(bytes(_documents[documentName].docURI).length != 0);
         // Action Blocked - Empty document
         return (
-        _documents[name].docURI,
-        _documents[name].docHash
+        _documents[documentName].docURI,
+        _documents[documentName].docHash
         );
     }
 
     /**
      * [ERC1400 INTERFACE (2/9)]
      * @dev Associate a document with the token.
-     * @param name Short name (represented as a bytes32) associated to the document.
+     * @param documentName Short name (represented as a bytes32) associated to the document.
      * @param uri Document content.
      * @param documentHash Hash of the document [optional parameter].
      */
-    function setDocument(bytes32 name, string calldata uri, bytes32 documentHash) external {
-        require(hasRole(7, _msgSender()));
-        _documents[name] = Doc({
+    function setDocument(bytes32 documentName, string calldata uri, bytes32 documentHash) external {
+        require(_admin.hasRole(7, _msgSender()));
+        _documents[documentName] = Doc({
             docURI : uri,
             docHash : documentHash
             });
-        emit Document(name, uri, documentHash);
+        emit Document(documentName, uri, documentHash);
     }
 
     /**
@@ -121,12 +123,22 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param value Number of tokens issued.
      * @param data Information attached to the issuance, by the issuer. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
-
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data)
     external
         // onlyMinter is taken care of in _issue function
-    issuableToken
     {
+        require(_isIssuable, "A8");
+
+        // total cap is always the sum of all partitionCaps, so it can't be violated
+
+        // capByPartition needs to be either unset (0)
+        // or greater or equal to the new _totalSupplyByPartition
+        require(
+            _capByPartition[partition] == 0
+        || _totalSupplyByPartition[partition].add(value) <= _capByPartition[partition],
+            'totalSupplyByPartition would exceed capByPartition'
+        );
+
         _issueByPartition(partition, _msgSender(), tokenHolder, value, data, "");
     }
 
@@ -137,11 +149,12 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param value Number of tokens redeemed.
      * @param data Information attached to the redemption, by the redeemer. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
-    function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data)
+    // only controllers can redeem
+    /*function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data)
     external
     {
         _redeemByPartition(partition, _msgSender(), _msgSender(), value, data, "");
-    }
+    }*/
 
     /**
      * [ERC1400 INTERFACE (7/9)]
@@ -152,14 +165,20 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param data Information attached to the redemption.
      * @param operatorData Information attached to the redemption, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
+
     function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData)
     external
     {
-        require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
+        // only BURNER can burn tokens (checked in _redeem())
+
+        // require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
         // Transfer Blocked - Identity restriction
 
         _redeemByPartition(partition, _msgSender(), tokenHolder, value, data, operatorData);
     }
+
+    // TODO were these only used for standardized use of the off-chain validator?
+    // we could test-run transfers locally if we want to find out if they succeed
 
     /**
      * [ERC1400 INTERFACE (8/9)]
@@ -174,7 +193,8 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * transfer restriction rule responsible for making the transfer operation invalid).
      * @return Destination partition.
      */
-    function canTransferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data)
+
+    /*function canTransferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data)
     external
     view
     returns (byte, bytes32, bytes32)
@@ -182,7 +202,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
         return _canTransfer(partition, _msgSender(), _msgSender(), to, value, data, "");
     }
 
-    /**
+   *//**
      * [ERC1400 INTERFACE (9/9)]
      * @dev Know the reason on success or failure based on the EIP-1066 application-specific status codes.
      * @param partition Name of the partition.
@@ -196,14 +216,15 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * application specific reason codes with additional details (for example the
      * transfer restriction rule responsible for making the transfer operation invalid).
      * @return Destination partition.
-     */
+     *//*
+
     function canOperatorTransferByPartition(bytes32 partition, address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
     external
     view
     returns (byte, bytes32, bytes32)
     {
         return _canTransfer(partition, _msgSender(), from, to, value, data, operatorData);
-    }
+    }*/
 
     /********************** ERC1400 INTERNAL FUNCTIONS **************************/
 
@@ -223,7 +244,8 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * transfer restriction rule responsible for making the transfer operation invalid).
      * @return Destination partition.
      */
-    function _canTransfer(
+
+    /*function _canTransfer(
         bytes32 partition,
         address operator,
         address from,
@@ -248,7 +270,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
             return (hex"A6", "", partition);
         // Transfer Blocked - Receiver not eligible
 
-        validateTransaction(partition, operator, from, to, value, data, operatorData);
+        validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
 
 
         address senderImplementation;
@@ -256,7 +278,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
         senderImplementation = interfaceAddr(from, "ERC1400TokensSender");
         recipientImplementation = interfaceAddr(to, "ERC1400TokensRecipient");
 
-        if ((senderImplementation != address(0))
+        *//*if ((senderImplementation != address(0))
             && !IERC1400TokensSender(senderImplementation).canTransfer(partition, from, to, value, data, operatorData))
             return (hex"A5", "", partition);
         // Transfer Blocked - Sender not eligible
@@ -264,7 +286,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
         if ((recipientImplementation != address(0))
             && !IERC1400TokensRecipient(recipientImplementation).canReceive(partition, from, to, value, data, operatorData))
             return (hex"A6", "", partition);
-        // Transfer Blocked - Receiver not eligible
+        // Transfer Blocked - Receiver not eligible*//*
 
         if (!_isMultiple(value))
             return (hex"A9", "", partition);
@@ -273,7 +295,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
         return (hex"A2", "", partition);
         // Transfer Verified - Off-Chain approval for restricted token
     }
-
+*/
     /**
      * [INTERNAL]
      * @dev Issue tokens from a specific partition.
@@ -284,6 +306,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param data Information attached to the issuance.
      * @param operatorData Information attached to the issuance, by the operator (if any).
      */
+
     function _issueByPartition(
         bytes32 toPartition,
         address operator,
@@ -310,6 +333,7 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param data Information attached to the redemption.
      * @param operatorData Information attached to the redemption, by the operator (if any).
      */
+
     function _redeemByPartition(
         bytes32 fromPartition,
         address operator,
@@ -338,8 +362,8 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      */
     function renounceControl()
     external
-    onlyRole(0)
     {
+        require(_admin.hasRole(0, _msgSender()));
         _isControllable = false;
     }
 
@@ -350,8 +374,8 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      */
     function renounceIssuance()
     external
-    onlyRole(0)
     {
+        require(_admin.hasRole(0, _msgSender()));
         _isIssuable = false;
     }
 
@@ -376,83 +400,43 @@ contract ERC1400 is IERC1400, ERC1400Partition {
      * @param partition Name of the partition.
      * @param operators Controller addresses.
      */
+
     function setPartitionControllers(bytes32 partition, address[] calldata operators)
     external
-    onlyRole(0) {
+    {
+        require(_admin.hasRole(0, _msgSender()));
         _setPartitionControllers(partition, operators);
     }
 
     // INFO no setCertificateSigner function here!
 
-    /************* ERC1400Partition/ERC1400Raw BACKWARDS RETROCOMPATIBILITY ******************/
 
 
-    /**
-     * [NOT MANDATORY FOR ERC1400 STANDARD][OVERRIDES ERC1400Partition METHOD]
-     * @dev Redeem the value of tokens from the address 'msg.sender'.
-     * @param value Number of tokens to redeem.
-     * @param data Information attached to the redemption, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
-     */
-    function redeem(uint256 value, bytes calldata data)
-    external
-    {
-        _redeemByDefaultPartitions(_msgSender(), _msgSender(), value, data, "");
-    }
+
+    //**************CAPPED*******************
 
     /**
-     * [NOT MANDATORY FOR ERC1400 STANDARD][OVERRIDES ERC1400Partition METHOD]
-     * @dev Redeem the value of tokens on behalf of the address 'from'.
-     * @param from Token holder whose tokens will be redeemed (or 'address(0)' to set from to 'msg.sender').
-     * @param value Number of tokens to redeem.
-     * @param data Information attached to the redemption.
-     * @param operatorData Information attached to the redemption, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @dev Returns the cap on the token's total supply.
      */
-    function redeemFrom(address from, uint256 value, bytes calldata data, bytes calldata operatorData)
-    external
-    {
-        require(_isOperator(_msgSender(), from), "A7");
-        // Transfer Blocked - Identity restriction
-
-        _redeemByDefaultPartitions(_msgSender(), from, value, data, operatorData);
+    function cap() public view returns (uint256) {
+        return _cap;
     }
 
-    /**
-    * [NOT MANDATORY FOR ERC1400Partition STANDARD]
-     * @dev Redeem tokens from a default partitions.
-     * @param operator The address performing the redeem.
-     * @param from Token holder.
-     * @param value Number of tokens to redeem.
-     * @param data Information attached to the redemption.
-     * @param operatorData Information attached to the redemption, by the operator (if any).
-     */
-    function _redeemByDefaultPartitions(
-        address operator,
-        address from,
-        uint256 value,
-        bytes memory data,
-        bytes memory operatorData
-    )
-    internal
-    {
-        require(_defaultPartitions.length != 0, "A8");
-        // Transfer Blocked - Token restriction
-
-        uint256 _remainingValue = value;
-        uint256 _localBalance;
-
-        for (uint i = 0; i < _defaultPartitions.length; i++) {
-            _localBalance = _balanceOfByPartition[from][_defaultPartitions[i]];
-            if (_remainingValue <= _localBalance) {
-                _redeemByPartition(_defaultPartitions[i], operator, from, _remainingValue, data, operatorData);
-                _remainingValue = 0;
-                break;
-            } else {
-                _redeemByPartition(_defaultPartitions[i], operator, from, _localBalance, data, operatorData);
-                _remainingValue = _remainingValue - _localBalance;
-            }
-        }
-
-        require(_remainingValue == 0, "A8");
-        // Transfer Blocked - Token restriction
+    function capByPartition(bytes32 partition) public view returns (uint256) {
+        return _capByPartition[partition];
     }
+
+    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public {
+        require(_admin.hasRole(5, _msgSender()));
+        require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
+
+        // add difference to total cap
+        _cap += (_capByPartition[partition].sub(newPartitionCap));
+
+        // set new cap
+        _capByPartition[partition] = newPartitionCap;
+    }
+
+    //**************CAPPED*******************
+
 }

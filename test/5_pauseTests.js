@@ -4,6 +4,9 @@ const truffleAssert = require('truffle-assertions')
 
 
 contract('Test Pausing', async (accounts) => {
+
+	// TODO
+
 	let contracts
 
 	let pauser = accounts[2]

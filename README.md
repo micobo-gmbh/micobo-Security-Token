@@ -1,27 +1,16 @@
-## European Security Token
+## micobo Security Token
 
 ### Components
 
-There are 4 main components:
+There are 2 main components:
 
-1. _Token Contract_  
-2. _Constraint Logic Contract_ (CLC)  
-3. _Administration Logic Contract_ (ALC)
-4. _Dividend Contract_         (DC)  
-
-
-##
-
-   CLC and ALC an will both be made **updatable** through the use of master contracts.  
-   This means that their storage data will persist when new versions are deployed.
+1. _Security Token Contract_  
+2. _Admin Contract_
 
 #
 ### Architecture
 
-![architecture](./resources/Architecture.jpg "Architecture")
-
-
-#
+TODO
 #
 ## Tests
 
@@ -36,23 +25,16 @@ Use the test script to run all tests:
 ```
 npm run test
 ```
+#
 
 #### Gas report
 
-Replace the eth address in ``token-config.json`` in the ``gas_report`` network with your
-Ganache address to run the tests with the gas-reporter.  
-
-We use Ganache here because it lets us test without using the HD Wallet Provider.  
-HD Wallet Provider only allows async calls which does not work for the gas-reporter.
-
-```
-npm run gas_report
-```
+Gas report is configured by default in ``truffle-config.js``
 
 #
 ## Deployment
 
-Alter the ``token-config.json`` file to set token **name**, **symbol** and **cap**.
+Edit the ``token-config.json`` file to set token **name**, **symbol** and **cap** etc.
 
 Use the deploy script to deploy all contracts on local testnet (localhost:8454):
 ```
@@ -63,168 +45,32 @@ npm run deploy
 
 The Administration contract can endow addresses with one **Role** or more:
 
-- ADMIN  
-- ADMIN_UPDATER  
-- CONSTRAINTS_UPDATER  
-- MINTER  
-- PAUSER  
-- CONSTRAINTS_EDITOR 
+* 0 ADMIN   (can add and remove roles)
+* 1 CONTROLLER (ERC1400, can move tokens if contract _isControllable),
+* 2 MINTER / ISSUER,
+* 3 PAUSER,
+* 4 BURNER / REDEEMER
+* 5 CAP_EDITOR
+* 6 CONSTRAINTS_EDITOR (can edit constraint modules),
+* 7 DOCUMENT_EDITOR
 
 #
 
-#### Constraints Logic Contract
+#### Constrainable
 
-The Constraints Logic Contract checks constraints when tokens are transferred.  
-Currently, we have checks implemented for _sending_ and _receiving_ tokens.  
-These are reflected in the **Code** enum:  
-  
-- SEND  
-- RECEIVE
-
-#
-### Updatable contracts
-
-The contracts we call _logic_ contracts are treated as Solidity [_libraries_](https://solidity.readthedocs.io/en/latest/contracts.html?#libraries).  
-This means that they are exclusively used to perform tasks for other contracts, in this case the _master_ contracts.  
-
-Even though the master contract does not contain any of the variable definitions or functions,  
-it assumes these as its own when using "delegatecall" to use our library/logic contract.  
-
-So i.e. the _userList_ mapping is actually saved in the master contract's storage and we are using the logic contract's functions to alter it.
-
-This gives us the ability to update the logic contract whenever we want!  
-
-**But, the new contract has to inherit the old one**, so that the old storage variables will not be changed.
-
+Constraint Modules can be set to implement any kind of on-chain checks.
 
 #
 ### Process Flows
 
-We can identify these main interactions:  
-
-**User Interaction**  
-    1. transfer token  
-    2. claim dividend
- 
-**Updates**  
-    3. update Constraints Logic Contract   
-    4. update Administration Logic Contract
-
-**Admin**  
-    5. edit roles  
-    6. renounce role  
-    7. edit constraintsList (i.e. whitelist)  
-    8. minting  
-    9. pausing and unpausing  
-    10. burning
-    
-
-##
-#### 1. transfer token
-
-Every token transferring action triggers a call to the _check()_ function in the CLC, which is routed through the master contract (here Master Contract)
-
-![transfer_token](./resources/token_transfer.jpg "transfer token")
+TODO
 
 
-##
-#### 2. claim dividend
-
-As a token holder, I can claim my fair share of the dividend.  
-A call to determine the callers token balance (greyed out here) is not planned for now, but can easily be added later on.
-
-![dividen_claim](./resources/dividend_claim.jpg "claim dividend")
-
-
-##
-#### 3. update constraints logic contract
-
-Given the necessary authorisation, we can update the Constraints Logic Contract.  
-We need to deploy the new version, which has to inherit the old one.  
-We then register the new contract address with the master contract.
-
-![contract_update](./resources/contract_update.jpg "update contstraints logic contract")
-
-##
-#### 4. update admin contract
-
-The process is almost identical to the one showing the constraint logic contract update, so it is omitted here.
-
-##
-#### 5. edit roles
-
-Roles can be edited only by the admin using
-```
-function add(uint8 role, address account) _onlyAdmins public
-```
-and
-```
-function remove(uint8 role, address account) _onlyAdmins public
-```
-which can be found in the admin contract
-
-##
-#### 6. renounce role
-
-Every bearer of a role can renounce that role any time by calling
-```
-function renounce(uint8 role) public
-```
-
-##
-#### 7. edit constraintsList (whitelist)
-
-An authorized actor can make changes in the constraintsList mapping of the CLC.  
-For example, an addition to the whitelist can be made by calling the 
-```
-editUserList(address user, uint key, uint value)
-```
-function in the CLC like this:
-
-![userlist_edit](./resources/userlist_edit.jpg "edit constraintsList (whitelist)")
-
-##
-#### 8. minting
-
-Only accounts bearing the role of **MINTER** can mint tokens using this function in the CompliantToken:
-```
-function mint(address to, uint256 value) external returns (bool);
-```
-
-##
-#### 9. pausing and unpausing
-
-Only accounts bearing the role of **PAUSER** can pause or unpause the token contract  
-using these functions in the CompliantToken:
-```
-function pause() external;
-
-function unpause() external;
-```
-
-##
-#### 10. burning
-
-Only accounts bearing the role of **BURNER** can burn/destroy tokens:
-```
-function destroy(address target, uint256 amount) external;
-```
-
-
-```destroy()``` calls the internal ERC20 ```_burn()``` function directly.  
-
-It is called destroy to signify its ability to **burn tokens of any user**, not just of the sender's address.   
- 
 
 #
 ## Gas Consumption
 
-#### Gas report for each function and deployemnt
-![est_gas_report](./resources/est_gas_report.png "EST gas report")
-#
-#### Gas consumption for test cases
-![est_gas_test](./resources/est_gas_test.png "EST gas tests")
-
+TODO
 
 #  
 #### Diagrams

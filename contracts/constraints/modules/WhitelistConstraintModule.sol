@@ -1,8 +1,9 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.9;
 
-import "../IConstraintsModule.sol";
+/*
+import "../../interfaces/IConstraintsModule.sol";
 
-contract OffChainValidator is IConstraintsModule {
+contract WhitelistConstraintModule is IConstraintsModule {
 
     // TODO
 
@@ -55,3 +56,4 @@ contract OffChainValidator is IConstraintsModule {
     }
 
 }
+*/

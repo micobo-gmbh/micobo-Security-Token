@@ -4,6 +4,9 @@ const truffleAssert = require('truffle-assertions')
 
 
 contract('Test Burning', async (accounts) => {
+
+	// TODO
+
 	let contracts
 
 	let minter = accounts[1]

@@ -10,6 +10,9 @@ const truffleAssert = require('truffle-assertions')
 
 
 contract('Test Constraint Contract', async (accounts) => {
+
+	// TODO
+
 	let contracts
 
 	let constraintsEditor = accounts[1]

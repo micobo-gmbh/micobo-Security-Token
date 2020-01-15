@@ -7,6 +7,8 @@ const {deployAllContracts, Role, Code} = require('./_deployment.js');
 
 contract('Test Compliant Token', async (accounts) => {
 
+	// TODO
+
 	let contracts
 
 	// deepEqual compares with '==='

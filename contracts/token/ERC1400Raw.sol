@@ -2,23 +2,20 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity ^0.5.0;
+pragma solidity 0.5.9;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "erc1820/contracts/ERC1820Client.sol";
+import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "../../node_modules/erc1820/contracts/ERC1820Client.sol";
 
-import "./IERC1400Raw.sol";
-import "./IERC1400TokensSender.sol";
-import "./IERC1400TokensRecipient.sol";
-import "../constraints/Constrainable.sol";
+import "./Constrainable.sol";
+import "../interfaces/IERC1400Raw.sol";
 
 /**
  * @title ERC1400Raw
  * @dev ERC1400Raw logic
  */
 
-// TODO do we need the Sender - Recipient check?
-// keep it for now
+// INFO got rid of sender recipient check
 
 contract ERC1400Raw is
 IERC1400Raw,
@@ -66,28 +63,25 @@ ERC1820Client
      * @param name Name of the token.
      * @param symbol Symbol of the token.
      * @param granularity Granularity of the token.
-     * @param controllers Array of initial controllers.
-     * certificateSigner Address of the off-chain service which signs the
-     * conditional ownership certificates required for token transfers, issuance,
-     * redemption (Cf. CertificateController.sol).
+     * @param adminContract Address of the Admin contract.
      */
     constructor(
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address[] memory controllers,
+        address adminContract
 
         // this is not being used,
         // as this functionality can be realised with the OffChainValidator module
-        address // certificateSigner
+        // address certificateSigner
     )
     public
-    Constrainable(controllers)
+    Constrainable(adminContract)
     {
         _name = name;
         _symbol = symbol;
         _totalSupply = 0;
-        require(granularity >= 1);
+        require(granularity >= 1, 'granularity >= 1');
         // Constructor Blocked - Token granularity can not be lower than 1
         _granularity = granularity;
 
@@ -148,16 +142,18 @@ ERC1820Client
      * @dev Get the list of controllers as defined by the Administrable contract.
      * @return List of addresses of all the controllers.
      */
+    // has been moved to Admin
+    /*
     function controllers() external view returns (address[] memory) {
-        address[] memory controllers = _controllers;
+        address[] memory activeControllers = _controllers;
 
         // only return active entries (we only add to _controllers in Administrable)
         for(uint i = 0; i < _controllers.length; i++) {
-            if(hasRole(1, _controllers[i])) {
-                delete controllers[i];
+            if(_admin.hasRole(1, _controllers[i])) {
+                delete activeControllers[i];
             }
         }
-        return controllers;
+        return activeControllers;
     }
 
     /**
@@ -166,11 +162,12 @@ ERC1820Client
      * and redeem tokens on its behalf.
      * @param operator Address to set as an operator for 'msg.sender'.
      */
-    function authorizeOperator(address operator) external {
+    // we only use authorizeOperatorByPartition()
+    /*function authorizeOperator(address operator) external {
         require(operator != _msgSender());
         _authorizedOperator[operator][_msgSender()] = true;
         emit AuthorizedOperator(operator, _msgSender());
-    }
+    }*/
 
     /**
      * [ERC1400Raw INTERFACE (8/13)]
@@ -178,11 +175,12 @@ ERC1820Client
      * and to transfer and redeem tokens on its behalf.
      * @param operator Address to rescind as an operator for 'msg.sender'.
      */
-    function revokeOperator(address operator) external {
+    // we only use revokeOperatorByPartition()
+    /*function revokeOperator(address operator) external {
         require(operator != _msgSender());
         _authorizedOperator[operator][_msgSender()] = false;
         emit RevokedOperator(operator, _msgSender());
-    }
+    }*/
 
     /**
      * [ERC1400Raw INTERFACE (9/13)]
@@ -191,9 +189,10 @@ ERC1820Client
      * @param tokenHolder Address of a token holder which may have the operator address as an operator.
      * @return 'true' if operator is an operator of 'tokenHolder' and 'false' otherwise.
      */
-    function isOperator(address operator, address tokenHolder) external view returns (bool) {
+    // we only use isOperatorForPartition()
+    /*function isOperator(address operator, address tokenHolder) external view returns (bool) {
         return _isOperator(operator, tokenHolder);
-    }
+    }*/
 
     /**
      * [ERC1400Raw INTERFACE (10/13)]
@@ -203,6 +202,7 @@ ERC1820Client
      * @param data Information attached to the transfer, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
     // is overridden in ERC1400Partition
+    /*
     function transferWithData(address to, uint256 value, bytes calldata data)
     external
     {
@@ -219,6 +219,7 @@ ERC1820Client
      * @param operatorData Information attached to the transfer by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
     // is overridden in ERC1400Partition
+    /*
     function transferFromWithData(
         address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
     external
@@ -236,6 +237,7 @@ ERC1820Client
      * @param data Information attached to the redemption, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
     // is overridden in ERC1400Partition
+    /*
     function redeem(uint256 value, bytes calldata data)
     external
     {
@@ -251,6 +253,7 @@ ERC1820Client
      * @param operatorData Information attached to the redemption, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
     // is overridden in ERC1400Partition
+    /*
     function redeemFrom(address from, uint256 value, bytes calldata data, bytes calldata operatorData)
     external
     {
@@ -278,13 +281,13 @@ ERC1820Client
      * @param addr Address of the contract that has to be checked.
      * @return 'true' if 'addr' is a regular address (not a contract).
      */
-    function _isRegularAddress(address addr) internal view returns (bool) {
+    /*function _isRegularAddress(address addr) internal view returns (bool) {
         if (addr == address(0)) {return false;}
         uint size;
         assembly {size := extcodesize(addr)}
         // solhint-disable-line no-inline-assembly
         return size == 0;
-    }
+    }*/
 
     /**
      * [INTERNAL]
@@ -293,13 +296,13 @@ ERC1820Client
      * @param tokenHolder Address of a token holder which may have the 'operator' address as an operator.
      * @return 'true' if 'operator' is an operator of 'tokenHolder' and 'false' otherwise.
      */
-    function _isOperator(address operator, address tokenHolder) internal view returns (bool) {
+    /*function _isOperator(address operator, address tokenHolder) internal view returns (bool) {
         return (operator == tokenHolder
         || _authorizedOperator[operator][tokenHolder]
         // contract is controllable and operator is a controller
-        || (_isControllable && hasRole(1, operator))
+        || (_isControllable && _admin.hasRole(1, operator))
         );
-    }
+    }*/
 
     /**
      * [INTERNAL]
@@ -311,7 +314,6 @@ ERC1820Client
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer.
      * @param operatorData Information attached to the transfer by the operator (if any)..
-     * @param preventLocking 'true' if you want this function to throw when tokens are sent to a contract not
      * implementing 'erc777tokenHolder'.
      * ERC1400Raw native transfer functions MUST set this parameter to 'true', and backwards compatible ERC20 transfer
      * functions SHOULD set this parameter to 'false'.
@@ -324,8 +326,7 @@ ERC1820Client
         address to,
         uint256 value,
         bytes memory data,
-        bytes memory operatorData,
-        bool preventLocking
+        bytes memory operatorData
     )
     internal
     nonReentrant
@@ -337,15 +338,15 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        validateTransaction(partition, operator, from, to, value, data, operatorData);
+        validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
 
 
-        _callSender(partition, operator, from, to, value, data, operatorData);
+        // _callSender(partition, operator, from, to, value, data, operatorData);
 
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
 
-        _callRecipient(partition, operator, from, to, value, data, operatorData, preventLocking);
+        // _callRecipient(partition, operator, from, to, value, data, operatorData, preventLocking);
 
         emit TransferWithData(operator, from, to, value, data, operatorData);
     }
@@ -363,7 +364,6 @@ ERC1820Client
     function _redeem(bytes32 partition, address operator, address from, uint256 value, bytes memory data, bytes memory operatorData)
     internal
     nonReentrant
-    onlyRole(4)
     {
         require(_isMultiple(value), "A9");
         // Transfer Blocked - Token granularity
@@ -372,10 +372,13 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        validateTransaction(partition, operator, from, address(0), value, data, operatorData);
+        // is BURNER
+        require(_admin.hasRole(4, _msgSender()));
+
+        validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
 
 
-        _callSender(partition, operator, from, address(0), value, data, operatorData);
+        // _callSender(partition, operator, from, address(0), value, data, operatorData);
 
         _balances[from] = _balances[from].sub(value);
         _totalSupply = _totalSupply.sub(value);
@@ -395,7 +398,7 @@ ERC1820Client
      * @param data Extra information.
      * @param operatorData Extra information, attached by the operator (if any).
      */
-    function _callSender(
+    /*function _callSender(
         bytes32 partition,
         address operator,
         address from,
@@ -412,7 +415,7 @@ ERC1820Client
         if (senderImplementation != address(0)) {
             IERC1400TokensSender(senderImplementation).tokensToTransfer(partition, operator, from, to, value, data, operatorData);
         }
-    }
+    }*/
 
     /**
      * [INTERNAL]
@@ -430,7 +433,7 @@ ERC1820Client
      * ERC1400Raw native transfer functions MUST set this parameter to 'true', and backwards compatible ERC20 transfer
      * functions SHOULD set this parameter to 'false'.
      */
-    function _callRecipient(
+    /*function _callRecipient(
         bytes32 partition,
         address operator,
         address from,
@@ -451,7 +454,7 @@ ERC1820Client
             require(_isRegularAddress(to), "A6");
             // Transfer Blocked - Receiver not eligible
         }
-    }
+    }*/
 
     /**
      * [INTERNAL]
@@ -473,20 +476,21 @@ ERC1820Client
     )
     internal
     nonReentrant
-    onlyRole(2)
     {
         require(_isMultiple(value), "A9");
         // Transfer Blocked - Token granularity
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
 
-        validateTransaction(partition, operator, address(0), to, value, data, operatorData);
+        require(_admin.hasRole(2, _msgSender()));
+
+        validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
 
 
         _totalSupply = _totalSupply.add(value);
         _balances[to] = _balances[to].add(value);
 
-        _callRecipient(partition, operator, address(0), to, value, data, operatorData, true);
+        // _callRecipient(partition, operator, address(0), to, value, data, operatorData, true);
 
         emit Issued(operator, to, value, data, operatorData);
     }

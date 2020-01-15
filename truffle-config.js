@@ -47,19 +47,21 @@ module.exports = {
 			host: 'localhost',
 			port: '8545',
 			network_id: '*',
-			gas: 8000000
+			gas: 0xffffffff
 		},
 
-		/*
-		rinkeby: {
+/*
+		development: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af");
+				return new HDWalletProvider(mnemonic, "http://localhost:8545");
 			},
-			network_id: '4',
-			gas: 4500000,
-			gasPrice: 10000000000,
+			network_id: '*',
+			gas: 0xffffffffff,
+			gasPrice: 10000000000
 		}
 		*/
+
+
 
 
 		// Useful for deploying to a public network.
@@ -90,17 +92,18 @@ module.exports = {
 		}
 	},
 
+
 	// Configure your compilers
 	compilers: {
 		solc: {
-			version: "0.5.0",    // Fetch exact version from solc-bin (default: truffle's version)
+			version: "0.5.9",    // Fetch exact version from solc-bin (default: truffle's version)
 			docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {          // See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
-					enabled: false,
-					runs: 200
+					enabled: true,
+					runs: 24000
 				},
-				evmVersion: "byzantium"
+				evmVersion: "petersburg"
 			}
 		}
 	},

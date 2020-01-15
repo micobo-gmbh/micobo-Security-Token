@@ -1,10 +1,8 @@
-pragma solidity 0.5.0;
+pragma solidity 0.5.9;
 
-import "@openzeppelin/contracts/GSN/GSNRecipient.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "../interfaces/IAdmin.sol";
 
-
-contract Administrable is GSNRecipient, ReentrancyGuard {
+contract Admin is IAdmin {
 
     /**
      * @dev list of standard roles
@@ -27,7 +25,6 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
      */
 
     /**
-     * @title _roles
      * @dev mapping for managing addresses assigned to a role.
      * cannot be changed, just like _administrationLogic
      */
@@ -56,15 +53,19 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
      * @dev Modifier to make a function callable only when the caller is a specific role.
      */
     modifier onlyRole(uint8 role) {
-        require(hasRole(role, _msgSender()), 'sender does not have necessary role');
+        require(hasRole(role, msg.sender), 'sender does not have necessary role');
         _;
     }
 
-    constructor (address[] memory controllers) public {
+
+    constructor (address[] memory admins, address[] memory controllers) public {
         for (uint i = 0; i < controllers.length; i++) {
             _add(1, controllers[i]);
         }
-        _controllers = controllers;
+
+        for (uint i = 0; i < admins.length; i++) {
+            _add(0, controllers[i]);
+        }
     }
 
     /**
@@ -73,7 +74,7 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
      * @dev Assigns a role to an account
      * only ADMIN
      */
-    function addRole(uint8 role, address account) onlyRole(0) public {
+    function addRole(uint8 role, address account) public {
         _add(role, account);
     }
 
@@ -92,12 +93,25 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
      * @dev Removes a role from the sender's address
      */
     function renounceRole(uint8 role) public {
-        require(hasRole(role, _msgSender()), 'sender does not have this role');
+        require(hasRole(role, msg.sender), 'sender does not have this role');
 
-        _remove(role, _msgSender());
+        _remove(role, msg.sender);
 
-        emit RoleRenounced(role, _msgSender());
+        emit RoleRenounced(role, msg.sender);
     }
+
+    /**
+     * @dev check if an account has a role
+     * @return bool
+     */
+    function hasRole(uint8 role, address account) public view returns (bool) {
+        require(account != address(0), 'zero address');
+        return _roles[role][account];
+    }
+
+
+
+    /******* INTERNAL FUNCTIONS *******/
 
     /**
      * @dev give an account access to a role
@@ -125,7 +139,7 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
     function _remove(uint8 role, address account) internal {
         require(account != address(0), 'zero address');
         require(
-            !(role == 0 && account == _msgSender()),
+            !(role == 0 && account == msg.sender),
             'cannot remove your own ADMIN role'
         );
         require(hasRole(role, account), 'account does not have this role');
@@ -133,40 +147,5 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
         _roles[role][account] = false;
 
         emit RoleRemoved(role, account);
-    }
-
-    /**
-     * @dev check if an account has a role
-     * @return bool
-     */
-    function hasRole(uint8 role, address account) public view returns (bool) {
-        require(account != address(0), 'zero address');
-        return _roles[role][account];
-    }
-
-
-    // GSN
-
-    function acceptRelayedCall(
-        address relay,
-        address from,
-        bytes calldata encodedFunction,
-        uint256 transactionFee,
-        uint256 gasPrice,
-        uint256 gasLimit,
-        uint256 nonce,
-        bytes calldata approvalData,
-        uint256 maxPossibleCharge
-    ) external view returns (uint256, bytes memory) {
-        // TODO zero means accepting --> add some constraints
-        return(0, "");
-    }
-
-    function _preRelayedCall(bytes memory context) internal returns (bytes32) {
-        return "";
-    }
-
-    function _postRelayedCall(bytes memory context, bool success, uint256 actualCharge, bytes32 preRetVal) internal {
-
     }
 }
