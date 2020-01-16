@@ -1,4 +1,4 @@
-pragma solidity 0.5.9;
+pragma solidity ^0.5.9;
 
 import "../interfaces/IAdmin.sol";
 
@@ -74,7 +74,7 @@ contract Admin is IAdmin {
      * @dev Assigns a role to an account
      * only ADMIN
      */
-    function addRole(uint8 role, address account) public {
+    function addRole(uint8 role, address account) public onlyRole(0) {
         _add(role, account);
     }
 
@@ -84,7 +84,7 @@ contract Admin is IAdmin {
      * @dev Removes a role from an account
      * only ADMIN
      */
-    function removeRole(uint8 role, address account) onlyRole(0) public {
+    function removeRole(uint8 role, address account) public onlyRole(0) {
         _remove(role, account);
     }
 

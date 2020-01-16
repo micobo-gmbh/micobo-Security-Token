@@ -21,12 +21,31 @@ interface IERC1400Capped  {
     // Token Issuance
     function isIssuable() external view returns (bool); // 4/9
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data) external; // 5/9
-    event IssuedByPartition(bytes32 indexed partition, address indexed operator, address indexed to, uint256 value, bytes data, bytes operatorData);
+    event IssuedByPartition(
+        bytes32 indexed partition,
+        address indexed operator,
+        address indexed to, uint256 value,
+        bytes data, bytes operatorData
+    );
 
     // Token Redemption
     // function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data) external; // 6/9
-    function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData) external; // 7/9
-    event RedeemedByPartition(bytes32 indexed partition, address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
+    function operatorRedeemByPartition(
+        bytes32 partition,
+        address tokenHolder,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    ) external; // 7/9
+
+    event RedeemedByPartition(
+        bytes32 indexed partition,
+        address indexed operator,
+        address indexed from,
+        uint256 value,
+        bytes data,
+        bytes operatorData
+    );
 
     // Transfer Validity
     // function canTransferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external view returns (byte, bytes32, bytes32); // 8/9
