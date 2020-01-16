@@ -30,7 +30,10 @@ contract('Test Deployment', async (accounts) => {
 			admin.address
 		)
 
-		// console.log(micoboSecurityToken);
+		assert.deepEqual(
+			await micoboSecurityToken.admin(),
+			admin.address
+		)
 	})
 
 	it("adds the standard partition", async() => {

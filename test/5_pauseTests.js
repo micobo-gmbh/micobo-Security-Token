@@ -15,7 +15,7 @@ contract('Test Pausing', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await deployAllContracts(accounts[0])
+		contracts = await deployAllContracts(accounts)
 
 		// make pauser
 		await contracts.adminInterface.add(Role.PAUSER, pauser)

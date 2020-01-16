@@ -29,7 +29,7 @@ interface ISecurityToken {
     //******************/
     // Administrable INTERFACE
     //******************/
-    function admin() external returns (IAdmin);
+    function admin() external view returns (IAdmin);
 
 
     //******************/

@@ -13,7 +13,7 @@ contract Administrable is GSNRecipient, ReentrancyGuard {
         _admin = IAdmin(adminContract);
     }
 
-    function admin() public returns (IAdmin) {
+    function admin() public view returns (IAdmin) {
         return _admin;
     }
 

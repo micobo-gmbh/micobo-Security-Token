@@ -66,7 +66,7 @@ contract Constrainable is Administrable {
     }
 
     function setModules(IConstraintsModule[] calldata newModules) external {
-        require(_admin.hasRole(6, msg.sender), 'sender is not eligible to edit modules');
+        require(_admin.hasRole(6, msg.sender), '0x07');
         _modules = newModules;
     }
 
