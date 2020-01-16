@@ -220,7 +220,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         address operator,
         address tokenHolder
     )
-    public
+    internal
     view
     returns (bool)
     {

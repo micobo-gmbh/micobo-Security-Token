@@ -102,7 +102,7 @@ interface ISecurityToken {
     // ERC20 proxy compatibility
     function totalSupplyByPartition(bytes32 partition) external view returns (uint256);
 
-    // add a new Partition proxy contract
+    // Partition proxy contracts
     function partitionProxies() external view returns (SecurityTokenPartition[] memory);
     // function addPartition(bytes32 partition) external;
 

@@ -5,9 +5,9 @@ import "./ISecurityToken.sol";
 contract ISecurityTokenPartition {
 
 
-    function securityTokenAddress() external returns (ISecurityToken);
+    function securityTokenAddress() external view returns (ISecurityToken);
 
-    function partitionId() external returns (bytes32);
+    function partitionId() external view returns (bytes32);
 
 
     //******************/

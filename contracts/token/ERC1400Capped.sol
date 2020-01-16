@@ -431,7 +431,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 
         // add difference to total cap
-        _cap += (_capByPartition[partition].sub(newPartitionCap));
+        _cap = _cap.add((newPartitionCap.sub(_capByPartition[partition])));
 
         // set new cap
         _capByPartition[partition] = newPartitionCap;

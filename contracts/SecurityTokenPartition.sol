@@ -28,11 +28,11 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         _partitionId = partitionId;
     }
 
-    function securityTokenAddress() external returns (ISecurityToken) {
+    function securityTokenAddress() external view returns (ISecurityToken) {
         return _securityToken;
     }
 
-    function partitionId() external returns (bytes32) {
+    function partitionId() external view returns (bytes32) {
         return _partitionId;
     }
 
