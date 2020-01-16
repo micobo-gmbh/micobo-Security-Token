@@ -10,8 +10,6 @@ const {deployAllContracts, Role} = require('./_deployment.js');
 
 contract('Test Admin Contract', async (accounts) => {
 
-	// TODO
-
 	let contracts
 
 	before(async () => {

@@ -1,4 +1,4 @@
-pragma solidity 0.5.9;
+pragma solidity 0.5.12;
 
 import "./IConstraintsModule.sol";
 import "../SecurityTokenPartition.sol";

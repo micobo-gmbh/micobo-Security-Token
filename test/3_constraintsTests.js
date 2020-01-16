@@ -10,8 +10,6 @@ const truffleAssert = require('truffle-assertions')
 
 contract('Test Constraint Contract', async (accounts) => {
 
-	// TODO
-
 	let contracts
 
 	let modules = ['0x024269E2057b904d1Fa6a7B52056A8580a85180F']
@@ -38,5 +36,7 @@ contract('Test Constraint Contract', async (accounts) => {
 			modules
 		)
 	})
+
+	// TODO test out some real modules and their effects
 
 })
