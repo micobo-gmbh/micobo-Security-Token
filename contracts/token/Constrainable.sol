@@ -14,15 +14,6 @@ contract Constrainable is Administrable {
 
     IConstraintsModule[] private _modules;
 
-    constructor(
-        address adminContract
-    )
-    public
-    Administrable(adminContract)
-    {
-
-    }
-
     function validateTransaction(
         address sender,
         bytes32 partition,
@@ -60,7 +51,7 @@ contract Constrainable is Administrable {
     }
 
     function setModules(IConstraintsModule[] calldata newModules) external {
-        require(_admin.hasRole(6, msg.sender), '0x07');
+        require(hasRole(6, msg.sender), '0x07');
         _modules = newModules;
     }
 

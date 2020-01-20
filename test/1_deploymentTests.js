@@ -2,54 +2,43 @@
 	Test if all contracts can be deployed
  */
 
-const Admin = artifacts.require('Admin')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
-ISecurityTokenPartition = artifacts.require('ISecurityTokenPartition')
+SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 const conf = require('../token-config');
 
 
 contract('Test Deployment', async (accounts) => {
 
-	let micoboSecurityToken, admin, securityTokenPartition
+	let micoboSecurityToken, securityTokenPartition
 
 	// deepEqual compares with '==='
-
-	it("deploys admin contract", async () => {
-		admin = await Admin.new(
-			[accounts[0]],
-			[accounts[0]]
-		)
-	})
 
 	it("deploys micobo security token", async () => {
 		micoboSecurityToken = await MicoboSecurityToken.new(
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			admin.address
-		)
-
-		assert.deepEqual(
-			await micoboSecurityToken.admin(),
-			admin.address
+			[accounts[0]],
+			[accounts[0]]
 		)
 	})
 
-	it("adds the standard partition", async() => {
+	it("adds the standard partition", async () => {
 
 		// give CAP_EDITOR role
-		await admin.addRole(5, accounts[0])
+		await micoboSecurityToken.addRole(5, accounts[0])
 
-		await micoboSecurityToken.addPartition(conf.standardPartition, conf.standardPartitionCap)
+		securityTokenPartition = await SecurityTokenPartition.new(
+			micoboSecurityToken.address,
+			conf.standardPartition
+		)
 
-		// console.log('securityTokenAddress', micoboSecurityToken.address)
-
-		let partitionProxies = await micoboSecurityToken.partitionProxies()
-
-		// console.log('partition proxy', partitionProxies[0])
-
-		let securityTokenPartition = await ISecurityTokenPartition.at(partitionProxies[0])
+		await micoboSecurityToken.addPartition(
+			conf.standardPartition,
+			securityTokenPartition.address,
+			conf.standardPartitionCap
+		)
 
 		assert.deepEqual(
 			await securityTokenPartition.securityTokenAddress(),
@@ -59,6 +48,17 @@ contract('Test Deployment', async (accounts) => {
 		assert.deepEqual(
 			await securityTokenPartition.partitionId(),
 			conf.standardPartition
+		)
+
+
+		assert.deepEqual(
+			(await micoboSecurityToken.capByPartition(conf.standardPartition)).toNumber(),
+			conf.standardPartitionCap
+		)
+
+		assert.deepEqual(
+			await micoboSecurityToken.partitionProxies(),
+			[securityTokenPartition.address]
 		)
 	})
 

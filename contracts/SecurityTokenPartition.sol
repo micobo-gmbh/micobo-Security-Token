@@ -100,12 +100,6 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
     }
 
 
-    // Transfer events are implemented in ERC1400ERC20
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
-
     //******************/
     // ERC1400Raw
     //******************/
@@ -170,11 +164,6 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         bytes data,
         bytes operatorData
     );
-
-    event Issued(address indexed operator, address indexed to, uint256 value, bytes data, bytes operatorData);
-    event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
-    event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
-    event RevokedOperator(address indexed operator, address indexed tokenHolder);
 
 
     // GSN

@@ -1,9 +1,9 @@
 pragma solidity 0.5.12;
 
 /*
-import "../../interfaces/IConstraintsModule.sol";
-import "../../interfaces/ISecurityToken.sol";
-import "../../administration/Admin.sol";
+import "../interfaces/IConstraintsModule.sol";
+import "../interfaces/ISecurityToken.sol";
+import "../administration/Admin.sol";
 
 contract PauseConstraintModule is IConstraintsModule {
 
@@ -120,7 +120,7 @@ contract PauseConstraintModule is IConstraintsModule {
 
 
     function pause() public whenNotPaused {
-        require(_admin.hasRole(3, msg.sender));
+        require(hasRole(3, msg.sender));
         _paused = true;
         emit Paused(msg.sender);
     }
@@ -133,7 +133,7 @@ contract PauseConstraintModule is IConstraintsModule {
 
 
     function unpause() public whenPaused {
-        require(_admin.hasRole(3, msg.sender));
+        require(hasRole(3, msg.sender));
         _paused = false;
         emit Unpaused(msg.sender);
     }

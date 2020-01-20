@@ -5,7 +5,6 @@
 pragma solidity 0.5.12;
 
 import "./ERC1400Raw.sol";
-import "../SecurityTokenPartition.sol";
 import "../interfaces/IERC1400Partition.sol";
 
 
@@ -50,7 +49,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     /****************************************************************************/
 
 
-    SecurityTokenPartition[] internal _partitionProxies;
+    address[] internal _partitionProxies;
 
     /**
      * [ERC1400Partition CONSTRUCTOR]
@@ -59,16 +58,14 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param name Name of the token.
      * @param symbol Symbol of the token.
      * @param granularity Granularity of the token.
-     * @param adminContract Address of the Admin contract.
      */
     constructor(
         string memory name,
         string memory symbol,
-        uint256 granularity,
-        address adminContract
+        uint256 granularity
     )
     public
-    ERC1400Raw(name, symbol, granularity, adminContract)
+    ERC1400Raw(name, symbol, granularity)
     {
         _isControllable = true;
     }
@@ -80,7 +77,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         return _totalSupplyByPartition[partition];
     }
 
-    function partitionProxies() public view returns (SecurityTokenPartition[] memory) {
+    function partitionProxies() public view returns (address[] memory) {
         return _partitionProxies;
     }
 
@@ -398,6 +395,11 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     }
 
     /************** ERC1400Raw BACKWARDS RETROCOMPATIBILITY *************************/
+
+    // INFO we don't use these as they make use of the defaultPartition
+    // we don't have a default partition, either you call operatorTransferByPartition
+    // or use the SecurityTokenPartition ERC20 Proxy contract that still implements
+    // transferWithData and transferFromWithData
 
     /**
      * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]

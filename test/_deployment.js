@@ -1,5 +1,6 @@
-const Admin = artifacts.require('Admin')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
+SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
+
 ISecurityTokenPartition = artifacts.require('ISecurityTokenPartition')
 
 const conf = require('../token-config');
@@ -7,28 +8,31 @@ const conf = require('../token-config');
 
 deployAllContracts = async (accounts) => {
 
-	let micoboSecurityToken, adminInterface
-
-	adminInterface = await Admin.new(
-		[accounts[0]],
-		[accounts[0]]
-	)
+	let micoboSecurityToken, securityTokenPartition
 
 	micoboSecurityToken = await MicoboSecurityToken.new(
 		conf.name,
 		conf.symbol,
 		conf.granularity,
-		adminInterface.address
+		[accounts[0]],
+		[accounts[0]]
 	)
 
-	await adminInterface.addRole(5, accounts[0]) // CAP_EDITOR
-	await micoboSecurityToken.addPartition(conf.standardPartition, conf.standardPartitionCap)
-	let partitionProxies = await micoboSecurityToken.partitionProxies()
-	let securityTokenPartition = await ISecurityTokenPartition.at(partitionProxies[0])
+	await micoboSecurityToken.addRole(5, accounts[0]) // CAP_EDITOR
+
+	securityTokenPartition = await SecurityTokenPartition.new(
+		micoboSecurityToken.address,
+		conf.standardPartition
+	)
+
+	await micoboSecurityToken.addPartition(
+		conf.standardPartition, 
+		securityTokenPartition.address,
+		conf.standardPartitionCap
+	)
 
 	return {
 		micoboSecurityToken,
-		adminInterface,
 		securityTokenPartition
 	}
 }

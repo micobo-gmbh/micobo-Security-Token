@@ -1,9 +1,9 @@
 pragma solidity 0.5.12;
 
 /*
-import "../../interfaces/IConstraintsModule.sol";
+import "../interfaces/IConstraintsModule.sol";
 
-contract OffChainValidator is IConstraintsModule {
+contract WhitelistConstraintModule is IConstraintsModule {
 
     // TODO
 
@@ -18,14 +18,18 @@ contract OffChainValidator is IConstraintsModule {
     );
 
     // module data
-    address _signer;
+    mapping(address => bool) _whitelisted;
 
-    constructor(address signer) public {
-        _signer = signer;
+    address _owner;
+
+    constructor(address owner) public {
+        _owner = owner;
     }
 
 
-    // function change signer
+    // function editWhitelist
+
+    // function bulkEditWhitelist
 
 
     function isValid(
@@ -46,11 +50,10 @@ contract OffChainValidator is IConstraintsModule {
     )
     {
 
-        // TODO ecrecover
+        // TODO check _whitelisted
 
         return (valid, message);
     }
-
 
 }
 */

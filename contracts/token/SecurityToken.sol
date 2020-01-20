@@ -1,6 +1,7 @@
 pragma solidity 0.5.12;
 
 import "./ERC1400Capped.sol";
+import "../interfaces/ISecurityToken.sol";
 
 /**
  * @author openzeppelin
@@ -17,24 +18,31 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address adminContract
+        address[] memory admins,
+        address[] memory controllers
     )
     public
-    ERC1400Capped(name, symbol, granularity, adminContract)
+    ERC1400Capped(name, symbol, granularity)
     {
+        for (uint i = 0; i < controllers.length; i++) {
+            _add(1, controllers[i]);
+        }
 
+        for (uint i = 0; i < admins.length; i++) {
+            _add(0, admins[i]);
+        }
     }
 
 
     // add a new Partition proxy contract
-    function addPartition(bytes32 partition, uint256 partitionCap) public{
-        require(_admin.hasRole(0, _msgSender()), "0xA7");
-
-        SecurityTokenPartition newPartition = new SecurityTokenPartition(address(this), partition);
+    function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) public{
+        require(hasRole(0, _msgSender()), "0xA7");
 
         setCapByPartition(partition, partitionCap);
 
-        _partitionProxies.push(newPartition);
+        _partitionProxies.push(proxyAddress);
+
+        // _totalPartitions is being updated when when minting for the first time
     }
 
 

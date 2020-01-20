@@ -4,8 +4,6 @@
  */
 pragma solidity 0.5.12;
 
-import "../SecurityTokenPartition.sol";
-
 /**
  * @title IERC1400Partition partially fungible token standard
  * @dev ERC1400Partition interface
@@ -16,7 +14,7 @@ interface IERC1400Partition {
     function totalSupplyByPartition(bytes32 partition) external view returns (uint256);
 
     // add a new Partition proxy contract
-    function partitionProxies() external view returns (SecurityTokenPartition[] memory);
+    function partitionProxies() external view returns (address[] memory);
     // function addPartition(bytes32 partition) external;
 
     // Token Information
@@ -25,7 +23,14 @@ interface IERC1400Partition {
 
     // Token Transfers
     function transferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external returns (bytes32); // 3/10
-    function operatorTransferByPartition(bytes32 partition, address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData) external returns (bytes32); // 4/10
+    function operatorTransferByPartition(
+        bytes32 partition,
+        address from,
+        address to,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    ) external returns (bytes32); // 4/10
 
     // Operators
     function controllersByPartition(bytes32 partition) external view returns (address[] memory); // 7/10

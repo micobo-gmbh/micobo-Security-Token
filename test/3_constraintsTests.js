@@ -12,7 +12,7 @@ contract('Test Constraint Contract', async (accounts) => {
 
 	let contracts
 
-	let modules = ['0x024269E2057b904d1Fa6a7B52056A8580a85180F']
+	let moduleAddresses = ['0x024269E2057b904d1Fa6a7B52056A8580a85180F']
 
 	// deepEqual compares with '==='
 
@@ -21,19 +21,19 @@ contract('Test Constraint Contract', async (accounts) => {
 		contracts = await deployAllContracts(accounts)
 
 		// add constraintEditor
-		await contracts.adminInterface.addRole(Role.CONSTRAINTS_EDITOR, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.CONSTRAINTS_EDITOR, accounts[0])
 	})
 
 
 	it("can set modules", async () => {
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules(modules)
+			contracts.micoboSecurityToken.setModules(moduleAddresses)
 		)
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.modules(),
-			modules
+			moduleAddresses
 		)
 	})
 

@@ -63,20 +63,16 @@ ERC1820Client
      * @param name Name of the token.
      * @param symbol Symbol of the token.
      * @param granularity Granularity of the token.
-     * @param adminContract Address of the Admin contract.
      */
     constructor(
         string memory name,
         string memory symbol,
-        uint256 granularity,
-        address adminContract
-
+        uint256 granularity
         // this is not being used,
         // as this functionality can be realised with the OffChainValidator module
         // address certificateSigner
     )
     public
-    Constrainable(adminContract)
     {
         _name = name;
         _symbol = symbol;
@@ -149,7 +145,7 @@ ERC1820Client
 
         // only return active entries (we only add to _controllers in Administrable)
         for(uint i = 0; i < _controllers.length; i++) {
-            if(_admin.hasRole(1, _controllers[i])) {
+            if(hasRole(1, _controllers[i])) {
                 delete activeControllers[i];
             }
         }
@@ -300,7 +296,7 @@ ERC1820Client
         return (operator == tokenHolder
         || _authorizedOperator[operator][tokenHolder]
         // contract is controllable and operator is a controller
-        || (_isControllable && _admin.hasRole(1, operator))
+        || (_isControllable && hasRole(1, operator))
         );
     }*/
 
@@ -373,7 +369,7 @@ ERC1820Client
         // Transfer Blocked - Sender balance insufficient
 
         // is BURNER
-        require(_admin.hasRole(4, _msgSender()));
+        require(hasRole(4, _msgSender()));
 
         validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
 
@@ -482,7 +478,7 @@ ERC1820Client
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
 
-        require(_admin.hasRole(2, _msgSender()));
+        require(hasRole(2, _msgSender()));
 
         validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
 

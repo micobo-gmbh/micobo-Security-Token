@@ -1,7 +1,6 @@
 pragma solidity 0.5.12;
 
 import "./IConstraintsModule.sol";
-import "../SecurityTokenPartition.sol";
 import "./IAdmin.sol";
 
 /**
@@ -15,7 +14,7 @@ import "./IAdmin.sol";
 
 interface ISecurityToken {
 
-    function addPartition(bytes32 partition, uint256 partitionCap) external;
+    function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) external;
 
     //******************/
     // Constrainable INTERFACE
@@ -29,7 +28,17 @@ interface ISecurityToken {
     //******************/
     // Administrable INTERFACE
     //******************/
-    function admin() external view returns (IAdmin);
+    function addRole(uint8 role, address account) external;
+
+    function removeRole(uint8 role, address account) external;
+
+    function renounceRole(uint8 role) external;
+
+    function hasRole(uint8 role, address account) external view returns (bool);
+
+    event RoleAdded(uint8 indexed role, address indexed account);
+    event RoleRemoved(uint8 indexed role, address indexed account);
+    event RoleRenounced(uint8 indexed role, address indexed account);
 
 
     //******************/
@@ -103,7 +112,7 @@ interface ISecurityToken {
     function totalSupplyByPartition(bytes32 partition) external view returns (uint256);
 
     // Partition proxy contracts
-    function partitionProxies() external view returns (SecurityTokenPartition[] memory);
+    function partitionProxies() external view returns (address[] memory);
     // function addPartition(bytes32 partition) external;
 
     // Token Information
@@ -112,7 +121,14 @@ interface ISecurityToken {
 
     // Token Transfers
     function transferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external returns (bytes32); // 3/10
-    function operatorTransferByPartition(bytes32 partition, address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData) external returns (bytes32); // 4/10
+    function operatorTransferByPartition(
+        bytes32 partition,
+        address from,
+        address to,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    ) external returns (bytes32); // 4/10
 
     // Operators
     function controllersByPartition(bytes32 partition) external view returns (address[] memory); // 7/10
@@ -162,12 +178,33 @@ interface ISecurityToken {
     // Token Issuance
     function isIssuable() external view returns (bool); // 4/9
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data) external; // 5/9
-    event IssuedByPartition(bytes32 indexed partition, address indexed operator, address indexed to, uint256 value, bytes data, bytes operatorData);
+    event IssuedByPartition(
+        bytes32 indexed partition,
+        address indexed operator,
+        address indexed to,
+        uint256 value,
+        bytes data,
+        bytes operatorData
+    );
 
     // Token Redemption
     // function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data) external; // 6/9
-    function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData) external; // 7/9
-    event RedeemedByPartition(bytes32 indexed partition, address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
+    function operatorRedeemByPartition(
+        bytes32 partition,
+        address tokenHolder,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    ) external; // 7/9
+
+    event RedeemedByPartition(
+        bytes32 indexed partition,
+        address indexed operator,
+        address indexed from,
+        uint256 value,
+        bytes data,
+        bytes operatorData
+    );
 
     // Transfer Validity
     // function canTransferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external view returns (byte, bytes32, bytes32); // 8/9

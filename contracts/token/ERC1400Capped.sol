@@ -46,16 +46,14 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param name Name of the token.
      * @param symbol Symbol of the token.
      * @param granularity Granularity of the token.
-     * @param adminContract Address of the Admin contract.
      */
     constructor(
         string memory name,
         string memory symbol,
-        uint256 granularity,
-        address adminContract
+        uint256 granularity
     )
     public
-    ERC1400Partition(name, symbol, granularity, adminContract)
+    ERC1400Partition(name, symbol, granularity)
     {
         // TODO activate when live
         // setInterfaceImplementation("ERC1400Token", address(this));
@@ -72,7 +70,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @return Requested document + document hash.
      */
     function getDocument(bytes32 documentName) external view returns (string memory, bytes32) {
-        require(bytes(_documents[documentName].docURI).length != 0);
+        require(bytes(_documents[documentName].docURI).length != 0, "Empty document");
         // Action Blocked - Empty document
         return (
         _documents[documentName].docURI,
@@ -88,7 +86,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param documentHash Hash of the document [optional parameter].
      */
     function setDocument(bytes32 documentName, string calldata uri, bytes32 documentHash) external {
-        require(_admin.hasRole(7, _msgSender()));
+        require(hasRole(7, _msgSender()), "0x07");
         _documents[documentName] = Doc({
             docURI : uri,
             docHash : documentHash
@@ -131,11 +129,8 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
 
         // total cap is always the sum of all partitionCaps, so it can't be violated
 
-        // capByPartition needs to be either unset (0)
-        // or greater or equal to the new _totalSupplyByPartition
         require(
-            _capByPartition[partition] == 0
-        || _totalSupplyByPartition[partition].add(value) <= _capByPartition[partition],
+            _totalSupplyByPartition[partition].add(value) <= _capByPartition[partition],
             'totalSupplyByPartition would exceed capByPartition'
         );
 
@@ -363,7 +358,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function renounceControl()
     external
     {
-        require(_admin.hasRole(0, _msgSender()));
+        require(hasRole(0, _msgSender()));
         _isControllable = false;
     }
 
@@ -375,7 +370,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function renounceIssuance()
     external
     {
-        require(_admin.hasRole(0, _msgSender()));
+        require(hasRole(0, _msgSender()));
         _isIssuable = false;
     }
 
@@ -404,7 +399,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function setPartitionControllers(bytes32 partition, address[] calldata operators)
     external
     {
-        require(_admin.hasRole(0, _msgSender()));
+        require(hasRole(0, _msgSender()));
         _setPartitionControllers(partition, operators);
     }
 
@@ -427,7 +422,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     }
 
     function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public {
-        require(_admin.hasRole(5, _msgSender()));
+        require(hasRole(5, _msgSender()), '0x07, not allowed to set cap');
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 
         // add difference to total cap

@@ -1,5 +1,5 @@
-const Admin = artifacts.require('Admin')
 const SecurityToken = artifacts.require('SecurityToken')
+const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 const conf = require('../token-config')
 
@@ -9,20 +9,22 @@ module.exports = async (deployer, network) => {
 
 	try {
 		await deployer.deploy(
-			Admin,
-			conf.admins,
-			conf.controllers
-		)
-
-		let admin = await Admin.deployed()
-
-		await deployer.deploy(
 			SecurityToken,
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			admin.address
+			conf.admins,
+			conf.controllers
 		)
+
+		let st = await SecurityToken.deployed()
+
+		await deployer.deploy(
+			SecurityTokenPartition,
+			st.address,
+			conf.standardPartition
+		)
+
 	} catch (e) {
 		console.log(e)
 	}
