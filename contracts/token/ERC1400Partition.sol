@@ -221,8 +221,8 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     view
     returns (bool)
     {
-        return (_authorizedOperatorByPartition[tokenHolder][partition][operator]
-        || (_isControllable && _isControllerByPartition[partition][operator]));
+        return (_authorizedOperatorByPartition[tokenHolder][partition][operator] ||
+        (_isControllable && _isControllerByPartition[partition][operator]));
     }
 
     /**

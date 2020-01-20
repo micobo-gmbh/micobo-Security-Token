@@ -72,8 +72,8 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
 
     function transferFrom(address from, address to, uint256 value) external returns (bool) {
         // check if is operator by partition or has enough allowance here
-        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from)
-            || (value <= _allowed[from][_msgSender()]), "A7");
+        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from) ||
+        (value <= _allowed[from][_msgSender()]), "A7");
         // Transfer Blocked - Identity restriction
 
         if (_allowed[from][_msgSender()] >= value) {
@@ -140,8 +140,8 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
     external
     {
         // check if is operator by partition or has enough allowance here
-        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from)
-            || (value <= _allowed[from][_msgSender()]), "A7");
+        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from) ||
+        (value <= _allowed[from][_msgSender()]), "A7");
         // Transfer Blocked - Identity restriction
 
         if (_allowed[from][_msgSender()] >= value) {

@@ -3,7 +3,7 @@
  */
 
 
-const {deployAllContracts, Role, Code} = require('./_deployment.js');
+const {deployAllContracts, Role} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
 

@@ -2,6 +2,8 @@ const {deployAllContracts, Role} = require('./_deployment.js');
 
 const truffleAssert = require('truffle-assertions')
 
+const conf = require('../token-config');
+
 
 contract('Test Minting', async (accounts) => {
 
@@ -10,6 +12,8 @@ contract('Test Minting', async (accounts) => {
 	let contracts
 
 	let minter = accounts[1]
+
+	let value = 1234567890
 
 	// deepEqual compares with '==='
 
@@ -21,27 +25,34 @@ contract('Test Minting', async (accounts) => {
 
 	it("mints tokens to test addresses if minter", async () => {
 
-		assert.deepEqual(
-			(await contracts.compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
-			0
-		)
-
-		// should fail because is not minter
 		await truffleAssert.fails(
-			contracts.compliantTokenInterface.mint(accounts[0], 1000, {from: minter})
+			contracts.micoboSecurityToken.issueByPartition(
+				conf.standardPartition,
+				accounts[0],
+				value,
+				'0x0'
+			)
 		)
 
-		// make minter
-		await contracts.adminInterface.add(Role.MINTER, minter)
+		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
 
-		// now it should pass
-		await truffleAssert.passes(
-			contracts.compliantTokenInterface.mint(accounts[0], 1000, {from: minter})
+		await contracts.micoboSecurityToken.issueByPartition(
+			conf.standardPartition,
+			accounts[0],
+			value,
+			'0x0'
 		)
+
+		let balance = (await contracts.micoboSecurityToken.balanceOfByPartition(
+			conf.standardPartition,
+			accounts[0]
+		)).toNumber()
+
+		console.log('balance: ', balance)
 
 		assert.deepEqual(
-			(await contracts.compliantTokenInterface.balanceOf(accounts[0])).toNumber(),
-			1000
+			balance,
+			value
 		)
 
 	})
@@ -49,16 +60,15 @@ contract('Test Minting', async (accounts) => {
 
 	it("cannot mint more than cap", async () => {
 
-
-		await truffleAssert.passes(
-			contracts.compliantTokenInterface.mint(accounts[0], 1000, {from: minter})
-		)
-
 		await truffleAssert.fails(
-			contracts.compliantTokenInterface.mint(accounts[0], 1000000000000001, {from: minter})
+			contracts.micoboSecurityToken.issueByPartition(
+				conf.standardPartition,
+				accounts[0],
+				conf.standardPartitionCap + 1,
+				'0x0'
+			)
 		)
 
-		// 1000000000000000
 	})
 
 })

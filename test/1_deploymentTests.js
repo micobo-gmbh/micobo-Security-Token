@@ -7,12 +7,16 @@ SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 const conf = require('../token-config');
 
+const {Role} = require('./_deployment.js');
+
 
 contract('Test Deployment', async (accounts) => {
 
 	let micoboSecurityToken, securityTokenPartition
 
 	// deepEqual compares with '==='
+
+	let contracts
 
 	it("deploys micobo security token", async () => {
 		micoboSecurityToken = await MicoboSecurityToken.new(
@@ -27,7 +31,7 @@ contract('Test Deployment', async (accounts) => {
 	it("adds the standard partition", async () => {
 
 		// give CAP_EDITOR role
-		await micoboSecurityToken.addRole(5, accounts[0])
+		await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
 
 		securityTokenPartition = await SecurityTokenPartition.new(
 			micoboSecurityToken.address,

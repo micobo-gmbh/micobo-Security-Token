@@ -51,7 +51,7 @@ contract Constrainable is Administrable {
     }
 
     function setModules(IConstraintsModule[] calldata newModules) external {
-        require(hasRole(6, msg.sender), '0x07');
+        require(hasRole(6, msg.sender), 'A7');
         _modules = newModules;
     }
 

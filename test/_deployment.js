@@ -18,7 +18,7 @@ deployAllContracts = async (accounts) => {
 		[accounts[0]]
 	)
 
-	await micoboSecurityToken.addRole(5, accounts[0]) // CAP_EDITOR
+	await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0]) // CAP_EDITOR
 
 	securityTokenPartition = await SecurityTokenPartition.new(
 		micoboSecurityToken.address,

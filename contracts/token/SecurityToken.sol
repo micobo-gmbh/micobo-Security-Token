@@ -36,7 +36,7 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
 
     // add a new Partition proxy contract
     function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) public{
-        require(hasRole(0, _msgSender()), "0xA7");
+        require(hasRole(0, _msgSender()), "A7");
 
         setCapByPartition(partition, partitionCap);
 
@@ -44,6 +44,8 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
 
         // _totalPartitions is being updated when when minting for the first time
     }
+
+    // TODO bulk minting?
 
 
     // GSN ***********************************

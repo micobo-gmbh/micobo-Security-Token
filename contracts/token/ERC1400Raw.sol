@@ -369,7 +369,7 @@ ERC1820Client
         // Transfer Blocked - Sender balance insufficient
 
         // is BURNER
-        require(hasRole(4, _msgSender()));
+        require(hasRole(4, _msgSender()), "A7");
 
         validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
 
@@ -478,7 +478,7 @@ ERC1820Client
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
 
-        require(hasRole(2, _msgSender()));
+        require(hasRole(2, _msgSender()), "A7");
 
         validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
 
