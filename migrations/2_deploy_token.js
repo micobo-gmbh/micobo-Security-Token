@@ -29,11 +29,11 @@ module.exports = async (deployer, network) => {
 		console.log(e)
 	}
 
-	let max_reached = await checkSize(artifacts);
+	/* let max_reached = await checkSize(artifacts);
 
 	if(max_reached) {
 		console.log('\n CONTRACT TOO BIG!')
-	}
+	} */
 
 };
 

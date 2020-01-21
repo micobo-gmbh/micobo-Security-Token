@@ -4,7 +4,7 @@
 
 const truffleAssert = require("truffle-assertions");
 
-const { deployAllContracts, Role } = require("./_deployment.js");
+const { deployAllContracts, Role } = require("./deployment.js");
 
 contract("Test Admin Contract", async accounts => {
   let contracts;

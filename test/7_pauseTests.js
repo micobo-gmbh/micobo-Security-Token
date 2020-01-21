@@ -45,7 +45,8 @@ contract('Test Pausing', async accounts => {
 	it('deploy PauseConstraintModule', async () => {
 
 		pauseConstraintModule = await PauseConstraintModule.new(
-			contracts.micoboSecurityToken.address
+			contracts.micoboSecurityToken.address,
+			'Pause Constraint'
 		)
 	
 	})

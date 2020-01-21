@@ -2,7 +2,7 @@
 	Test constraint contract functionality and updatability
  */
 
-const { deployAllContracts, Role } = require("./_deployment.js");
+const { deployAllContracts, Role } = require("./deployment.js");
 
 const truffleAssert = require("truffle-assertions");
 
