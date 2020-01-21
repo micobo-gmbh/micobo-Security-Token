@@ -21,7 +21,7 @@ contract WhitelistConstraintModule is IConstraintsModule {
     );
 
     // module data
-    mapping(address => bool) _whitelist;
+    mapping(address => bool) private _whitelist;
 
     // TODO maybe change to canSend and
 
@@ -36,9 +36,14 @@ contract WhitelistConstraintModule is IConstraintsModule {
         _securityToken = ISecurityToken(tokenAddress);
     }
 
+    function isWhitelisted(address account) public view returns (bool) {
+        return _whitelist[account];
+    }
+
 
     // function editWhitelist
     function editWhitelist(address account, bool whitelisted) public {
+        require(_securityToken.hasRole(8, msg.sender));
         _whitelist[account] = whitelisted;
     }
 

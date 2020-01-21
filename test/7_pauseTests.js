@@ -8,8 +8,7 @@ const conf = require('../token-config')
 
 
 contract('Test Pausing', async accounts => {
-	// TODO
-
+	
 	let contracts, pauseConstraintModule
 
 	let pauser = accounts[2]

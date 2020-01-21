@@ -1,5 +1,5 @@
 /*
-	Test constraint contract functionality and updatability
+	Test constraint functionality
  */
 
 const { deployAllContracts, Role } = require("./deployment.js");

@@ -1,13 +1,20 @@
 pragma solidity 0.5.12;
 
-/*
+import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+
 import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
 contract SpendingLimitsConstraintModule is IConstraintsModule {
 
-    // TODO
+    using SafeMath for uint256;
+
+    // TODO test
+
+    // Set spending limits like:
+    // Not more than 2000/500/100 tokens every 24h/12h/6h etc
+
 
     ISecurityToken _securityToken;
 
@@ -23,9 +30,21 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     // module data
 
-    mapping(bytes32 => mapping(uint256 => uint256) limitsByPartitionByTime;
+    // tracks limits for different time periods
+    TimeLock[] private _timelocks;
 
-    mapping(bytes32 => uint256) lockingPeriodByPartition;
+    struct TimeLock {
+        uint256 periodLength;
+        uint256 amountAllowed;
+    }
+
+    // tracks the current spending of accounts in a period
+    mapping(bytes32 => mapping(address => User)) private _cPAU;
+
+    struct User {
+        uint256 amount;
+        uint256 periodEnd;
+    }
 
     address _owner;
 
@@ -41,14 +60,14 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     // function edit limits
 
     function isValid(
-        address msg_sender,
+        address /* msg_sender */,
         bytes32 partition,
-        address operator,
+        address /* operator */,
         address from,
-        address to,
+        address /* to */,
         uint256 value,
-        bytes memory data,
-        bytes memory operatorData
+        bytes memory /* data */,
+        bytes memory /* operatorData */
     )
     public
     view
@@ -57,11 +76,35 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         string memory message
     )
     {
+        User memory user = _cPAU[partition][from];
+        valid = true;
 
-        // TODO check limits
+        // if any of the timelocks a violated, valid is set to false
+        for (uint i = 0; i < _timelocks.length; i++) {
+
+            // period has not ended => there has been at least 1 tx
+            if(now <= user.periodEnd) {
+
+                // accumulated amount plus the amount to be transferred exceeds the allowed amount
+                if (user.amount.add(value) > _timelocks[i].amountAllowed) {
+                    valid = false;
+                    message = 'A8 - spending limit for this period reached';
+                }
+
+                // accumulated amount plus the amount to be transferred does not exceed the allowed amount
+                else {
+                    // increase accumulated amount and leave periodEnd
+                    user.amount = user.amount.add(value);
+                }
+            }
+
+            // period ended => no tx in the relevant timeperiod
+            else {
+                user.amount = value;
+                user.periodEnd = _timelocks[i].periodLength.add(now);
+            }
+        }
 
         return (valid, message);
     }
-
 }
-*/

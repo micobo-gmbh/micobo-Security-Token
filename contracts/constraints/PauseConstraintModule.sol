@@ -57,8 +57,8 @@ contract PauseConstraintModule is IConstraintsModule {
     public
     view
     returns (
-        bool valid,
-        string memory message
+        bool,
+        string memory
     )
     {
         if (_paused) {

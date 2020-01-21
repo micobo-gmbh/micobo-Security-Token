@@ -1,5 +1,5 @@
 /*
-	Test admin contract functionality
+	Test admin functionality
  */
 
 const truffleAssert = require("truffle-assertions");

@@ -5,7 +5,6 @@ const truffleAssert = require("truffle-assertions");
 const conf = require("../token-config");
 
 contract("Test Minting", async accounts => {
-  // TODO
 
   let contracts;
 
