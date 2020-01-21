@@ -9,6 +9,8 @@ contract ISecurityTokenPartition {
 
     function partitionId() external view returns (bytes32);
 
+    function cap() external view returns (uint256);
+
 
     //******************/
     // ERC20Detailed
@@ -19,6 +21,7 @@ contract ISecurityTokenPartition {
     function symbol() external view returns (string memory);
 
     function decimals() external view returns (uint8);
+
 
     //******************/
     // IERC20
@@ -46,11 +49,6 @@ contract ISecurityTokenPartition {
     //******************/
     // ERC1400Raw
     //******************/
-
-    // ERC20Detailed  function name() external view returns (string memory); // 1/13
-    // ERC20Detailed  function symbol() external view returns (string memory); // 2/13
-    // ERC20  function totalSupply() external view returns (uint256); // 3/13
-    // ERC20  function balanceOf(address owner) external view returns (uint256); // 4/13
 
     function granularity() external view returns (uint256);
 

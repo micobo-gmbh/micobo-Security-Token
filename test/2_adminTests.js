@@ -2,118 +2,140 @@
 	Test admin contract functionality
  */
 
+const truffleAssert = require("truffle-assertions");
 
-const truffleAssert = require('truffle-assertions')
+const { deployAllContracts, Role } = require("./_deployment.js");
 
-const {deployAllContracts, Role} = require('./_deployment.js');
+contract("Test Admin Contract", async accounts => {
+  let contracts;
 
+  before(async () => {
+    contracts = await deployAllContracts(accounts);
+  });
 
-contract('Test Admin Contract', async (accounts) => {
+  it("accounts[0] is admin", async () => {
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[0]),
+      true
+    );
+  });
 
-	let contracts
+  it("can add and remove roles", async () => {
+    // other admin
+    await contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1]);
 
-	before(async () => {
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+      true
+    );
 
-		contracts = await deployAllContracts(accounts)
+    await contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[1]);
 
-	})
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+      false
+    );
 
-	it("accounts[0] is admin", async () => {
+    // constraintsEditor
+    await contracts.micoboSecurityToken.addRole(
+      Role.CONSTRAINTS_EDITOR,
+      accounts[1]
+    );
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[0]),
-			true
-		)
-	})
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(
+        Role.CONSTRAINTS_EDITOR,
+        accounts[1]
+      ),
+      true
+    );
 
-	it("can add and remove roles", async () => {
+    await contracts.micoboSecurityToken.removeRole(
+      Role.CONSTRAINTS_EDITOR,
+      accounts[1]
+    );
 
-		// other admin
-		await contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1])
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(
+        Role.CONSTRAINTS_EDITOR,
+        accounts[1]
+      ),
+      false
+    );
+  });
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
-			true
-		)
+  it("can renounce role", async () => {
+    // constraintsEditor
+    await contracts.micoboSecurityToken.addRole(
+      Role.CONSTRAINTS_EDITOR,
+      accounts[1]
+    );
 
-		await contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[1])
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(
+        Role.CONSTRAINTS_EDITOR,
+        accounts[1]
+      ),
+      true
+    );
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN ,accounts[1]),
-			false
-		)
+    await contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {
+      from: accounts[1]
+    });
 
-		// constraintsEditor
-		await contracts.micoboSecurityToken.addRole(Role.CONSTRAINTS_EDITOR, accounts[1])
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(
+        Role.CONSTRAINTS_EDITOR,
+        accounts[1]
+      ),
+      false
+    );
+  });
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONSTRAINTS_EDITOR, accounts[1]),
-			true
-		)
+  it("cannot renounce role one doesn't have", async () => {
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(
+        Role.CONSTRAINTS_EDITOR,
+        accounts[1]
+      ),
+      false
+    );
 
-		await contracts.micoboSecurityToken.removeRole(Role.CONSTRAINTS_EDITOR, accounts[1])
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {
+        from: accounts[1]
+      })
+    );
+  });
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONSTRAINTS_EDITOR, accounts[1]),
-			false
-		)
-	})
+  it("cannot remove own ADMIN role", async () => {
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0])
+    );
 
-	it("can renounce role", async () => {
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.renounceRole(Role.ADMIN)
+    );
+  });
 
-		// constraintsEditor
-		await contracts.micoboSecurityToken.addRole(Role.CONSTRAINTS_EDITOR, accounts[1])
+  it("non-admin cannot add nor remove roles", async () => {
+    assert.deepEqual(
+      await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+      false
+    );
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONSTRAINTS_EDITOR, accounts[1]),
-			true
-		)
+    // give admin role to oneself
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1], {
+        from: accounts[1]
+      })
+    );
 
-		await contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {from: accounts[1]})
-
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONSTRAINTS_EDITOR, accounts[1]),
-			false
-		)
-	})
-
-	it("cannot renounce role one doesn't have", async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONSTRAINTS_EDITOR, accounts[1]),
-			false
-		)
-
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {from: accounts[1]})
-		)
-	})
-
-	it("cannot remove own ADMIN role", async () => {
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0])
-		)
-
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.renounceRole(Role.ADMIN)
-		)
-	})
-
-	it("non-admin cannot add nor remove roles", async () => {
-
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN ,accounts[1]),
-			false
-		)
-
-		// give admin role to oneself
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1], {from: accounts[1]})
-		)
-
-		// remove admin role from other admin
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0], {from: accounts[1]})
-		)
-	})
-
-})
+    // remove admin role from other admin
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0], {
+        from: accounts[1]
+      })
+    );
+  });
+});

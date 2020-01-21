@@ -36,6 +36,10 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         return _partitionId;
     }
 
+    function cap() external view returns (uint256) {
+        return _securityToken.capByPartition(_partitionId);
+    }
+
 
     //******************/
     // ERC20Detailed

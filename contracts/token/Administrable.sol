@@ -23,6 +23,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * 5 CAP_EDITOR
      * 6 CONSTRAINTS_EDITOR (can edit constraint modules),
      * 7 DOCUMENT_EDITOR
+     * 8 WHITELIST_EDITOR
      *
      * constraints_editor: simply use new roles in every constraint module!
      */

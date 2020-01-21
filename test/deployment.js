@@ -45,7 +45,8 @@ const Role = {
 	BURNER: 4,
 	CAP_EDITOR: 5,	
 	CONSTRAINTS_EDITOR: 6,
-	DOCUMENT_EDITOR: 7
+	DOCUMENT_EDITOR: 7,
+	WHITELIST_EDITOR: 8
 }
 
 module.exports = {

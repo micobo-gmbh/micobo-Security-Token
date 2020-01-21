@@ -120,7 +120,13 @@ interface ISecurityToken {
     function partitionsOf(address tokenHolder) external view returns (bytes32[] memory); // 2/10
 
     // Token Transfers
-    function transferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external returns (bytes32); // 3/10
+    function transferByPartition(
+        bytes32 partition,
+        address to,
+        uint256 value,
+        bytes calldata data
+    )external returns (bytes32); // 3/10
+
     function operatorTransferByPartition(
         bytes32 partition,
         address from,
