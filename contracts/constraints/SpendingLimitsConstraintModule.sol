@@ -5,13 +5,11 @@ import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
-contract OffChainValidator is IConstraintsModule {
+contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     // TODO
 
     ISecurityToken _securityToken;
-
-    address _signer;
 
     string private module_name;
 
@@ -24,22 +22,23 @@ contract OffChainValidator is IConstraintsModule {
     );
 
     // module data
-    address _signer;
+
+    mapping(bytes32 => mapping(uint256 => uint256) limitsByPartitionByTime;
+
+    mapping(bytes32 => uint256) lockingPeriodByPartition;
+
+    address _owner;
 
     constructor(
         address tokenAddress,
-        string memory _module_name,
-        address signer
+        string memory _module_name
     ) public {
         _owner = msg.sender;
         module_name = _module_name;
         _securityToken = ISecurityToken(tokenAddress);
-        _signer = signer;
     }
 
-
-    // function change signer
-
+    // function edit limits
 
     function isValid(
         address msg_sender,
@@ -59,11 +58,10 @@ contract OffChainValidator is IConstraintsModule {
     )
     {
 
-        // TODO ecrecover
+        // TODO check limits
 
         return (valid, message);
     }
-
 
 }
 */
