@@ -57,7 +57,6 @@ contract('Test Minting', async (accounts) => {
 
 	})
 
-
 	it("cannot mint more than cap", async () => {
 
 		await truffleAssert.fails(

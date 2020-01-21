@@ -1,12 +1,12 @@
 pragma solidity 0.5.12;
 
-import "../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
-import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
+import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./interfaces/ISecurityToken.sol";
-import "./interfaces/IERC1400Raw.sol";
-import "./interfaces/ISecurityTokenPartition.sol";
+import "../interfaces/ISecurityToken.sol";
+import "../interfaces/IERC1400Raw.sol";
+import "../interfaces/ISecurityTokenPartition.sol";
 
 contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw, GSNRecipient {
 
