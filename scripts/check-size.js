@@ -3,7 +3,7 @@ const fs = require('fs') ;
 module.exports = async (artifacts) => {
 	console.log('\n *** CONTRACT SIZES: \n')
 
-	const LIMIT = 1024 ;
+	const LIMIT = 1 ;
 	const MAX = 24 * 1024;
 
 	let max_reached = false;

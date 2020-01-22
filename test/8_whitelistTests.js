@@ -51,10 +51,6 @@ contract('Test Whitelist', async (accounts) => {
 
 	it('register WhitelistConstraintModule', async () => {
 
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setModules([whitelistConstraintModule.address])
-		)
-
 		// adding CONSTRAINTS_EDITOR
 		await contracts.micoboSecurityToken.addRole(Role.CONSTRAINTS_EDITOR, accounts[0])
 		

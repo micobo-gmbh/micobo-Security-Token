@@ -16,14 +16,21 @@ contract("Test Constraint Contract", async accounts => {
   before(async () => {
     contracts = await deployAllContracts(accounts);
 
+  
+  });
+
+  it("can set modules only when constraints editor", async () => {
+
+    await truffleAssert.fails(
+      contracts.micoboSecurityToken.setModules(moduleAddresses)
+    );
+
     // add constraintEditor
     await contracts.micoboSecurityToken.addRole(
       Role.CONSTRAINTS_EDITOR,
       accounts[0]
     );
-  });
 
-  it("can set modules", async () => {
     await truffleAssert.passes(
       contracts.micoboSecurityToken.setModules(moduleAddresses)
     );

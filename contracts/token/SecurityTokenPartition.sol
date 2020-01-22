@@ -20,12 +20,12 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
     mapping(address => mapping(address => uint256)) internal _allowed;
 
 
-    constructor(address securityTokenAddress, bytes32 partitionId) public {
+    constructor(address securityTokenAddress, bytes32 partition) public {
 
         // TODO maybe set interface implementation 1820 for ERC20 here?
 
         _securityToken = ISecurityToken(securityTokenAddress);
-        _partitionId = partitionId;
+        _partitionId = partition;
     }
 
     function securityTokenAddress() external view returns (ISecurityToken) {

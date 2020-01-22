@@ -5,7 +5,7 @@ import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
-contract SpendingLimitsConstraintModule is IConstraintsModule {
+contract PartitionTimeLockConstraintModule is IConstraintsModule {
 
     // TODO
 
@@ -36,7 +36,11 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         _securityToken = ISecurityToken(tokenAddress);
     }
 
-    // function edit limits
+    // function to edit limits
+    function editTimeLock(bytes32 partition, uint256 time) public {
+        require(_securityToken.hasRole(9, msg.sender), 'A8');
+        _partitionTimeLock[partition] = time;
+    }
 
     function isValid(
         address /* msg_sender */,
@@ -55,7 +59,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         string memory
     )
     {
-        if(_partitionTimeLock[partition] <= now) {
+        if(_partitionTimeLock[partition] > now) {
             return(false, 'A8 - partition is still locked');
         } else {
             return(true, '');
