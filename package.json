@@ -8,10 +8,9 @@
   },
   "scripts": {
     "test": "truffle test",
-    "gas_report": "truffle test --network gas_report",
     "deploy": "truffle migrate --reset",
     "compile": "solc --bin --optimize --optimize-runs 99999 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
-    "compile-all": "truffle compile --all"
+    "size": "truffle compile --all && truffle exec scripts/check-size.js"
   },
   "repository": {
     "type": "git",

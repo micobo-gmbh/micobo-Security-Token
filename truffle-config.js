@@ -18,12 +18,15 @@
  *
  */
 
-const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 // const infuraKey = "fj4jll3k.....";
 
-const fs = require('fs');
-const mnemonic = fs.readFileSync(".mnemonic").toString().trim();
+const fs = require('fs')
+const mnemonic = fs
+	.readFileSync('.mnemonic')
+	.toString()
+	.trim()
 
 module.exports = {
 	/**
@@ -50,7 +53,7 @@ module.exports = {
 			gas: 0xffffffff
 		},
 
-/*
+		/*
 		development: {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "http://localhost:8545");
@@ -60,9 +63,6 @@ module.exports = {
 			gasPrice: 10000000000
 		}
 		*/
-
-
-
 
 		// Useful for deploying to a public network.
 		// NB: It's important to wrap the provider as a function.
@@ -92,21 +92,21 @@ module.exports = {
 		}
 	},
 
-
 	// Configure your compilers
 	compilers: {
 		solc: {
-			version: "0.5.12",    // Fetch exact version from solc-bin (default: truffle's version)
-			docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
-			settings: {          // See the solidity docs for advice about optimization and evmVersion
+			version: '0.5.12', // Fetch exact version from solc-bin (default: truffle's version)
+			docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
+			settings: {
+				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
 					runs: 32768
 				},
-				evmVersion: "petersburg"
+				evmVersion: 'petersburg'
 			}
 		}
 	},
 
-	plugins: ["truffle-security"]
+	plugins: ['truffle-security']
 }

@@ -24,20 +24,7 @@ module.exports = async (deployer, network) => {
 			st.address,
 			conf.standardPartition
 		)
-
 	} catch (e) {
 		console.log(e)
 	}
-
-	/* let max_reached = await checkSize(artifacts);
-
-	if(max_reached) {
-		console.log('\n CONTRACT TOO BIG!')
-	} */
-
-};
-
-
-
-
-
+}

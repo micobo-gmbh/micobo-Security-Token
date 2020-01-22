@@ -1,6 +1,6 @@
 const fs = require('fs') ;
 
-module.exports = async (artifacts) => {
+module.exports = async () => {
 	console.log('\n *** CONTRACT SIZES: \n')
 
 	const LIMIT = 1 ;
@@ -15,9 +15,9 @@ module.exports = async (artifacts) => {
 	}
 
 	const sizes = name => {
-		let abi = artifacts.require(name) ;
-		let size = (abi.bytecode.length / 2) - 1 ;
-		let deployedSize = (abi.deployedBytecode.length / 2) - 1 ;
+		let contract = require('../build/contracts/' + name);
+		let size = (contract.bytecode.length / 2) - 1 ;
+		let deployedSize = (contract.deployedBytecode.length / 2) - 1 ;
 		return {name, size, deployedSize} ;
 	};
 
