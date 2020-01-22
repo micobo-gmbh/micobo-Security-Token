@@ -42,6 +42,8 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
 
         _partitionProxies.push(proxyAddress);
 
+        _setPartitionControllers(partition, _partitionProxies);
+
         // _totalPartitions is being updated when when minting for the first time
     }
 

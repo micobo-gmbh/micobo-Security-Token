@@ -1,13 +1,10 @@
 pragma solidity 0.5.12;
 
+/*
 import './interfaces/ISecurityToken.sol';
 import './token/SecurityTokenPartition.sol';
 
 contract SecurityTokenPartitionFactory {
-
-    constructor() public {
-
-    }
 
     function createPartition(
         address securityTokenAddress,
@@ -21,6 +18,8 @@ contract SecurityTokenPartitionFactory {
             partition
         );
 
+        // TODO this will lead to problems with _msgSender() !
+
         ISecurityToken(securityTokenAddress).addPartition(
             partition,
             address(tokenPartition),
@@ -29,4 +28,4 @@ contract SecurityTokenPartitionFactory {
 
         return tokenPartition;
     }
-}
+} */

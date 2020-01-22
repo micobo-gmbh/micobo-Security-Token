@@ -4,7 +4,6 @@ import "./ISecurityToken.sol";
 
 contract ISecurityTokenPartition {
 
-
     function securityTokenAddress() external view returns (ISecurityToken);
 
     function partitionId() external view returns (bytes32);
@@ -51,14 +50,6 @@ contract ISecurityTokenPartition {
     //******************/
 
     function granularity() external view returns (uint256);
-
-    function controllers() external view returns (address[] memory);
-
-    function authorizeOperator(address operator) external;
-
-    function revokeOperator(address operator) external;
-
-    function isOperator(address operator, address tokenHolder) external view returns (bool);
 
     function transferWithData(address to, uint256 value, bytes calldata data) external;
 

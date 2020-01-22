@@ -50,7 +50,7 @@ contract WhitelistConstraintModule is IConstraintsModule {
     // function bulkEditWhitelist
     function bulkEditWhitelist(address[] memory accounts, bool whitelisted) public {
         require(_securityToken.hasRole(8, msg.sender), 'A8');
-        require(accounts.length <= 40);
+        require(accounts.length <= 40, 'too many accounts');
 
         for(uint i = 0; i < accounts.length; i++) {
             _whitelist[accounts[i]] = whitelisted;

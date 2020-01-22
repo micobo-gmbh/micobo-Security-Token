@@ -72,7 +72,7 @@ contract PauseConstraintModule is IConstraintsModule {
 
     // MODULE FUNCTIONS
 
-    
+
     /**
     * @dev Returns true if the contract is paused, and false otherwise.
     */
@@ -80,7 +80,7 @@ contract PauseConstraintModule is IConstraintsModule {
         return _paused;
     }
 
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -90,7 +90,7 @@ contract PauseConstraintModule is IConstraintsModule {
     }
 
 
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is paused.
     */
@@ -100,23 +100,23 @@ contract PauseConstraintModule is IConstraintsModule {
     }
 
 
-    
+
     /**
     * @dev Called by a pauser to pause, triggers stopped state.
     */
     function pause() public whenNotPaused {
-        require(_securityToken.hasRole(3, msg.sender));
+        require(_securityToken.hasRole(3, msg.sender), 'A7');
         _paused = true;
         emit Paused(msg.sender);
     }
 
 
-    
+
     /**
      * @dev Called by a pauser to unpause, returns to normal state.
      */
     function unpause() public whenPaused {
-        require(_securityToken.hasRole(3, msg.sender));
+        require(_securityToken.hasRole(3, msg.sender), 'A7');
         _paused = false;
         emit Unpaused(msg.sender);
     }

@@ -58,11 +58,14 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
     }
 
     //******************/
-    // IERC20
+    // ERC20
     //******************/
 
     function transfer(address to, uint256 value) external returns (bool) {
-        _securityToken.transferByPartition(_partitionId, to, value, '');
+
+        // transferByPartition contains "_msgSender()", which would be THIS contract's address
+        // this is why this contract is a controllerByPartition so we can still make transfers.
+        _securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, '', '');
         return true;
     }
 
@@ -87,7 +90,7 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         }
 
         // transfer by partition
-        _securityToken.transferByPartition(_partitionId, to, value, '');
+        _securityToken.operatorTransferByPartition(_partitionId, from, to, value, '', '');
         return true;
     }
 
@@ -117,26 +120,10 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         return _securityToken.granularity();
     }
 
-    function controllers() external view returns (address[] memory) {
-        return _securityToken.controllersByPartition(_partitionId);
-    }
-
-    function authorizeOperator(address operator) external {
-        _securityToken.authorizeOperatorByPartition(_partitionId, operator);
-    }
-
-    function revokeOperator(address operator) external {
-        _securityToken.revokeOperatorByPartition(_partitionId, operator);
-    }
-
-    function isOperator(address operator, address tokenHolder) external view returns (bool) {
-        return _securityToken.isOperatorForPartition(_partitionId, operator, tokenHolder);
-    }
-
     function transferWithData(address to, uint256 value, bytes calldata data)
     external
     {
-        _securityToken.transferByPartition(_partitionId, to, value, data);
+        _securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, data, '');
     }
 
     // this is where the operator functionality is used
@@ -155,7 +142,7 @@ contract SecurityTokenPartition is ISecurityTokenPartition, IERC20, IERC1400Raw,
         }
 
         // transfer by partition with data
-        _securityToken.transferByPartition(_partitionId, to, value, data);
+        _securityToken.operatorTransferByPartition(_partitionId, from, to, value, data, '');
     }
 
     // only BURNERS can redeem tokens
