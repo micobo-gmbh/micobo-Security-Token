@@ -51,7 +51,7 @@ The Administration contract can endow addresses with one **Role** or more:
 * 3 PAUSER,
 * 4 BURNER / REDEEMER
 * 5 CAP_EDITOR
-* 6 CONSTRAINTS_EDITOR (can edit constraint modules),
+* 6 MODULE_EDITOR (can edit constraint modules),
 * 7 DOCUMENT_EDITOR
 
 #

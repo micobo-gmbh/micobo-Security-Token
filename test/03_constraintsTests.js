@@ -27,7 +27,7 @@ contract("Test Constraint Contract", async accounts => {
 
     // add constraintEditor
     await contracts.micoboSecurityToken.addRole(
-      Role.CONSTRAINTS_EDITOR,
+      Role.MODULE_EDITOR,
       accounts[0]
     );
 

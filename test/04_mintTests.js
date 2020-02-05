@@ -44,7 +44,7 @@ contract("Test Minting", async accounts => {
       )
     ).toNumber();
 
-    console.log("balance: ", balance);
+    // console.log("balance: ", balance);
 
     assert.deepEqual(balance, value);
   });

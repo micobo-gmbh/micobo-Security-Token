@@ -4,7 +4,7 @@ import "./IConstraintsModule.sol";
 import "./IAdmin.sol";
 
 /**
- * @title Interface for using the Compliant Token
+ * @title Interface for using the Security Token
  * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
  *

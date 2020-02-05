@@ -27,8 +27,6 @@ contract("Test Deployment", async accounts => {
     });
 
     it("adds the standard partition", async () => {
-        // give CAP_EDITOR role
-        await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0]);
 
         securityTokenPartition = await SecurityTokenPartition.new(
             micoboSecurityToken.address,

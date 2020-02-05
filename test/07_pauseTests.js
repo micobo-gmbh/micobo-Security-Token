@@ -56,8 +56,8 @@ contract('Test Pausing', async accounts => {
 			contracts.micoboSecurityToken.setModules([pauseConstraintModule.address])
 		)
 
-		// adding CONSTRAINTS_EDITOR
-		await contracts.micoboSecurityToken.addRole(Role.CONSTRAINTS_EDITOR, accounts[0])
+		// adding MODULE_EDITOR
+		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 		
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModules([pauseConstraintModule.address])

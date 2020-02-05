@@ -38,7 +38,7 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
     function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) public{
         require(hasRole(0, _msgSender()), "A7");
 
-        setCapByPartition(partition, partitionCap);
+        _setCapByPartition(partition, partitionCap);
 
         _partitionProxies.push(proxyAddress);
 

@@ -38,26 +38,26 @@ contract("Test Admin Contract", async accounts => {
 
     // constraintsEditor
     await contracts.micoboSecurityToken.addRole(
-      Role.CONSTRAINTS_EDITOR,
+      Role.MODULE_EDITOR,
       accounts[1]
     );
 
     assert.deepEqual(
       await contracts.micoboSecurityToken.hasRole(
-        Role.CONSTRAINTS_EDITOR,
+        Role.MODULE_EDITOR,
         accounts[1]
       ),
       true
     );
 
     await contracts.micoboSecurityToken.removeRole(
-      Role.CONSTRAINTS_EDITOR,
+      Role.MODULE_EDITOR,
       accounts[1]
     );
 
     assert.deepEqual(
       await contracts.micoboSecurityToken.hasRole(
-        Role.CONSTRAINTS_EDITOR,
+        Role.MODULE_EDITOR,
         accounts[1]
       ),
       false
@@ -67,25 +67,25 @@ contract("Test Admin Contract", async accounts => {
   it("can renounce role", async () => {
     // constraintsEditor
     await contracts.micoboSecurityToken.addRole(
-      Role.CONSTRAINTS_EDITOR,
+      Role.MODULE_EDITOR,
       accounts[1]
     );
 
     assert.deepEqual(
       await contracts.micoboSecurityToken.hasRole(
-        Role.CONSTRAINTS_EDITOR,
+        Role.MODULE_EDITOR,
         accounts[1]
       ),
       true
     );
 
-    await contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {
+    await contracts.micoboSecurityToken.renounceRole(Role.MODULE_EDITOR, {
       from: accounts[1]
     });
 
     assert.deepEqual(
       await contracts.micoboSecurityToken.hasRole(
-        Role.CONSTRAINTS_EDITOR,
+        Role.MODULE_EDITOR,
         accounts[1]
       ),
       false
@@ -95,14 +95,14 @@ contract("Test Admin Contract", async accounts => {
   it("cannot renounce role one doesn't have", async () => {
     assert.deepEqual(
       await contracts.micoboSecurityToken.hasRole(
-        Role.CONSTRAINTS_EDITOR,
+        Role.MODULE_EDITOR,
         accounts[1]
       ),
       false
     );
 
     await truffleAssert.fails(
-      contracts.micoboSecurityToken.renounceRole(Role.CONSTRAINTS_EDITOR, {
+      contracts.micoboSecurityToken.renounceRole(Role.MODULE_EDITOR, {
         from: accounts[1]
       })
     );

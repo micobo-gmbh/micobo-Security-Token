@@ -18,8 +18,6 @@ deployAllContracts = async (accounts) => {
 		[accounts[0]]
 	)
 
-	await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0]) // CAP_EDITOR
-
 	securityTokenPartition = await SecurityTokenPartition.new(
 		micoboSecurityToken.address,
 		conf.standardPartition
@@ -44,7 +42,7 @@ const Role = {
 	PAUSER: 3,
 	BURNER: 4,
 	CAP_EDITOR: 5,	
-	CONSTRAINTS_EDITOR: 6,
+	MODULE_EDITOR: 6,
 	DOCUMENT_EDITOR: 7,
 	WHITELIST_EDITOR: 8,
 	TIME_LOCK_EDITOR: 9

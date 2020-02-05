@@ -21,12 +21,11 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * 3 PAUSER,
      * 4 BURNER / REDEEMER
      * 5 CAP_EDITOR
-     * 6 CONSTRAINTS_EDITOR (can edit constraint modules),
+     * 6 MODULE_EDITOR (can edit constraint modules),
      * 7 DOCUMENT_EDITOR
      * 8 WHITELIST_EDITOR
      * 9 TIME_LOCK_EDITOR
      *
-     * constraints_editor: simply use new roles in every constraint module!
      */
 
     mapping(uint8 => mapping(address => bool)) internal _roles;

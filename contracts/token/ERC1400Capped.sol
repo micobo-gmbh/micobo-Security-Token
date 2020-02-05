@@ -425,6 +425,10 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
         require(hasRole(5, _msgSender()), 'A7, not allowed to set cap');
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 
+        _setCapByPartition(partition, newPartitionCap);
+    }
+
+    function _setCapByPartition(bytes32 partition, uint256 newPartitionCap) internal {
         // add difference to total cap
         _cap = _cap.add((newPartitionCap.sub(_capByPartition[partition])));
 

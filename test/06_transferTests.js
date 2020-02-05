@@ -5,7 +5,7 @@ const conf = require('../token-config')
 const {deployAllContracts, Role, Code} = require('./deployment.js');
 
 
-contract('Test Compliant Token', async (accounts) => {
+contract('Test Security Token', async (accounts) => {
 
 	let contracts
 

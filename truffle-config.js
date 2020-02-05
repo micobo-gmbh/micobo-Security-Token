@@ -88,7 +88,7 @@ module.exports = {
 		reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
-			gasPrice: 6
+			gasPrice: 2
 		}
 	},
 

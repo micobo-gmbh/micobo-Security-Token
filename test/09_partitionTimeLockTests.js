@@ -46,9 +46,9 @@ contract('Test Partition TimeLocks', async accounts => {
 	})
 
 	it('register PartitionTimeLockConstraintModule', async () => {
-		// adding CONSTRAINTS_EDITOR
+		// adding MODULE_EDITOR
 		await contracts.micoboSecurityToken.addRole(
-			Role.CONSTRAINTS_EDITOR,
+			Role.MODULE_EDITOR,
 			accounts[0]
 		)
 
