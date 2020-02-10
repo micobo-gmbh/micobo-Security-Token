@@ -84,13 +84,13 @@ module.exports = {
 	},
 
 	// Set default mocha options here, use special reporters etc.
-	mocha: {
+	/* mocha: {
 		reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
 			gasPrice: 2
 		}
-	},
+	}, */
 
 	// Configure your compilers
 	compilers: {

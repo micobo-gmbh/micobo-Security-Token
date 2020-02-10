@@ -52,7 +52,6 @@ contract OffChainValidator is IConstraintsModule {
         bytes memory operatorData
     )
     public
-    view
     returns (
         bool valid,
         string memory message

@@ -10,7 +10,6 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     using SafeMath for uint256;
 
-    // TODO test
 
     // Set spending limits like:
     // Not more than 2000/500/100 tokens every 24h/12h/6h etc
@@ -38,8 +37,8 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         uint256 amountAllowed;
     }
 
-    // tracks the current spending of accounts in a period
-    mapping(bytes32 => mapping(address => User)) private _cPAU;
+    // tracks the current spending of accounts in a period, current Partition - Account - TimelockIndex - User
+    mapping(bytes32 => mapping(address => mapping(uint256 => User))) private _cPATU;
 
     struct User {
         uint256 amount;
@@ -57,7 +56,29 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         _securityToken = ISecurityToken(tokenAddress);
     }
 
-    // function edit limits
+
+    // TODO find a way to easily get all timelock entries
+
+
+    modifier onlySpendingLimitsEditor {
+        require(_securityToken.hasRole(10, msg.sender), 'A7');
+        _;
+    }
+
+    function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
+        _timelocks.push(TimeLock(periodLength, amountAllowed));
+    }
+
+    function setTimelock (uint256 index, uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
+        require(_timelocks.length > index, "out of bounds");
+        _timelocks[index] = TimeLock(periodLength, amountAllowed);
+    }
+
+    function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
+        require(_timelocks.length > index, "out of bounds");
+        _timelocks[index] = _timelocks[_timelocks.length - 1];
+        _timelocks.length--;
+    }
 
     function isValid(
         address /* msg_sender */,
@@ -70,24 +91,23 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         bytes memory /* operatorData */
     )
     public
-    view
     returns (
-        bool valid,
+        bool invalid,
         string memory message
     )
     {
-        User memory user = _cPAU[partition][from];
-        valid = true;
 
-        // if any of the timelocks a violated, valid is set to false
+        // if any of the timelocks are violated, valid is set to false
         for (uint i = 0; i < _timelocks.length; i++) {
+
+            User storage user = _cPATU[partition][from][i];
 
             // period has not ended => there has been at least 1 tx
             if(now <= user.periodEnd) {
 
                 // accumulated amount plus the amount to be transferred exceeds the allowed amount
                 if (user.amount.add(value) > _timelocks[i].amountAllowed) {
-                    valid = false;
+                    invalid = true;
                     message = 'A8 - spending limit for this period reached';
                 }
 
@@ -100,11 +120,18 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
             // period ended => no tx in the relevant timeperiod
             else {
-                user.amount = value;
-                user.periodEnd = _timelocks[i].periodLength.add(now);
+                if (value > _timelocks[i].amountAllowed) {
+                    invalid = true;
+                    message = 'A8 - spending limit for this period reached';
+                }
+
+                else {
+                    user.amount = value;
+                    user.periodEnd = _timelocks[i].periodLength.add(now);
+                }
             }
         }
 
-        return (valid, message);
+        return (!invalid, message);
     }
 }

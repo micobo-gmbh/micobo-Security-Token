@@ -25,7 +25,6 @@ contract Constrainable is Administrable {
         bytes memory operatorData
     )
     internal
-    view
     {
 
         for (uint i = 0; i < _modules.length; i++) {

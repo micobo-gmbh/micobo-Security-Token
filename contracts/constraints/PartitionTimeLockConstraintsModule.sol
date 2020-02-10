@@ -38,7 +38,7 @@ contract PartitionTimeLockConstraintModule is IConstraintsModule {
 
     // function to edit limits
     function editTimeLock(bytes32 partition, uint256 time) public {
-        require(_securityToken.hasRole(9, msg.sender), 'A8');
+        require(_securityToken.hasRole(9, msg.sender), 'A7');
         _partitionTimeLock[partition] = time;
     }
 
@@ -53,7 +53,6 @@ contract PartitionTimeLockConstraintModule is IConstraintsModule {
         bytes memory /* operatorData */
     )
     public
-    view
     returns (
         bool,
         string memory

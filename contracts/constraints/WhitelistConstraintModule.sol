@@ -69,7 +69,6 @@ contract WhitelistConstraintModule is IConstraintsModule {
         bytes memory /* operatorData */
     )
     public
-    view
     returns (
         bool valid,
         string memory message

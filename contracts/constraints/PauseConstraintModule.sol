@@ -55,7 +55,6 @@ contract PauseConstraintModule is IConstraintsModule {
         bytes memory /* operatorData */
     )
     public
-    view
     returns (
         bool,
         string memory
