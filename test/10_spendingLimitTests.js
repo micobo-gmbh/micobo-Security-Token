@@ -208,11 +208,6 @@ contract('Test Spending Limits', async (accounts) => {
 				)
 			) 
 		}, 30000)
-
-
-
-		
-
 	})
 
 })

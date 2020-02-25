@@ -30,9 +30,9 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     // module data
 
     // tracks limits for different time periods
-    TimeLock[] private _timelocks;
+    SpendingLimit[] private _spendinglimits;
 
-    struct TimeLock {
+    struct SpendingLimit {
         uint256 periodLength;
         uint256 amountAllowed;
     }
@@ -66,18 +66,20 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     }
 
     function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        _timelocks.push(TimeLock(periodLength, amountAllowed));
+        _spendinglimits.push(SpendingLimit
+(periodLength, amountAllowed));
     }
 
     function setTimelock (uint256 index, uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        require(_timelocks.length > index, "out of bounds");
-        _timelocks[index] = TimeLock(periodLength, amountAllowed);
+        require(_spendinglimits.length > index, "out of bounds");
+        _spendinglimits[index] = SpendingLimit
+(periodLength, amountAllowed);
     }
 
     function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
-        require(_timelocks.length > index, "out of bounds");
-        _timelocks[index] = _timelocks[_timelocks.length - 1];
-        _timelocks.length--;
+        require(_spendinglimits.length > index, "out of bounds");
+        _spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
+        _spendinglimits.length--;
     }
 
     function isValid(
@@ -98,7 +100,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     {
 
         // if any of the timelocks are violated, valid is set to false
-        for (uint i = 0; i < _timelocks.length; i++) {
+        for (uint i = 0; i < _spendinglimits.length; i++) {
 
             User storage user = _cPATU[partition][from][i];
 
@@ -106,7 +108,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
             if(now <= user.periodEnd) {
 
                 // accumulated amount plus the amount to be transferred exceeds the allowed amount
-                if (user.amount.add(value) > _timelocks[i].amountAllowed) {
+                if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
                     invalid = true;
                     message = 'A8 - spending limit for this period reached';
                 }
@@ -120,14 +122,14 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
             // period ended => no tx in the relevant timeperiod
             else {
-                if (value > _timelocks[i].amountAllowed) {
+                if (value > _spendinglimits[i].amountAllowed) {
                     invalid = true;
                     message = 'A8 - spending limit for this period reached';
                 }
 
                 else {
                     user.amount = value;
-                    user.periodEnd = _timelocks[i].periodLength.add(now);
+                    user.periodEnd = _spendinglimits[i].periodLength.add(now);
                 }
             }
         }
