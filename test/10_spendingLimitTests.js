@@ -194,20 +194,25 @@ contract('Test Spending Limits', async (accounts) => {
 			)
 		)
 
-		setTimeout(async () => {
-			console.log('waited for 10s')
+		function sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
 
-			// can transfer 80 again
-			await truffleAssert.passes(
-				contracts.micoboSecurityToken.transferByPartition(
-					conf.standardPartition,
-					accounts[1],
-					80,
-					'0x0',
-					{ from: accounts[0] }
-				)
-			) 
-		}, 30000)
+		await sleep(11000)
+		
+		console.log('waited for 11s')
+
+		// can transfer 80 again
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				80,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		) 
+		
 	})
 
 })

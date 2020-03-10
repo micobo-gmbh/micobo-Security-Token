@@ -6,8 +6,6 @@ import "../interfaces/ISecurityToken.sol";
 
 contract WhitelistConstraintModule is IConstraintsModule {
 
-    // TODO
-
     ISecurityToken _securityToken;
 
     string private module_name;
@@ -23,7 +21,7 @@ contract WhitelistConstraintModule is IConstraintsModule {
     // module data
     mapping(address => bool) private _whitelist;
 
-    // TODO maybe change to canSend and
+    // TODO maybe change to canSend and can Receive
 
     address _owner;
 

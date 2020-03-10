@@ -9,7 +9,8 @@
   "scripts": {
     "test": "truffle test",
     "deploy": "truffle migrate --reset",
-    "compile": "solc --bin --optimize --optimize-runs 99999 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
+    "compile": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
+    "abigen": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type Token --out ./build/go/securityToken.go",
     "size": "truffle compile --all && truffle exec scripts/check-size.js"
   },
   "repository": {
@@ -23,17 +24,17 @@
   },
   "homepage": "",
   "dependencies": {
-    "@openzeppelin/contracts": "^2.4.0",
+    "@openzeppelin/contracts": "^2.5.0",
     "erc1820": "^0.0.2"
   },
   "devDependencies": {
+    "@codechecks/client": "^0.1.10",
     "@truffle/hdwallet-provider": "^1.0.21",
+    "acorn": "^7.1.0",
     "eth-gas-reporter": "^0.2.12",
-    "truffle": "^5.0.40",
+    "truffle": "^5.1.14",
     "truffle-assertions": "^0.9.1",
     "truffle-security": "^1.6.1",
-    "acorn": "^7.1.0",
-    "@codechecks/client": "^0.1.10",
     "typescript": "^3.6.4"
   }
 }

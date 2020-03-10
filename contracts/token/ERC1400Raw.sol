@@ -18,6 +18,7 @@ import "../interfaces/IERC1400Raw.sol";
 // INFO got rid of sender recipient check
 
 contract ERC1400Raw is
+
 IERC1400Raw,
 Constrainable,
 ERC1820Client

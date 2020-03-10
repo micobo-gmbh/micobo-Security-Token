@@ -26,6 +26,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * 8 WHITELIST_EDITOR
      * 9 TIME_LOCK_EDITOR
      * 10 SPENDING_LIMITS_EDITOR
+     * 11 VESTING_PERIOD_EDITOR
      *
      */
 

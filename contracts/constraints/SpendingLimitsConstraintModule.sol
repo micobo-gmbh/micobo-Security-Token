@@ -66,14 +66,12 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     }
 
     function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        _spendinglimits.push(SpendingLimit
-(periodLength, amountAllowed));
+        _spendinglimits.push(SpendingLimit(periodLength, amountAllowed));
     }
 
     function setTimelock (uint256 index, uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
         require(_spendinglimits.length > index, "out of bounds");
-        _spendinglimits[index] = SpendingLimit
-(periodLength, amountAllowed);
+        _spendinglimits[index] = SpendingLimit(periodLength, amountAllowed);
     }
 
     function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
@@ -94,6 +92,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     )
     public
     returns (
+        // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
         string memory message
     )
