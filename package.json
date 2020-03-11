@@ -10,7 +10,7 @@
     "test": "truffle test",
     "deploy": "truffle migrate --reset",
     "compile": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
-    "abigen": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type Token --out ./build/go/securityToken.go",
+    "abigen": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
     "size": "truffle compile --all && truffle exec scripts/check-size.js"
   },
   "repository": {

@@ -16,6 +16,13 @@ interface ISecurityToken {
 
     function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) external;
 
+    function bulkIssueByPartition(
+        bytes32 partition,
+        address[] calldata tokenHolders,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external;
+
     //******************/
     // Constrainable INTERFACE
     //******************/

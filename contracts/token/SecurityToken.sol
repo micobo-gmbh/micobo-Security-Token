@@ -47,7 +47,26 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
         // _totalPartitions is being updated when when minting for the first time
     }
 
-    // TODO bulk minting?
+
+    // bulk minting
+    function bulkIssueByPartition(
+        bytes32 partition,
+        address[] memory tokenHolders,
+        uint256[] memory values,
+        bytes memory data
+    ) public {
+        require(_isIssuable, "A8");
+        require(tokenHolders.length <= 40, 'too many accounts');
+        require(tokenHolders.length == values.length, 'tokenHolders and values must be same length');
+
+        for(uint i = 0; i < tokenHolders.length; i++) {
+            require(
+                _totalSupplyByPartition[partition].add(values[i]) <= capByPartition(partition),
+                'totalSupplyByPartition would exceed capByPartition'
+            );
+            _issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
+        }
+    }
 
 
     // GSN ***********************************

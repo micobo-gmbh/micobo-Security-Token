@@ -129,4 +129,27 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
 
             // we get the total amountAllowed at this point in time
     }
+
+
+    // VIEW
+
+    function getModuleName() public view returns (string memory) {
+        return module_name;
+    }
+
+    function getVestingStartByPartition(bytes32 partition) public view returns (uint256) {
+        return vestingStartByPartition[partition];
+    }
+
+    function getVestedFractionAfterStartByPartition(bytes32 partition) public view returns (uint256) {
+        return vestedFractionAfterStartByPartition[partition];
+    }
+
+    function getVestingRatioByPartition(bytes32 partition) public view returns (uint256) {
+        return vestingRatioByPartition[partition];
+    }
+
+    function getVestingRatioByPartition(bytes32 partition, address user) public view returns (uint256) {
+        return amountSpentByUserByPartition[partition][user];
+    }
 }
