@@ -5,21 +5,13 @@ import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
-contract PartitionTimeLockConstraintModule is IConstraintsModule {
+contract TimeLockConstraintModule is IConstraintsModule {
 
     // TODO
 
     ISecurityToken _securityToken;
 
-    string private module_name;
-
-    event Authorised(
-        address msg_sender,
-        address from,
-        address to,
-        uint256 value,
-        string module_name
-    );
+    string private _module_name = "TIME_LOCK";
 
     // module data
     mapping(bytes32 => uint256) private _partitionTimeLock;
@@ -28,11 +20,9 @@ contract PartitionTimeLockConstraintModule is IConstraintsModule {
     address _owner;
 
     constructor(
-        address tokenAddress,
-        string memory _module_name
+        address tokenAddress
     ) public {
         _owner = msg.sender;
-        module_name = _module_name;
         _securityToken = ISecurityToken(tokenAddress);
     }
 
@@ -63,5 +53,11 @@ contract PartitionTimeLockConstraintModule is IConstraintsModule {
         } else {
             return(true, '');
         }
+    }
+
+    // VIEW
+
+    function getModuleName() public view returns (string memory) {
+        return _module_name;
     }
 }

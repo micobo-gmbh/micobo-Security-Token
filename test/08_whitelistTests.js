@@ -43,8 +43,7 @@ contract('Test Whitelist', async (accounts) => {
 	it('deploy WhitelistConstraintModule', async () => {
 
 		whitelistConstraintModule = await WhitelistConstraintModule.new(
-			contracts.micoboSecurityToken.address,
-			'Whitelist Constraint'
+			contracts.micoboSecurityToken.address
 		)
 	
 	})

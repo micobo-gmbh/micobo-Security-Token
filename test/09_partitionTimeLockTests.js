@@ -1,5 +1,5 @@
-const PartitionTimeLockConstraintModule = artifacts.require(
-	'PartitionTimeLockConstraintModule'
+const TimeLockConstraintModule = artifacts.require(
+	'TimeLockConstraintModule'
 )
 
 const truffleAssert = require('truffle-assertions')
@@ -8,9 +8,9 @@ const conf = require('../token-config')
 
 const { deployAllContracts, Role, Code } = require('./deployment.js')
 
-contract('Test Partition TimeLocks', async accounts => {
+contract('Test TimeLock Module', async accounts => {
 
-    let contracts, partitionTimeLockConstraintModule
+    let contracts, timeLockConstraintModule
     
     let value = 1000
 
@@ -38,14 +38,13 @@ contract('Test Partition TimeLocks', async accounts => {
 		)
 	})
 
-	it('deploy PartitionTimeLockConstraintModule', async () => {
-		partitionTimeLockConstraintModule = await PartitionTimeLockConstraintModule.new(
-			contracts.micoboSecurityToken.address,
-			'Partition Time Lock Module'
+	it('deploy TimeLockConstraintModule', async () => {
+		timeLockConstraintModule = await TimeLockConstraintModule.new(
+			contracts.micoboSecurityToken.address
 		)
 	})
 
-	it('register PartitionTimeLockConstraintModule', async () => {
+	it('register TimeLockConstraintModule', async () => {
 		// adding MODULE_EDITOR
 		await contracts.micoboSecurityToken.addRole(
 			Role.MODULE_EDITOR,
@@ -54,14 +53,14 @@ contract('Test Partition TimeLocks', async accounts => {
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModules([
-				partitionTimeLockConstraintModule.address
+				timeLockConstraintModule.address
 			])
 		)
 	})
 
 	it('can edit timelock when time_lock_editor', async () => {
 		await truffleAssert.fails(
-			partitionTimeLockConstraintModule.editTimeLock(
+			timeLockConstraintModule.editTimeLock(
 				conf.standardPartition,
 				1893456000
 			) // 01/01/2030 @ 12:00 (UTC)
@@ -70,7 +69,7 @@ contract('Test Partition TimeLocks', async accounts => {
         await contracts.micoboSecurityToken.addRole(Role.TIME_LOCK_EDITOR, accounts[0])
 
         await truffleAssert.passes(
-			partitionTimeLockConstraintModule.editTimeLock(
+			timeLockConstraintModule.editTimeLock(
 				conf.standardPartition,
 				1893456000
 			) // 01/01/2030 @ 12:00 (UTC)
@@ -78,7 +77,7 @@ contract('Test Partition TimeLocks', async accounts => {
 	})
 
 	it('cannot transfer when timelocked', async () => {
-		partitionTimeLockConstraintModule.editTimeLock(
+		timeLockConstraintModule.editTimeLock(
 			conf.standardPartition,
 			1893456000
 		) // 01/01/2030 @ 12:00 (UTC)
@@ -95,7 +94,7 @@ contract('Test Partition TimeLocks', async accounts => {
 	})
 
 	it('can transfer when timelock over', async () => {
-		await partitionTimeLockConstraintModule.editTimeLock(
+		await timeLockConstraintModule.editTimeLock(
 			conf.standardPartition,
 			1577836800
         ) // 01/01/2020 @ 12:00 (UTC)

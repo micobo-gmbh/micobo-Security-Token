@@ -45,8 +45,7 @@ contract('Test Spending Limits', async (accounts) => {
 
 	it('deploy SpendingLimitsConstraintModule', async () => {
 		spendingLimitsConstraintModule = await SpendingLimitsConstraintModule.new(
-			contracts.micoboSecurityToken.address,
-			'Spending Limits Module'
+			contracts.micoboSecurityToken.address
 		)
 	})
 

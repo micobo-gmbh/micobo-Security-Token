@@ -17,15 +17,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     ISecurityToken _securityToken;
 
-    string private module_name;
-
-    event Authorised(
-        address msg_sender,
-        address from,
-        address to,
-        uint256 value,
-        string module_name
-    );
+    string private _module_name = "SPENDING_LIMIT";
 
     // module data
 
@@ -48,11 +40,9 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     address _owner;
 
     constructor(
-        address tokenAddress,
-        string memory _module_name
+        address tokenAddress
     ) public {
         _owner = msg.sender;
-        module_name = _module_name;
         _securityToken = ISecurityToken(tokenAddress);
     }
 
@@ -134,5 +124,11 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         }
 
         return (!invalid, message);
+    }
+
+    // VIEW
+
+    function getModuleName() public view returns (string memory) {
+        return _module_name;
     }
 }

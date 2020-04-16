@@ -8,15 +8,7 @@ contract PauseConstraintModule is IConstraintsModule {
 
     ISecurityToken _securityToken;
 
-    string public module_name;
-
-    event Authorised(
-        address msg_sender,
-        address from,
-        address to,
-        uint256 value,
-        string module_name
-    );
+    string public _module_name = "PAUSE";
 
     /**
     * @dev Emitted when the pause is triggered by a pauser (`account`).
@@ -35,11 +27,9 @@ contract PauseConstraintModule is IConstraintsModule {
     address _owner;
 
     constructor(
-        address tokenAddress,
-        string memory _module_name
+        address tokenAddress
     ) public {
         _owner = msg.sender;
-        module_name = _module_name;
         _securityToken = ISecurityToken(tokenAddress);
         _paused = false;
     }
@@ -118,6 +108,13 @@ contract PauseConstraintModule is IConstraintsModule {
         require(_securityToken.hasRole(3, msg.sender), 'A7');
         _paused = false;
         emit Unpaused(msg.sender);
+    }
+
+
+    // VIEW
+
+    function getModuleName() public view returns (string memory) {
+        return _module_name;
     }
 
 }

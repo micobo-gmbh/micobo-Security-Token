@@ -13,26 +13,18 @@ contract OffChainValidator is IConstraintsModule {
 
     address _signer;
 
-    string private module_name;
-
-    event Authorised(
-        address msg_sender,
-        address from,
-        address to,
-        uint256 value,
-        string module_name
-    );
+    string private _module_name;
 
     // module data
     address _signer;
 
     constructor(
         address tokenAddress,
-        string memory _module_name,
+        string memory module_name,
         address signer
     ) public {
         _owner = msg.sender;
-        module_name = _module_name;
+        _module_name = module_name;
         _securityToken = ISecurityToken(tokenAddress);
         _signer = signer;
     }
@@ -63,6 +55,11 @@ contract OffChainValidator is IConstraintsModule {
         return (valid, message);
     }
 
+    // VIEW
+
+    function getModuleName() public view returns (string memory) {
+        return _module_name;
+    }
 
 }
 */

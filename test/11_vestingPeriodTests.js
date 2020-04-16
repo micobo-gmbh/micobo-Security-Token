@@ -45,8 +45,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 	it('deploy VestingPeriodConstraintModule', async () => {
 		vestingPeriodConstraintModule = await VestingPeriodConstraintModule.new(
-			contracts.micoboSecurityToken.address,
-			'Vesting Period Module'
+			contracts.micoboSecurityToken.address
 		)
 	})
 

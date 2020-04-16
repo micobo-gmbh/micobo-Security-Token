@@ -14,7 +14,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
 
     ISecurityToken _securityToken;
 
-    string private module_name;
+    string private _module_name = "VESTING";
 
     // time until vesting starts
     mapping(bytes32 => uint256) vestingStartByPartition;
@@ -27,22 +27,12 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
 
     mapping(bytes32 => mapping(address => uint256)) amountSpentByUserByPartition;
 
-    event Authorised(
-        address msg_sender,
-        address from,
-        address to,
-        uint256 value,
-        string module_name
-    );
-
     address _owner;
 
     constructor(
-        address tokenAddress,
-        string memory _module_name
+        address tokenAddress
     ) public {
         _owner = msg.sender;
-        module_name = _module_name;
         _securityToken = ISecurityToken(tokenAddress);
     }
 
@@ -134,7 +124,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
     // VIEW
 
     function getModuleName() public view returns (string memory) {
-        return module_name;
+        return _module_name;
     }
 
     function getVestingStartByPartition(bytes32 partition) public view returns (uint256) {
@@ -149,7 +139,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         return vestingRatioByPartition[partition];
     }
 
-    function getVestingRatioByPartition(bytes32 partition, address user) public view returns (uint256) {
+    function getAmountSpentByUserByPartition(bytes32 partition, address user) public view returns (uint256) {
         return amountSpentByUserByPartition[partition][user];
     }
 }

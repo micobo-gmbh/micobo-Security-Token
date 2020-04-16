@@ -5,19 +5,7 @@ contract IConstraintsModule {
     // they should also implement an interface to the token they are referring to
     // to call functions like hasRole() from Administrable
 
-    string private module_name;
-
-    event Authorised(
-        address msg_sender,
-        bytes32 indexed partition,
-        address operator,
-        address indexed from,
-        address indexed to,
-        uint256 value,
-        bytes data,
-        bytes operatorData,
-        string module_name
-    );
+    string private _module_name;
 
     function isValid(
         address msg_sender,
@@ -34,4 +22,6 @@ contract IConstraintsModule {
         bool valid,
         string memory message
     );
+
+    function getModuleName() external view returns (string memory);
 }
