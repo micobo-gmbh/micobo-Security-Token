@@ -191,4 +191,37 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 			)
 		)
 	})
+
+	it('can use partition without proxy contract', async () => {
+				     
+		const somePartition = "0x736f6d65506172746974696f6e00000000000000000000000000000000000000" // somePartition
+
+		const cap = 1000
+		const value = 100
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(somePartition, cap)
+		)
+
+		// already is MINTER
+
+		// issue tokens to new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.issueByPartition(somePartition, accounts[0], value, '0x0')
+		)
+
+		// see if balance is correct
+		let balance = (
+			await contracts.micoboSecurityToken.balanceOfByPartition(
+			  somePartition,
+			  accounts[0]
+			)
+		).toNumber();
+		
+		assert.deepEqual(balance, value);
+	})
 })

@@ -5,7 +5,7 @@
 There are 2 main components:
 
 1. _Security Token Contract_  
-2. _Admin Contract_
+2. _Security Token Partitions_
 
 #
 ### Architecture

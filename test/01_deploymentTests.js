@@ -7,14 +7,10 @@ SecurityTokenPartition = artifacts.require("SecurityTokenPartition");
 
 const conf = require("../token-config");
 
-const { Role } = require("./deployment.js");
-
 contract("Test Deployment", async accounts => {
     let micoboSecurityToken, securityTokenPartition;
 
     // deepEqual compares with '==='
-
-    let contracts;
 
     it("deploys micobo security token", async () => {
         micoboSecurityToken = await MicoboSecurityToken.new(

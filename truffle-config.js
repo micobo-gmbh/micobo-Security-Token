@@ -53,16 +53,18 @@ module.exports = {
 			gas: 0xffffffff
 		},
 
-		/*
-		development: {
+		
+		rinkeby: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "http://localhost:8545");
+				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af");
 			},
-			network_id: '*',
-			gas: 0xffffffffff,
-			gasPrice: 10000000000
+			network_id: 4,
+			gas: 10000000,        // 10.000.000
+			gasPrice: 1000000000,  // 1gwei in wei
+			confirmations: 2,
+			skipDryRun: true
 		}
-		*/
+		
 
 		// Useful for deploying to a public network.
 		// NB: It's important to wrap the provider as a function.
@@ -84,13 +86,13 @@ module.exports = {
 	},
 
 	// Set default mocha options here, use special reporters etc.
-	/* mocha: {
+	mocha: {
 		reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
 			gasPrice: 2
 		}
-	}, */
+	},
 
 	// Configure your compilers
 	compilers: {

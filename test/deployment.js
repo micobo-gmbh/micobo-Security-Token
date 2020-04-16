@@ -24,7 +24,7 @@ deployAllContracts = async (accounts) => {
 	)
 
 	await micoboSecurityToken.addPartition(
-		conf.standardPartition, 
+		conf.standardPartition,
 		securityTokenPartition.address,
 		conf.standardPartitionCap
 	)

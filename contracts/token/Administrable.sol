@@ -36,20 +36,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
     // INFO we use CONTROLLER roles for global controllers instead
     // address[] internal _controllers;
 
-    /**
-     * @dev Emitted whenever a new role was assigned to an account
-     */
-    event RoleAdded(uint8 indexed role, address indexed account);
-
-    /**
-     * @dev Emitted whenever a role was taken from an account
-     */
-    event RoleRemoved(uint8 indexed role, address indexed account);
-
-    /**
-     * @dev Emitted whenever an account renounced a role
-     */
-    event RoleRenounced(uint8 indexed role, address indexed account);
+    // EVENTS in IAdmin.sol
 
     /**
      * @dev Modifier to make a function callable only when the caller is a specific role.

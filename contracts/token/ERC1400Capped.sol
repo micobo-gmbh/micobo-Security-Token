@@ -312,7 +312,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     )
     internal
     {
-        _issue(toPartition, operator, to, value, data, operatorData);
+        _issue(operator, to, value, data, operatorData);
         _addTokenToPartition(to, toPartition, value);
 
         emit IssuedByPartition(toPartition, operator, to, value, data, operatorData);

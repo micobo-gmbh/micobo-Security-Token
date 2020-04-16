@@ -24,6 +24,14 @@ module.exports = async (deployer, network) => {
 			st.address,
 			conf.standardPartition
 		)
+
+		let stp = await SecurityTokenPartition.deployed()
+
+		await st.addPartition(
+			conf.standardPartition, 
+			stp.address,
+			conf.standardPartitionCap
+		)
 	} catch (e) {
 		console.log(e)
 	}

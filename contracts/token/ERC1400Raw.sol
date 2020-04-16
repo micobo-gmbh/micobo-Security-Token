@@ -456,7 +456,6 @@ ERC1820Client
     /**
      * [INTERNAL]
      * @dev Perform the issuance of tokens.
-     * @param partition Name of the partition (bytes32 to be left empty for ERC1400Raw transfer).
      * @param operator Address which triggered the issuance.
      * @param to Token recipient.
      * @param value Number of tokens issued.
@@ -464,7 +463,6 @@ ERC1820Client
      * @param operatorData Information attached to the issuance by the operator (if any).
      */
     function _issue(
-        bytes32 partition,
         address operator,
         address to,
         uint256 value,
@@ -481,7 +479,8 @@ ERC1820Client
 
         require(hasRole(2, _msgSender()), "A7");
 
-        validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
+        // don't validate when minting
+        // validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
 
 
         _totalSupply = _totalSupply.add(value);
