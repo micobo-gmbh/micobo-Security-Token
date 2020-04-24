@@ -1,13 +1,9 @@
-pragma solidity 0.5.12;
-
+pragma solidity 0.6.6;
 
 import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
-
 contract TimeLockConstraintModule is IConstraintsModule {
-
-    // TODO
 
     ISecurityToken _securityToken;
 
@@ -42,7 +38,7 @@ contract TimeLockConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public
+    public override
     returns (
         bool,
         string memory
@@ -57,7 +53,7 @@ contract TimeLockConstraintModule is IConstraintsModule {
 
     // VIEW
 
-    function getModuleName() public view returns (string memory) {
+    function getModuleName() public override view returns (string memory) {
         return _module_name;
     }
 }

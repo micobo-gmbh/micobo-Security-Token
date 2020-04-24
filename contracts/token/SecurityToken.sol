@@ -1,4 +1,4 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "./ERC1400Capped.sol";
 import "../interfaces/ISecurityToken.sol";
@@ -9,7 +9,7 @@ import "../interfaces/ISecurityToken.sol";
  * @dev token with a total cap and partition specific caps.
  * Cap cannot be changed afterwards.
  */
-contract SecurityToken is ISecurityToken, ERC1400Capped {
+contract SecurityToken is ERC1400Capped {
 
     // TODO maybe re-add the defaultPartitions (as initialPartitions)
     // seems to inflate the contract size by a lot!
@@ -66,37 +66,6 @@ contract SecurityToken is ISecurityToken, ERC1400Capped {
             );
             _issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
         }
-    }
-
-
-    // GSN ***********************************
-
-    function acceptRelayedCall(
-        address /*relay*/,
-        address /*from*/,
-        bytes calldata /*encodedFunction*/,
-        uint256 /*transactionFee*/,
-        uint256 /*gasPrice*/,
-        uint256 /*gasLimit*/,
-        uint256 /*nonce*/,
-        bytes calldata /*approvalData*/,
-        uint256 /*maxPossibleCharge*/
-    ) external view returns (uint256, bytes memory) {
-        // TODO zero means accepting --> add some constraints
-        return (0, "");
-    }
-
-    function _preRelayedCall(bytes memory /*context*/) internal returns (bytes32) {
-        return "";
-    }
-
-    function _postRelayedCall(
-        bytes memory /*context*/,
-        bool /*success*/,
-        uint256 /*actualCharge*/,
-        bytes32 /*preRetVal*/
-    ) internal {
-
     }
 }
 

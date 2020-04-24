@@ -6,26 +6,22 @@ const VestingPeriodConstraintModule = artifacts.require(
 	'VestingPeriodConstraintModule'
 )
 
-const {deployAllContracts, Role, Code} = require('./deployment.js');
-
+const { deployAllContracts, Role, Code } = require('./deployment.js')
 
 contract('Test Vesting Period', async (accounts) => {
-
 	let day = 86400
 
-    let value = 1000
+	let value = 1000
 
 	let contracts
 
 	// deepEqual compares with '==='
 
 	before(async () => {
-
 		contracts = await deployAllContracts(accounts)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
-
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -51,15 +47,12 @@ contract('Test Vesting Period', async (accounts) => {
 
 	it('register VestingPeriodConstraintModule', async () => {
 		// adding MODULE_EDITOR
-		await contracts.micoboSecurityToken.addRole(
-			Role.MODULE_EDITOR,
-			accounts[0]
-		)
+		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		// can set module
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModules([
-				vestingPeriodConstraintModule.address
+				vestingPeriodConstraintModule.address,
 			])
 		)
 	})
@@ -67,28 +60,30 @@ contract('Test Vesting Period', async (accounts) => {
 	it('can add vesting period when editor', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
-			  Role.VESTING_PERIOD_EDITOR,
-			  accounts[0]
+				Role.VESTING_PERIOD_EDITOR,
+				accounts[0]
 			),
 			false
-		);
-        
-        let now = new Date().getTime()
-        now = (now / 1000).toFixed(0)
-        
-        vestingStart = now - - 10
+		)
 
+		let now = new Date().getTime()
+		now = (now / 1000).toFixed(0)
+
+		vestingStart = now - -10
+
+		/* 
         console.log(now)
         console.log(vestingStart)
+		 */
 
 		// cannot set vesting options
-        await truffleAssert.fails(
-            vestingPeriodConstraintModule.setVestingOptionsByPartition(
-                conf.standardPartition,
-                vestingStart,
-                4,
-                48
-            )
+		await truffleAssert.fails(
+			vestingPeriodConstraintModule.setVestingOptionsByPartition(
+				conf.standardPartition,
+				vestingStart,
+				4,
+				48
+			)
 		)
 
 		// add role
@@ -99,48 +94,44 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// now it can set vesting options
 		await truffleAssert.passes(
-            vestingPeriodConstraintModule.setVestingOptionsByPartition(
-                conf.standardPartition,
-                vestingStart,
-                4,
-                48
-            )
+			vestingPeriodConstraintModule.setVestingOptionsByPartition(
+				conf.standardPartition,
+				vestingStart,
+				4,
+				48
+			)
 		)
-    })
-    
-    it('cannot transfer before dormant period is over', async () => {
-        // assumes that a vesting period has been set in the test case before this one
+	})
 
-        // cannot transfer
-        await truffleAssert.fails(
-            contracts.micoboSecurityToken.transferByPartition(
-                conf.standardPartition,
-                accounts[1],
-                1,
-                '0x0',
-                { from: accounts[0] }
-            )
-        )
+	it('cannot transfer before dormant period is over', async () => {
+		// assumes that a vesting period has been set in the test case before this one
 
-        function sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
+		// cannot transfer
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				1,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+
+		function sleep(ms) {
+			return new Promise((resolve) => setTimeout(resolve, ms))
 		}
 
 		await sleep(11000)
-        
-        console.log('waited for 11s')
 
-        // can transfer again
-        await truffleAssert.passes(
-            contracts.micoboSecurityToken.transferByPartition(
-                conf.standardPartition,
-                accounts[1],
-                1,
-                '0x0',
-                { from: accounts[0] }
-            )
-        ) 
-
+		// can transfer again
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				1,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
 	})
-    
 })

@@ -2,7 +2,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "./ERC1400Raw.sol";
 import "../interfaces/IERC1400Partition.sol";
@@ -73,11 +73,11 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     /********************** NEW FUNCTIONS **************************/
 
     // for ERC20 compatibility via proxy
-    function totalSupplyByPartition(bytes32 partition) public view returns (uint256) {
+    function totalSupplyByPartition(bytes32 partition) public override view returns (uint256) {
         return _totalSupplyByPartition[partition];
     }
 
-    function partitionProxies() public view returns (address[] memory) {
+    function partitionProxies() public override view returns (address[] memory) {
         return _partitionProxies;
     }
 
@@ -90,7 +90,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param tokenHolder Address for which the balance is returned.
      * @return Amount of token of partition 'partition' held by 'tokenHolder' in the token contract.
      */
-    function balanceOfByPartition(bytes32 partition, address tokenHolder) external view returns (uint256) {
+    function balanceOfByPartition(bytes32 partition, address tokenHolder) external override view returns (uint256) {
         return _balanceOfByPartition[tokenHolder][partition];
     }
 
@@ -100,7 +100,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param tokenHolder Address for which the partitions index are returned.
      * @return Array of partitions index of 'tokenHolder'.
      */
-    function partitionsOf(address tokenHolder) external view returns (bytes32[] memory) {
+    function partitionsOf(address tokenHolder) external override view returns (bytes32[] memory) {
         return _partitionsOf[tokenHolder];
     }
 
@@ -119,7 +119,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         uint256 value,
         bytes calldata data
     )
-    external
+    external override
     returns (bytes32)
     {
         return _transferByPartition(partition, _msgSender(), _msgSender(), to, value, data, "");
@@ -144,7 +144,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         bytes calldata data,
         bytes calldata operatorData
     )
-    external
+    external override
     returns (bytes32)
     {
         require(_isOperatorForPartition(partition, _msgSender(), from), "A7");
@@ -160,7 +160,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param partition Name of the partition.
      * @return Array of controllers for partition.
      */
-    function controllersByPartition(bytes32 partition) external view returns (address[] memory) {
+    function controllersByPartition(bytes32 partition) external override view returns (address[] memory) {
         return _controllersByPartition[partition];
     }
 
@@ -170,7 +170,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param partition Name of the partition.
      * @param operator Address to set as an operator for 'msg.sender'.
      */
-    function authorizeOperatorByPartition(bytes32 partition, address operator) external {
+    function authorizeOperatorByPartition(bytes32 partition, address operator) external override {
         _authorizedOperatorByPartition[_msgSender()][partition][operator] = true;
         emit AuthorizedOperatorByPartition(partition, operator, _msgSender());
     }
@@ -182,7 +182,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param partition Name of the partition.
      * @param operator Address to rescind as an operator on given partition for 'msg.sender'.
      */
-    function revokeOperatorByPartition(bytes32 partition, address operator) external {
+    function revokeOperatorByPartition(bytes32 partition, address operator) external override {
         _authorizedOperatorByPartition[_msgSender()][partition][operator] = false;
         emit RevokedOperatorByPartition(partition, operator, _msgSender());
     }
@@ -196,7 +196,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param tokenHolder Address of a token holder which may have the operator address as an operator for the given partition.
      * @return 'true' if 'operator' is an operator of 'tokenHolder' for partition 'partition' and 'false' otherwise.
      */
-    function isOperatorForPartition(bytes32 partition, address operator, address tokenHolder) external view returns (bool) {
+    function isOperatorForPartition(bytes32 partition, address operator, address tokenHolder) external override view returns (bool) {
         return _isOperatorForPartition(partition, operator, tokenHolder);
     }
 
@@ -295,7 +295,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
             // adjust for 1-based indexing
             _indexOfTotalPartitions[lastValue] = index1;
 
-            _totalPartitions.length -= 1;
+            _totalPartitions.pop();
             _indexOfTotalPartitions[partition] = 0;
         }
 
@@ -311,7 +311,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
             // adjust for 1-based indexing
             _indexOfPartitionsOf[from][lastValue] = index2;
 
-            _partitionsOf[from].length -= 1;
+            _partitionsOf[from].pop();
             _indexOfPartitionsOf[from][partition] = 0;
         }
 
@@ -350,7 +350,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * 32 bytes following the flag.
      * @param fromPartition Partition of the tokens to transfer.
      * @param data Information attached to the transfer. [CAN CONTAIN THE DESTINATION PARTITION]
-     * @return Destination partition.
+     * @return toPartition Destination partition.
      */
     function _getDestinationPartition(bytes32 fromPartition, bytes memory data) internal pure returns (bytes32 toPartition) {
         bytes32 changePartitionFlag = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
@@ -374,7 +374,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @dev Get list of existing partitions.
      * @return Array of all exisiting partitions.
      */
-    function totalPartitions() external view returns (bytes32[] memory) {
+    function totalPartitions() external override view returns (bytes32[] memory) {
         return _totalPartitions;
     }
 

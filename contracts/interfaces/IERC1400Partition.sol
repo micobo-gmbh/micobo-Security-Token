@@ -2,7 +2,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 /**
  * @title IERC1400Partition partially fungible token standard

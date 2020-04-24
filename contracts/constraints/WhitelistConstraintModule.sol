@@ -1,4 +1,4 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "../interfaces/IConstraintsModule.sol";
 import "../interfaces/ISecurityToken.sol";
@@ -56,7 +56,7 @@ contract WhitelistConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public
+    public override
     returns (
         bool valid,
         string memory message
@@ -73,7 +73,7 @@ contract WhitelistConstraintModule is IConstraintsModule {
 
     // VIEW
 
-    function getModuleName() public view returns (string memory) {
+    function getModuleName() public override view returns (string memory) {
         return _module_name;
     }
 }

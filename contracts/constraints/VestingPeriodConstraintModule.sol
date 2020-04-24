@@ -1,4 +1,4 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 
@@ -59,7 +59,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public
+    public override
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
@@ -123,7 +123,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
 
     // VIEW
 
-    function getModuleName() public view returns (string memory) {
+    function getModuleName() public override view returns (string memory) {
         return _module_name;
     }
 

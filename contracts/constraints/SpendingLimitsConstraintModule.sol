@@ -1,4 +1,4 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 
@@ -67,7 +67,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
         require(_spendinglimits.length > index, "out of bounds");
         _spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
-        _spendinglimits.length--;
+        _spendinglimits.pop();
     }
 
     function isValid(
@@ -80,7 +80,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public
+    public override
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
@@ -128,7 +128,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     // VIEW
 
-    function getModuleName() public view returns (string memory) {
+    function getModuleName() public override view returns (string memory) {
         return _module_name;
     }
 }

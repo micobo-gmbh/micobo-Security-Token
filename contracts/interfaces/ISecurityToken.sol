@@ -1,4 +1,4 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "./IConstraintsModule.sol";
 import "./IAdmin.sol";
@@ -7,9 +7,6 @@ import "./IAdmin.sol";
  * @title Interface for using the Security Token
  * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
- *
- * Comments show excerpts or the whole content of functions
- * to better illustrate their inner workings here!
  */
 
 interface ISecurityToken {

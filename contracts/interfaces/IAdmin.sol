@@ -1,6 +1,6 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
-contract IAdmin {
+interface IAdmin {
 
     function addRole(uint8 role, address account) external;
 

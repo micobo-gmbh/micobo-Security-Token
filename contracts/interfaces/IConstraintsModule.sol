@@ -1,11 +1,11 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
-contract IConstraintsModule {
+interface IConstraintsModule {
 
     // they should also implement an interface to the token they are referring to
     // to call functions like hasRole() from Administrable
 
-    string private _module_name;
+    // string private _module_name;
 
     function isValid(
         address msg_sender,
@@ -14,10 +14,10 @@ contract IConstraintsModule {
         address from,
         address to,
         uint256 value,
-        bytes memory data,
-        bytes memory operatorData
+        bytes calldata data,
+        bytes calldata operatorData
     )
-    public
+    external
     returns (
         bool valid,
         string memory message

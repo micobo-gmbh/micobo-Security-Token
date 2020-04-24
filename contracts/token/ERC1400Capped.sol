@@ -2,7 +2,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "../interfaces/IERC1400Capped.sol";
 import "./ERC1400Partition.sol";
@@ -69,7 +69,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param documentName Short name (represented as a bytes32) associated to the document.
      * @return Requested document + document hash.
      */
-    function getDocument(bytes32 documentName) external view returns (string memory, bytes32) {
+    function getDocument(bytes32 documentName) external override view returns (string memory, bytes32) {
         require(bytes(_documents[documentName].docURI).length != 0, "Empty document");
         // Action Blocked - Empty document
         return (
@@ -85,7 +85,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param uri Document content.
      * @param documentHash Hash of the document [optional parameter].
      */
-    function setDocument(bytes32 documentName, string calldata uri, bytes32 documentHash) external {
+    function setDocument(bytes32 documentName, string calldata uri, bytes32 documentHash) external override {
         require(hasRole(7, _msgSender()), "A7");
         _documents[documentName] = Doc({
             docURI : uri,
@@ -100,7 +100,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * If a token returns 'false' for 'isControllable()'' then it MUST always return 'false' in the future.
      * @return bool 'true' if the token can still be controlled by operators, 'false' if it can't anymore.
      */
-    function isControllable() external view returns (bool) {
+    function isControllable() external override view returns (bool) {
         return _isControllable;
     }
 
@@ -109,7 +109,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @dev Know if new tokens can be issued in the future.
      * @return bool 'true' if tokens can still be issued by the issuer, 'false' if they can't anymore.
      */
-    function isIssuable() external view returns (bool) {
+    function isIssuable() external override view returns (bool) {
         return _isIssuable;
     }
 
@@ -122,7 +122,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param data Information attached to the issuance, by the issuer. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
      */
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data)
-    external
+    external override
         // onlyMinter is taken care of in _issue function
     {
         require(_isIssuable, "A8");
@@ -162,7 +162,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      */
 
     function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData)
-    external
+    external override
     {
         // only BURNER can burn tokens (checked in _redeem())
 
@@ -355,8 +355,9 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @dev Definitely renounce the possibility to control tokens on behalf of tokenHolders.
      * Once set to false, '_isControllable' can never be set to 'true' again.
      */
+     // TODO right now this would disable ERC20 proxyx contracts
     function renounceControl()
-    external
+    external override
     {
         require(hasRole(0, _msgSender()), "A7");
         _isControllable = false;
@@ -368,7 +369,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
     function renounceIssuance()
-    external
+    external override
     {
         require(hasRole(0, _msgSender()), "A7");
         _isIssuable = false;
@@ -397,7 +398,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      */
 
     function setPartitionControllers(bytes32 partition, address[] calldata operators)
-    external
+    external override
     {
         require(hasRole(0, _msgSender()), "A7");
         _setPartitionControllers(partition, operators);
@@ -413,15 +414,15 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     /**
      * @dev Returns the cap on the token's total supply.
      */
-    function cap() public view returns (uint256) {
+    function cap() public override view returns (uint256) {
         return _cap;
     }
 
-    function capByPartition(bytes32 partition) public view returns (uint256) {
+    function capByPartition(bytes32 partition) public override view returns (uint256) {
         return _capByPartition[partition];
     }
 
-    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public {
+    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public override {
         require(hasRole(5, _msgSender()), 'A7, not allowed to set cap');
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 

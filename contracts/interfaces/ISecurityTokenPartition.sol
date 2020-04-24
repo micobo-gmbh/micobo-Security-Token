@@ -1,8 +1,14 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "./ISecurityToken.sol";
 
-contract ISecurityTokenPartition {
+/**
+ * @title Interface for using the Security Token Partition
+ * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
+ * it is not used by any deployed contract
+ */
+
+interface ISecurityTokenPartition {
 
     function securityTokenAddress() external view returns (ISecurityToken);
 
@@ -78,19 +84,4 @@ contract ISecurityTokenPartition {
     event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
-
-
-    // GSN
-
-    function acceptRelayedCall(
-        address /*relay*/,
-        address /*from*/,
-        bytes calldata /*encodedFunction*/,
-        uint256 /*transactionFee*/,
-        uint256 /*gasPrice*/,
-        uint256 /*gasLimit*/,
-        uint256 /*nonce*/,
-        bytes calldata /*approvalData*/,
-        uint256 /*maxPossibleCharge*/
-    ) external view returns (uint256, bytes memory);
 }

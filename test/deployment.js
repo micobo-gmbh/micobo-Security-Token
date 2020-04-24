@@ -3,19 +3,17 @@ SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 ISecurityTokenPartition = artifacts.require('ISecurityTokenPartition')
 
-const conf = require('../token-config');
+const conf = require('../token-config')
 
-
-deployAllContracts = async (accounts) => {
-
+deployAllContracts = async () => {
 	let micoboSecurityToken, securityTokenPartition
 
 	micoboSecurityToken = await MicoboSecurityToken.new(
 		conf.name,
 		conf.symbol,
 		conf.granularity,
-		[accounts[0]],
-		[accounts[0]]
+		conf.admins,
+		conf.controllers
 	)
 
 	securityTokenPartition = await SecurityTokenPartition.new(
@@ -31,7 +29,7 @@ deployAllContracts = async (accounts) => {
 
 	return {
 		micoboSecurityToken,
-		securityTokenPartition
+		securityTokenPartition,
 	}
 }
 
@@ -41,17 +39,16 @@ const Role = {
 	MINTER: 2,
 	PAUSER: 3,
 	BURNER: 4,
-	CAP_EDITOR: 5,	
+	CAP_EDITOR: 5,
 	MODULE_EDITOR: 6,
 	DOCUMENT_EDITOR: 7,
 	WHITELIST_EDITOR: 8,
 	TIME_LOCK_EDITOR: 9,
 	SPENDING_LIMITS_EDITOR: 10,
-	VESTING_PERIOD_EDITOR: 11
-
+	VESTING_PERIOD_EDITOR: 11,
 }
 
 module.exports = {
 	deployAllContracts,
-	Role
+	Role,
 }

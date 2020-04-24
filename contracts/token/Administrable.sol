@@ -1,11 +1,10 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
 import "../../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IAdmin.sol";
+import "./GSNable.sol";
 
-
-contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
+contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 
     /**
      * @dev list of standard roles
@@ -42,7 +41,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * @dev Modifier to make a function callable only when the caller is a specific role.
      */
     modifier onlyRole(uint8 role) {
-        require(hasRole(role, msg.sender), 'sender does not have necessary role');
+        require(hasRole(role, _msgSender()), 'sender does not have necessary role');
         _;
     }
 
@@ -53,7 +52,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * @dev Assigns a role to an account
      * only ADMIN
      */
-    function addRole(uint8 role, address account) public onlyRole(0) {
+    function addRole(uint8 role, address account) public override onlyRole(0) {
         _add(role, account);
     }
 
@@ -63,27 +62,27 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
      * @dev Removes a role from an account
      * only ADMIN
      */
-    function removeRole(uint8 role, address account) public onlyRole(0) {
+    function removeRole(uint8 role, address account) public override onlyRole(0) {
         _remove(role, account);
     }
 
     /**
-     * @param role role that is being renounced by the msg.sender
+     * @param role role that is being renounced by the _msgSender()
      * @dev Removes a role from the sender's address
      */
-    function renounceRole(uint8 role) public {
-        require(hasRole(role, msg.sender), 'sender does not have this role');
+    function renounceRole(uint8 role) public override {
+        require(hasRole(role, _msgSender()), 'sender does not have this role');
 
-        _remove(role, msg.sender);
+        _remove(role, _msgSender());
 
-        emit RoleRenounced(role, msg.sender);
+        emit RoleRenounced(role, _msgSender());
     }
 
     /**
      * @dev check if an account has a role
      * @return bool
      */
-    function hasRole(uint8 role, address account) public view returns (bool) {
+    function hasRole(uint8 role, address account) public override view returns (bool) {
         require(account != address(0), 'zero address');
         return _roles[role][account];
     }
@@ -113,7 +112,7 @@ contract Administrable is IAdmin, GSNRecipient, ReentrancyGuard {
     function _remove(uint8 role, address account) internal {
         require(account != address(0), 'zero address');
         require(
-            !(role == 0 && account == msg.sender),
+            !(role == 0 && account == _msgSender()),
             'cannot remove your own ADMIN role'
         );
         require(hasRole(role, account), 'account does not have this role');

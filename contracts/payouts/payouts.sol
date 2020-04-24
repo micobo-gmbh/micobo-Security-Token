@@ -1,3 +1,3 @@
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 // TODO ERC2222

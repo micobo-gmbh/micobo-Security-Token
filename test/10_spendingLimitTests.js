@@ -199,8 +199,6 @@ contract('Test Spending Limits', async (accounts) => {
 
 		await sleep(11000)
 		
-		console.log('waited for 11s')
-
 		// can transfer 80 again
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(

@@ -1,10 +1,24 @@
-## micobo Security Token
+# micobo Security Token
+
+
+## Setup
+
+1. Solidity  
+
+we use `solc` binary, for manual compilation, since `solcjs` npm module throws  error ("File import callback not supported")
+
+[Install the binary here](https://solidity.readthedocs.io/en/latest/installing-solidity.html)  
+look for the brew installation
+
+2. Truffle
+
+You need truffle installed globally
 
 ### Components
 
 There are 2 main components:
 
-1. _Security Token Contract_  
+1. _Security Token_  
 2. _Security Token Partitions_
 
 #
@@ -15,16 +29,25 @@ TODO
 ## Tests
 
 All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.  
-The tests are kept completely as atomic (specific) and autonomous as possible.  
+
+The tests are kept as atomic (specific) and autonomous as possible.  
 Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
 
-**To use truffle tests on your own testchain, change the** ``.mnemonic`` **file to containt your own mnemonic key!**  
-Also make sure that your testnet is running on port ```:8545```
+- Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
+
+
+- Also make sure that **Ganache** is running on port ```:8545```
+
+- if you test GSN, also run the dev-relayer with:
+
+    ```
+    npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545 --quiet
+    ```
 
 Use the test script to run all tests:
-```
-npm run test
-```
+
+    npm run test
+
 #
 
 #### Gas report

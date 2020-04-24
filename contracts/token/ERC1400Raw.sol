@@ -2,7 +2,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.5.12;
+pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 import "../../node_modules/erc1820/contracts/ERC1820Client.sol";
@@ -93,7 +93,7 @@ ERC1820Client
      * @dev Get the name of the token, e.g., "MyToken".
      * @return Name of the token.
      */
-    function name() external view returns (string memory) {
+    function name() external override view returns (string memory) {
         return _name;
     }
 
@@ -102,7 +102,7 @@ ERC1820Client
      * @dev Get the symbol of the token, e.g., "MYT".
      * @return Symbol of the token.
      */
-    function symbol() external view returns (string memory) {
+    function symbol() external override view returns (string memory) {
         return _symbol;
     }
 
@@ -111,7 +111,7 @@ ERC1820Client
      * @dev Get the total number of issued tokens.
      * @return Total supply of tokens currently in circulation.
      */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public override view returns (uint256) {
         return _totalSupply;
     }
 
@@ -121,7 +121,7 @@ ERC1820Client
      * @param tokenHolder Address for which the balance is returned.
      * @return Amount of token held by 'tokenHolder' in the token contract.
      */
-    function balanceOf(address tokenHolder) public view returns (uint256) {
+    function balanceOf(address tokenHolder) public override view returns (uint256) {
         return _balances[tokenHolder];
     }
 
@@ -130,7 +130,7 @@ ERC1820Client
      * @dev Get the smallest part of the token that’s not divisible.
      * @return The smallest non-divisible part of the token.
      */
-    function granularity() external view returns (uint256) {
+    function granularity() external override view returns (uint256) {
         return _granularity;
     }
 
