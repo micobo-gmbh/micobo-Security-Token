@@ -1,23 +1,20 @@
-const TimeLockConstraintModule = artifacts.require(
-	'TimeLockConstraintModule'
-)
+const TimeLockConstraintModule = artifacts.require('TimeLockConstraintModule')
 
 const truffleAssert = require('truffle-assertions')
 
 const conf = require('../token-config')
 
-const { deployAllContracts, Role, Code } = require('./deployment.js')
+const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
-contract('Test TimeLock Module', async accounts => {
+contract('Test TimeLock Module', async (accounts) => {
+	let contracts, timeLockConstraintModule
 
-    let contracts, timeLockConstraintModule
-    
-    let value = 1000
+	let value = 1000
 
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await deployAllContracts(accounts)
+		contracts = await getDeployedContracts(accounts)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
@@ -46,41 +43,32 @@ contract('Test TimeLock Module', async accounts => {
 
 	it('register TimeLockConstraintModule', async () => {
 		// adding MODULE_EDITOR
-		await contracts.micoboSecurityToken.addRole(
-			Role.MODULE_EDITOR,
-			accounts[0]
-		)
+		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModules([
-				timeLockConstraintModule.address
+				timeLockConstraintModule.address,
 			])
 		)
 	})
 
 	it('can edit timelock when time_lock_editor', async () => {
 		await truffleAssert.fails(
-			timeLockConstraintModule.editTimeLock(
-				conf.standardPartition,
-				1893456000
-			) // 01/01/2030 @ 12:00 (UTC)
-        )
-        
-        await contracts.micoboSecurityToken.addRole(Role.TIME_LOCK_EDITOR, accounts[0])
+			timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
+		)
 
-        await truffleAssert.passes(
-			timeLockConstraintModule.editTimeLock(
-				conf.standardPartition,
-				1893456000
-			) // 01/01/2030 @ 12:00 (UTC)
-        )
+		await contracts.micoboSecurityToken.addRole(
+			Role.TIME_LOCK_EDITOR,
+			accounts[0]
+		)
+
+		await truffleAssert.passes(
+			timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
+		)
 	})
 
 	it('cannot transfer when timelocked', async () => {
-		timeLockConstraintModule.editTimeLock(
-			conf.standardPartition,
-			1893456000
-		) // 01/01/2030 @ 12:00 (UTC)
+		timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
 
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.transferByPartition(
@@ -97,14 +85,16 @@ contract('Test TimeLock Module', async accounts => {
 		await timeLockConstraintModule.editTimeLock(
 			conf.standardPartition,
 			1577836800
-        ) // 01/01/2020 @ 12:00 (UTC)
-        
-        // check if balance is enough
-        assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[0]
-			)).toNumber(),
+		) // 01/01/2020 @ 12:00 (UTC)
+
+		// check if balance is enough
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
 			value
 		)
 

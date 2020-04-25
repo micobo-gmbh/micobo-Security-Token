@@ -2,10 +2,9 @@ const truffleAssert = require('truffle-assertions')
 
 const conf = require('../token-config')
 
-const { deployAllContracts, Role, Code } = require('./deployment.js')
+const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
-contract('Test Partition ERC20 Proxy', async accounts => {
-
+contract('Test Partition ERC20 Proxy', async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -13,7 +12,7 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await deployAllContracts(accounts)
+		contracts = await getDeployedContracts(accounts)
 
 		// mint some tokens
 
@@ -78,7 +77,7 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 	it('can transfer using proxy', async () => {
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.transfer(accounts[1], value, {
-				from: accounts[0]
+				from: accounts[0],
 			})
 		)
 
@@ -105,7 +104,7 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 		// 1 approves 0 to transfer value
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.approve(accounts[0], value, {
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
@@ -137,7 +136,7 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 				value,
 				'0x0',
 				{
-					from: accounts[0]
+					from: accounts[0],
 				}
 			)
 		)
@@ -165,7 +164,7 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 		// 1 approves 0 to transfer value
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.approve(accounts[0], value, {
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
@@ -193,8 +192,8 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 	})
 
 	it('can use partition without proxy contract', async () => {
-				     
-		const somePartition = "0x736f6d65506172746974696f6e00000000000000000000000000000000000000" // somePartition
+		const somePartition =
+			'0x736f6d65506172746974696f6e00000000000000000000000000000000000000' // somePartition
 
 		const cap = 1000
 		const value = 100
@@ -211,17 +210,22 @@ contract('Test Partition ERC20 Proxy', async accounts => {
 
 		// issue tokens to new partition
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.issueByPartition(somePartition, accounts[0], value, '0x0')
+			contracts.micoboSecurityToken.issueByPartition(
+				somePartition,
+				accounts[0],
+				value,
+				'0x0'
+			)
 		)
 
 		// see if balance is correct
 		let balance = (
 			await contracts.micoboSecurityToken.balanceOfByPartition(
-			  somePartition,
-			  accounts[0]
+				somePartition,
+				accounts[0]
 			)
-		).toNumber();
-		
-		assert.deepEqual(balance, value);
+		).toNumber()
+
+		assert.deepEqual(balance, value)
 	})
 })

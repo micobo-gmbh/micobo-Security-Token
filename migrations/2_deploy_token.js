@@ -5,7 +5,7 @@ const conf = require('../token-config')
 
 const checkSize = require('../scripts/check-size')
 
-module.exports = async (deployer, network) => {
+module.exports = async (deployer, network, accounts) => {
 
 	try {
 		await deployer.deploy(
@@ -13,8 +13,8 @@ module.exports = async (deployer, network) => {
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			conf.admins,
-			conf.controllers
+			[accounts[0]],
+			[accounts[0]]
 		)
 
 		let st = await SecurityToken.deployed()

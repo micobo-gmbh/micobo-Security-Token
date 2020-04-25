@@ -1,14 +1,13 @@
 pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ISecurityToken.sol";
 import "../interfaces/IERC1400Raw.sol";
-import "../interfaces/ISecurityTokenPartition.sol";
+import "../gsn/GSNable.sol";
 
-contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
+contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
 
     using SafeMath for uint256;
 
@@ -28,15 +27,15 @@ contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
         _partitionId = partition;
     }
 
-    function securityTokenAddress() external override view returns (ISecurityToken) {
+    function securityTokenAddress() external view returns (ISecurityToken) {
         return _securityToken;
     }
 
-    function partitionId() external override view returns (bytes32) {
+    function partitionId() external view returns (bytes32) {
         return _partitionId;
     }
 
-    function cap() external override view returns (uint256) {
+    function cap() external view returns (uint256) {
         return _securityToken.capByPartition(_partitionId);
     }
 
@@ -53,7 +52,7 @@ contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
         return _securityToken.symbol();
     }
 
-    function decimals() external override view returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return uint8(18);
     }
 
@@ -94,11 +93,11 @@ contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
         return true;
     }
 
-    function totalSupply() external override view returns (uint256) {
+    function totalSupply() external override(IERC20, IERC1400Raw) view returns (uint256) {
         return _securityToken.totalSupplyByPartition(_partitionId);
     }
 
-    function balanceOf(address who) external override view returns (uint256) {
+    function balanceOf(address who) external override(IERC20, IERC1400Raw) view returns (uint256) {
         return _securityToken.balanceOfByPartition(_partitionId, who);
     }
 
@@ -121,14 +120,14 @@ contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
     }
 
     function transferWithData(address to, uint256 value, bytes calldata data)
-    external override
+    external
     {
         _securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, data, '');
     }
 
     // this is where the operator functionality is used
     function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata /*operatorData*/)
-    external override
+    external
     {
         // check if is operator by partition or has enough allowance here
         require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from) ||
@@ -156,35 +155,9 @@ contract SecurityTokenPartition is ISecurityTokenPartition, GSNRecipient {
         bytes operatorData
     );
 
-
     // GSN
-
-    function acceptRelayedCall(
-        address /*relay*/,
-        address /*from*/,
-        bytes calldata /*encodedFunction*/,
-        uint256 /*transactionFee*/,
-        uint256 /*gasPrice*/,
-        uint256 /*gasLimit*/,
-        uint256 /*nonce*/,
-        bytes calldata /*approvalData*/,
-        uint256 /*maxPossibleCharge*/
-    ) external override view returns (uint256, bytes memory) {
-        // TODO zero means accepting --> add some constraints
-        return(0, "");
-    }
-
-    function _preRelayedCall(bytes memory /*context*/) internal override returns (bytes32) {
-        return "";
-    }
-
-    function _postRelayedCall(
-        bytes memory /*context*/,
-        bool /*success*/,
-        uint256 /*actualCharge*/,
-        bytes32 /*preRetVal*/
-    ) internal override {
-
+    function isGSNController() internal view override returns (bool) {
+        return _securityToken.hasRole(0, _msgSender());
     }
 }
 

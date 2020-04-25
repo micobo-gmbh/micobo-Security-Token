@@ -1,12 +1,10 @@
-const {deployAllContracts, Role} = require('./deployment.js');
+const { getDeployedContracts, Role } = require('./deployment.js')
 
 const truffleAssert = require('truffle-assertions')
 
-const conf = require('../token-config');
-
+const conf = require('../token-config')
 
 contract('Test Burning', async (accounts) => {
-
 	let contracts
 
 	let minter = accounts[1]
@@ -17,13 +15,10 @@ contract('Test Burning', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-
-		contracts = await deployAllContracts(accounts)
-
+		contracts = await getDeployedContracts(accounts)
 	})
 
-	it("burns tokens of test addresses if burner", async () => {
-
+	it('burns tokens of test addresses if burner', async () => {
 		// make minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, minter)
 
@@ -33,14 +28,16 @@ contract('Test Burning', async (accounts) => {
 			accounts[0],
 			value,
 			'0x0',
-			{from: minter}
+			{ from: minter }
 		)
 
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[0]
-			)).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
 			value
 		)
 
@@ -73,23 +70,23 @@ contract('Test Burning', async (accounts) => {
 
 		// new balance matches
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[0]
-			)).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
 			value - value
 		)
 	})
 
-
-	it("cannot burn more than balance", async () => {
-
+	it('cannot burn more than balance', async () => {
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
 			accounts[0],
 			value,
 			'0x0',
-			{from: minter}
+			{ from: minter }
 		)
 
 		await truffleAssert.passes(
@@ -116,5 +113,4 @@ contract('Test Burning', async (accounts) => {
 
 		// 1000000000000000
 	})
-
 })

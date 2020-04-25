@@ -67,6 +67,11 @@ contract SecurityToken is ERC1400Capped {
             _issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
         }
     }
+
+    // GSN
+    function isGSNController() internal view override returns (bool) {
+        return hasRole(0, _msgSender());
+    }
 }
 
 /**

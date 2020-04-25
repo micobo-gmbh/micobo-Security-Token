@@ -19,14 +19,12 @@
  */
 
 const HDWalletProvider = require('@truffle/hdwallet-provider')
+const { GSNProvider } = require('@openzeppelin/gsn-provider')
 
 // const infuraKey = "fj4jll3k.....";
 
 const fs = require('fs')
-const mnemonic = fs
-	.readFileSync('.mnemonic')
-	.toString()
-	.trim()
+const mnemonic = fs.readFileSync('.mnemonic').toString().trim()
 
 module.exports = {
 	/**
@@ -47,24 +45,31 @@ module.exports = {
 		// options below to some value.
 
 		development: {
+			provider: () => {
+				return new GSNProvider('http://localhost:8545', {
+					// we set default to false here and use it explicitly when needed
+					useGSN: false,
+				})
+			},
 			host: 'localhost',
 			port: '8545',
 			network_id: '*',
-			gas: 0x989680 // 10 000 000
+			gas: 0x989680, // 10 000 000
 		},
 
-		
 		rinkeby: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af");
+				return new HDWalletProvider(
+					mnemonic,
+					'https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af'
+				)
 			},
 			network_id: 4,
-			gas: 10000000,        // 10.000.000
-			gasPrice: 1000000000,  // 1gwei in wei
+			gas: 10000000, // 10.000.000
+			gasPrice: 1000000000, // 1gwei in wei
 			confirmations: 2,
-			skipDryRun: true
-		}
-		
+			skipDryRun: true,
+		},
 
 		// Useful for deploying to a public network.
 		// NB: It's important to wrap the provider as a function.
@@ -90,8 +95,9 @@ module.exports = {
 		reporter: 'eth-gas-reporter',
 		reporterOptions: {
 			currency: 'EUR',
-			gasPrice: 2
-		}
+			gasPrice: 2,
+			url:'http://localhost:8545'
+		},
 	},
 
 	// Configure your compilers
@@ -103,12 +109,12 @@ module.exports = {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 32768
+					runs: 32768,
 				},
-				evmVersion: 'petersburg'
-			}
-		}
+				evmVersion: 'petersburg',
+			},
+		},
 	},
 
-	plugins: ['truffle-security']
+	plugins: ['truffle-security'],
 }

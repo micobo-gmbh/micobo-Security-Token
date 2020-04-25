@@ -6,11 +6,9 @@ const SpendingLimitsConstraintModule = artifacts.require(
 	'SpendingLimitsConstraintModule'
 )
 
-const {deployAllContracts, Role, Code} = require('./deployment.js');
-
+const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
 contract('Test Spending Limits', async (accounts) => {
-
 	let day = 86400
 
 	let value = 1000
@@ -20,12 +18,10 @@ contract('Test Spending Limits', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-
-		contracts = await deployAllContracts(accounts)
+		contracts = await getDeployedContracts(accounts)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
-
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -51,15 +47,12 @@ contract('Test Spending Limits', async (accounts) => {
 
 	it('register SpendingLimitsConstraintModule', async () => {
 		// adding MODULE_EDITOR
-		await contracts.micoboSecurityToken.addRole(
-			Role.MODULE_EDITOR,
-			accounts[0]
-		)
+		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		// can set module
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModules([
-				spendingLimitsConstraintModule.address
+				spendingLimitsConstraintModule.address,
 			])
 		)
 	})
@@ -67,12 +60,12 @@ contract('Test Spending Limits', async (accounts) => {
 	it('can add spending limit when editor', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
-			  Role.SPENDING_LIMITS_EDITOR,
-			  accounts[0]
+				Role.SPENDING_LIMITS_EDITOR,
+				accounts[0]
 			),
 			false
-		);
-		
+		)
+
 		// cannot add timelock yet
 		await truffleAssert.fails(
 			spendingLimitsConstraintModule.addTimelock(day, 100)
@@ -98,16 +91,16 @@ contract('Test Spending Limits', async (accounts) => {
 	it('can set spending limit when editor', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
-			  Role.SPENDING_LIMITS_EDITOR,
-			  accounts[0]
+				Role.SPENDING_LIMITS_EDITOR,
+				accounts[0]
 			),
 			true
-		);
+		)
 
 		// cannot update if not editor
 		await truffleAssert.fails(
 			spendingLimitsConstraintModule.setTimelock(1, day * 7, 700, {
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
@@ -125,33 +118,27 @@ contract('Test Spending Limits', async (accounts) => {
 	it('can delete spending limit when editor', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
-			  Role.SPENDING_LIMITS_EDITOR,
-			  accounts[0]
+				Role.SPENDING_LIMITS_EDITOR,
+				accounts[0]
 			),
 			true
-		);
+		)
 
 		// cannot delete if not editor
 		await truffleAssert.fails(
 			spendingLimitsConstraintModule.deleteTimelock(0, {
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
 		// can delete 1st timelock entry
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.deleteTimelock(0)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.deleteTimelock(0))
 
 		// cannot delete 2nd timelock entry, since only 1 is left
-		await truffleAssert.fails(
-			spendingLimitsConstraintModule.deleteTimelock(1)
-		)
+		await truffleAssert.fails(spendingLimitsConstraintModule.deleteTimelock(1))
 
 		// can delete 1st timelock entry
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.deleteTimelock(0)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.deleteTimelock(0))
 	})
 
 	it('can transfer according to limits', async () => {
@@ -194,11 +181,11 @@ contract('Test Spending Limits', async (accounts) => {
 		)
 
 		function sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
+			return new Promise((resolve) => setTimeout(resolve, ms))
 		}
 
 		await sleep(11000)
-		
+
 		// can transfer 80 again
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(
@@ -208,8 +195,6 @@ contract('Test Spending Limits', async (accounts) => {
 				'0x0',
 				{ from: accounts[0] }
 			)
-		) 
-		
+		)
 	})
-
 })

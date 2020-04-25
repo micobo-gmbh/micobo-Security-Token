@@ -4,11 +4,9 @@ const truffleAssert = require('truffle-assertions')
 
 const conf = require('../token-config')
 
-const {deployAllContracts, Role, Code} = require('./deployment.js');
-
+const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
 contract('Test Whitelist', async (accounts) => {
-    
 	let contracts, whitelistConstraintModule
 
 	let value = 1000
@@ -16,12 +14,10 @@ contract('Test Whitelist', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-
-		contracts = await deployAllContracts(accounts)
+		contracts = await getDeployedContracts(accounts)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
-
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -37,29 +33,26 @@ contract('Test Whitelist', async (accounts) => {
 			value,
 			'0x0'
 		)
-
 	})
 
 	it('deploy WhitelistConstraintModule', async () => {
-
 		whitelistConstraintModule = await WhitelistConstraintModule.new(
 			contracts.micoboSecurityToken.address
 		)
-	
 	})
 
 	it('register WhitelistConstraintModule', async () => {
-
 		// adding MODULE_EDITOR
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
-		
+
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules([whitelistConstraintModule.address])
+			contracts.micoboSecurityToken.setModules([
+				whitelistConstraintModule.address,
+			])
 		)
 	})
 
 	it('cannot transfer when not whitelisted', async () => {
-
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
@@ -69,7 +62,6 @@ contract('Test Whitelist', async (accounts) => {
 				{ from: accounts[0] }
 			)
 		)
-	
 	})
 
 	it('cannot edit whitelist whithout being Whitelist_editor', async () => {
@@ -83,7 +75,6 @@ contract('Test Whitelist', async (accounts) => {
 	})
 
 	it('can edit whitelist when Whitelist_editor', async () => {
-
 		// adding whitelist_editor
 		contracts.micoboSecurityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
 
@@ -96,9 +87,7 @@ contract('Test Whitelist', async (accounts) => {
 		)
 	})
 
-
 	it('can transfer when whitelisted', async () => {
-
 		assert.deepEqual(
 			await whitelistConstraintModule.isWhitelisted(accounts[0]),
 			true
@@ -118,7 +107,5 @@ contract('Test Whitelist', async (accounts) => {
 				{ from: accounts[0] }
 			)
 		)
-	
 	})
-
 })

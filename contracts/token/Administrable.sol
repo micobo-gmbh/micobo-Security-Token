@@ -2,7 +2,7 @@ pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IAdmin.sol";
-import "./GSNable.sol";
+import "../gsn/GSNable.sol";
 
 contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 
@@ -26,7 +26,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * 9 TIME_LOCK_EDITOR
      * 10 SPENDING_LIMITS_EDITOR
      * 11 VESTING_PERIOD_EDITOR
-     *
+     * 12 GSN_CONTROLLER
      */
 
     mapping(uint8 => mapping(address => bool)) internal _roles;

@@ -6,7 +6,7 @@ const VestingPeriodConstraintModule = artifacts.require(
 	'VestingPeriodConstraintModule'
 )
 
-const { deployAllContracts, Role, Code } = require('./deployment.js')
+const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
 contract('Test Vesting Period', async (accounts) => {
 	let day = 86400
@@ -18,7 +18,7 @@ contract('Test Vesting Period', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await deployAllContracts(accounts)
+		contracts = await getDeployedContracts(accounts)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])

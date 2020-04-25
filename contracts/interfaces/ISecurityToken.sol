@@ -234,5 +234,9 @@ interface ISecurityToken {
 
     function setCapByPartition(bytes32 partition, uint256 newPartitionCap) external;
 
+
+    // GSN
+    function setGSNAllowed(bool allow) external;
+    function getGSNAllowed() external view returns (bool);
 }
 

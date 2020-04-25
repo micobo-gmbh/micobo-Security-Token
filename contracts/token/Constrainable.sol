@@ -3,6 +3,7 @@ pragma solidity 0.6.6;
 import './Administrable.sol';
 import "../interfaces/IConstraintsModule.sol";
 
+
 contract Constrainable is Administrable {
 
     // Questions for OffChainValidator

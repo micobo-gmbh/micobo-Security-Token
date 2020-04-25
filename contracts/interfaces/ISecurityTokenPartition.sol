@@ -84,4 +84,9 @@ interface ISecurityTokenPartition {
     event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
+
+
+    // GSN
+    function setGSNAllowed(bool allow) external;
+    function getGSNAllowed() external view returns (bool);
 }
