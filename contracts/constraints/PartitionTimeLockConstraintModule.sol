@@ -24,7 +24,7 @@ contract TimeLockConstraintModule is IConstraintsModule {
 
     // function to edit limits
     function editTimeLock(bytes32 partition, uint256 time) public {
-        require(_securityToken.hasRole(9, msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32("TIME_LOCK_EDITOR"), msg.sender), 'A7');
         _partitionTimeLock[partition] = time;
     }
 

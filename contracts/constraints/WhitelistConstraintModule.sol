@@ -31,13 +31,13 @@ contract WhitelistConstraintModule is IConstraintsModule {
 
     // function editWhitelist
     function editWhitelist(address account, bool whitelisted) public {
-        require(_securityToken.hasRole(8, msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender), 'A8');
         _whitelist[account] = whitelisted;
     }
 
     // function bulkEditWhitelist
     function bulkEditWhitelist(address[] memory accounts, bool whitelisted) public {
-        require(_securityToken.hasRole(8, msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender), 'A8');
         require(accounts.length <= 40, 'too many accounts');
 
         for(uint i = 0; i < accounts.length; i++) {

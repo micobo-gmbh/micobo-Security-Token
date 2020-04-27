@@ -68,16 +68,7 @@ npm run deploy
 
 The Administration contract can endow addresses with one **Role** or more:
 
-* 0 ADMIN   (can add and remove roles)
-* 1 CONTROLLER (ERC1400, can move tokens if contract _isControllable),
-* 2 MINTER / ISSUER,
-* 3 PAUSER,
-* 4 BURNER / REDEEMER
-* 5 CAP_EDITOR
-* 6 MODULE_EDITOR (can edit constraint modules),
-* 7 DOCUMENT_EDITOR
-
-#
+// TODO
 
 #### Constrainable
 

@@ -9,6 +9,14 @@ const {
 
 const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
+const GSNMode = {
+	ALL: 0,
+	MODULE: 1,
+	NONE: 2,
+}
+
+// TODO add tests with GSN Module
+
 contract('Test GSN functionality', async (accounts) => {
 	let contracts
 
@@ -46,26 +54,19 @@ contract('Test GSN functionality', async (accounts) => {
 				// amount: 0, // use standard 1 eth
 			})
 		} catch (e) {
-			console.error("Error setting up GSN", e)
+			console.error('Error setting up GSN', e)
 		}
 
 		// mint some tokens
 
 		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
 			accounts[0],
-			value,
-			'0x0'
-		)
-
-		await contracts.micoboSecurityToken.issueByPartition(
-			conf.standardPartition,
-			accounts[1],
-			value,
+			value * 2,
 			'0x0'
 		)
 	})
@@ -82,23 +83,56 @@ contract('Test GSN functionality', async (accounts) => {
 				gasLimit: 147049,
 			})
 		)
-		
+
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
 			true
 		)
 	})
 
-	it('cannot deactivate GSN if not admin', async () => {
+	it('can transfer tokens for free', async () => {
+		const balance = await web3.eth.getBalance(accounts[0])
+
+		// can transfer tokens
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{
+					from: accounts[0],
+					useGSN: true
+				}
+			)
+		)
+
+		assert.deepEqual(
+			await web3.eth.getBalance(accounts[0]),
+			balance
+		)
+	})
+
+	it('cannot deactivate GSN if not GSN_CONTROLLER', async () => {
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setGSNMode(2, {
-				from: accounts[2],
+			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
+			})
+		)
+	})
+
+	it('can deactivate GSN if GSN_CONTROLLER', async () => {
+		await contracts.micoboSecurityToken.addRole(Role.GSN_CONTROLLER, accounts[0])
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
 			})
 		)
 	})
 
 	it('cannot add a role over GSN if deactivated', async () => {
-		await contracts.micoboSecurityToken.setGSNMode(2, {
+		await contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
 			from: accounts[0],
 		})
 
@@ -118,6 +152,10 @@ contract('Test GSN functionality', async (accounts) => {
 	})
 
 	it('can transfer using proxy and GSN', async () => {
+		const balance = (
+			await contracts.securityTokenPartition.balanceOf(accounts[1])
+		).toNumber()
+
 		// Sends the transaction via the GSN
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.transfer(accounts[1], value, {
@@ -127,12 +165,11 @@ contract('Test GSN functionality', async (accounts) => {
 			})
 		)
 
-		let balance = (
-			await contracts.securityTokenPartition.balanceOf(accounts[1])
-		).toNumber()
-
 		// console.log(balance)
 
-		assert.deepEqual(balance, value * 2)
+		assert.deepEqual(
+			(await contracts.securityTokenPartition.balanceOf(accounts[1])).toNumber(),
+			balance + value
+		)
 	})
 })

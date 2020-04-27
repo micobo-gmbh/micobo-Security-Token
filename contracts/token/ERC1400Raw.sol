@@ -146,7 +146,7 @@ ERC1820Client
 
         // only return active entries (we only add to _controllers in Administrable)
         for(uint i = 0; i < _controllers.length; i++) {
-            if(hasRole(1, _controllers[i])) {
+            if(hasRole(bytes32("CONTROLLER"), _controllers[i])) {
                 delete activeControllers[i];
             }
         }
@@ -297,7 +297,7 @@ ERC1820Client
         return (operator == tokenHolder
         || _authorizedOperator[operator][tokenHolder]
         // contract is controllable and operator is a controller
-        || (_isControllable && hasRole(1, operator))
+        || (_isControllable && hasRole(bytes32("CONTROLLER"), operator))
         );
     }*/
 
@@ -369,8 +369,8 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        // is BURNER
-        require(hasRole(4, _msgSender()), "A7");
+        // is REDEEMER
+        require(hasRole(bytes32("REDEEMER"), _msgSender()), "A7");
 
         validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
 
@@ -477,7 +477,7 @@ ERC1820Client
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
 
-        require(hasRole(2, _msgSender()), "A7");
+        require(hasRole(bytes32("ISSUER"), _msgSender()), "A7");
 
         // don't validate when minting
         // validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);

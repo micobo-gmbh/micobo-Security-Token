@@ -17,7 +17,7 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 		// mint some tokens
 
 		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -206,7 +206,7 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 			contracts.micoboSecurityToken.setCapByPartition(somePartition, cap)
 		)
 
-		// already is MINTER
+		// already is ISSUER
 
 		// issue tokens to new partition
 		await truffleAssert.passes(

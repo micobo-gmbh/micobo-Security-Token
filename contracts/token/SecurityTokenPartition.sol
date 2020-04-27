@@ -144,7 +144,7 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
         _securityToken.operatorTransferByPartition(_partitionId, from, to, value, data, '');
     }
 
-    // only BURNERS can redeem tokens
+    // only REDEEMERS can redeem tokens
 
     event TransferWithData(
         address indexed operator,
@@ -157,7 +157,7 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
 
     // GSN
     function isGSNController() internal view override returns (bool) {
-        return _securityToken.hasRole(0, _msgSender());
+        return _securityToken.hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
     }
 }
 

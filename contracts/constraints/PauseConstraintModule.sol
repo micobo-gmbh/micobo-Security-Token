@@ -94,7 +94,7 @@ contract PauseConstraintModule is IConstraintsModule {
     * @dev Called by a pauser to pause, triggers stopped state.
     */
     function pause() public whenNotPaused {
-        require(_securityToken.hasRole(3, msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32("PAUSER"), msg.sender), 'A7');
         _paused = true;
         emit Paused(msg.sender);
     }
@@ -105,7 +105,7 @@ contract PauseConstraintModule is IConstraintsModule {
      * @dev Called by a pauser to unpause, returns to normal state.
      */
     function unpause() public whenPaused {
-        require(_securityToken.hasRole(3, msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32("PAUSER"), msg.sender), 'A7');
         _paused = false;
         emit Unpaused(msg.sender);
     }

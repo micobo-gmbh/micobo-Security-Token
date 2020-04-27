@@ -42,7 +42,7 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         uint256 vestedFractionAfterStart,   // i.e. 4  => 1/4
         uint256 vestingRatio                // i.e. 48 => 1/48
     ) public {
-        require(_securityToken.hasRole(11, msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32("VESTING_PERIOD_EDITOR"), msg.sender), 'A8');
 
         vestingStartByPartition[partition] = vestingStart;
         vestedFractionAfterStartByPartition[partition] = vestedFractionAfterStart;

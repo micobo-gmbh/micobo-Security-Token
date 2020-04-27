@@ -69,7 +69,7 @@ interface ISecurityTokenPartition {
     external;
 
 
-    // only BURNERS can redeem tokens
+    // only REDEEMERS can redeem tokens
 
     event TransferWithData(
         address indexed operator,

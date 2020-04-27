@@ -24,19 +24,18 @@ contract SecurityToken is ERC1400Capped {
     public
     ERC1400Capped(name, symbol, granularity)
     {
-        for (uint i = 0; i < controllers.length; i++) {
-            _add(1, controllers[i]);
-        }
-
         for (uint i = 0; i < admins.length; i++) {
-            _add(0, admins[i]);
+            _add(bytes32("ADMIN"), admins[i]);
+        }
+        for (uint i = 0; i < controllers.length; i++) {
+            _add(bytes32("CONTROLLER"), controllers[i]);
         }
     }
 
 
     // add a new Partition proxy contract
     function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) public{
-        require(hasRole(0, _msgSender()), "A7");
+        require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
 
         _setCapByPartition(partition, partitionCap);
 
@@ -70,7 +69,7 @@ contract SecurityToken is ERC1400Capped {
 
     // GSN
     function isGSNController() internal view override returns (bool) {
-        return hasRole(0, _msgSender());
+        return hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
     }
 }
 

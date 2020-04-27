@@ -51,7 +51,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
 
     modifier onlySpendingLimitsEditor {
-        require(_securityToken.hasRole(10, msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32("SPENDING_LIMITS_EDITOR"), msg.sender), 'A7');
         _;
     }
 

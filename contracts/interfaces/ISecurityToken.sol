@@ -32,18 +32,17 @@ interface ISecurityToken {
     //******************/
     // Administrable INTERFACE
     //******************/
-    function addRole(uint8 role, address account) external;
+    function addRole(bytes32 role, address account) external;
 
-    function removeRole(uint8 role, address account) external;
+    function removeRole(bytes32 role, address account) external;
 
-    function renounceRole(uint8 role) external;
+    function renounceRole(bytes32 role) external;
 
-    function hasRole(uint8 role, address account) external view returns (bool);
+    function hasRole(bytes32 role, address account) external view returns (bool);
 
-    event RoleAdded(uint8 indexed role, address indexed account);
-    event RoleRemoved(uint8 indexed role, address indexed account);
-    event RoleRenounced(uint8 indexed role, address indexed account);
-
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+    event RoleRenounced(bytes32 indexed role, address indexed account);
 
     //******************/
     // GSNRecipient INTERFACE

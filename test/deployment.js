@@ -6,26 +6,26 @@ ISecurityTokenPartition = artifacts.require('ISecurityTokenPartition')
 const conf = require('../token-config')
 
 getDeployedContracts = async () => {
-
 	return {
-		micoboSecurityToken : await MicoboSecurityToken.deployed(),
-		securityTokenPartition : await SecurityTokenPartition.deployed(),
+		micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		securityTokenPartition: await SecurityTokenPartition.deployed(),
 	}
 }
 
 const Role = {
-	ADMIN: 0,
-	CONTROLLER: 1,
-	MINTER: 2,
-	PAUSER: 3,
-	BURNER: 4,
-	CAP_EDITOR: 5,
-	MODULE_EDITOR: 6,
-	DOCUMENT_EDITOR: 7,
-	WHITELIST_EDITOR: 8,
-	TIME_LOCK_EDITOR: 9,
-	SPENDING_LIMITS_EDITOR: 10,
-	VESTING_PERIOD_EDITOR: 11,
+	ADMIN: web3.utils.fromAscii('ADMIN'),
+	CONTROLLER: web3.utils.fromAscii('CONTROLLER'),
+	ISSUER: web3.utils.fromAscii('ISSUER'),
+	PAUSER: web3.utils.fromAscii('PAUSER'),
+	REDEEMER: web3.utils.fromAscii('REDEEMER'),
+	CAP_EDITOR: web3.utils.fromAscii('CAP_EDITOR'),
+	MODULE_EDITOR: web3.utils.fromAscii('MODULE_EDITOR'),
+	DOCUMENT_EDITOR: web3.utils.fromAscii('DOCUMENT_EDITOR'),
+	WHITELIST_EDITOR: web3.utils.fromAscii('WHITELIST_EDITOR'),
+	TIME_LOCK_EDITOR: web3.utils.fromAscii('TIME_LOCK_EDITOR'),
+	SPENDING_LIMITS_EDITOR: web3.utils.fromAscii('SPENDING_LIMITS_EDITOR'),
+	VESTING_PERIOD_EDITOR: web3.utils.fromAscii('VESTING_PERIOD_EDITOR'),
+	GSN_CONTROLLER: web3.utils.fromAscii('GSN_CONTROLLER'),
 }
 
 module.exports = {

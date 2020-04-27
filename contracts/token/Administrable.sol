@@ -16,9 +16,9 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      *
      * 0 ADMIN   (can add and remove roles)
      * 1 CONTROLLER (ERC1400, can move tokens if contract _isControllable),
-     * 2 MINTER / ISSUER,
-     * 3 PAUSER,
-     * 4 BURNER / REDEEMER
+     * 2 ISSUER (ISSUER)
+     * 3 PAUSER
+     * 4 REDEEMER (REDEEMER)
      * 5 CAP_EDITOR
      * 6 MODULE_EDITOR (can edit constraint modules),
      * 7 DOCUMENT_EDITOR
@@ -29,7 +29,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * 12 GSN_CONTROLLER
      */
 
-    mapping(uint8 => mapping(address => bool)) internal _roles;
+    mapping(bytes32 => mapping(address => bool)) internal _roles;
 
     // Array of controllers. [GLOBAL - NOT TOKEN-HOLDER-SPECIFIC]
     // INFO we use CONTROLLER roles for global controllers instead
@@ -40,7 +40,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
     /**
      * @dev Modifier to make a function callable only when the caller is a specific role.
      */
-    modifier onlyRole(uint8 role) {
+    modifier onlyRole(bytes32 role) {
         require(hasRole(role, _msgSender()), 'sender does not have necessary role');
         _;
     }
@@ -52,7 +52,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * @dev Assigns a role to an account
      * only ADMIN
      */
-    function addRole(uint8 role, address account) public override onlyRole(0) {
+    function addRole(bytes32 role, address account) public override onlyRole(bytes32("ADMIN")) {
         _add(role, account);
     }
 
@@ -62,7 +62,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * @dev Removes a role from an account
      * only ADMIN
      */
-    function removeRole(uint8 role, address account) public override onlyRole(0) {
+    function removeRole(bytes32 role, address account) public override onlyRole(bytes32("ADMIN")) {
         _remove(role, account);
     }
 
@@ -70,7 +70,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * @param role role that is being renounced by the _msgSender()
      * @dev Removes a role from the sender's address
      */
-    function renounceRole(uint8 role) public override {
+    function renounceRole(bytes32 role) public override {
         require(hasRole(role, _msgSender()), 'sender does not have this role');
 
         _remove(role, _msgSender());
@@ -82,7 +82,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * @dev check if an account has a role
      * @return bool
      */
-    function hasRole(uint8 role, address account) public override view returns (bool) {
+    function hasRole(bytes32 role, address account) public override view returns (bool) {
         require(account != address(0), 'zero address');
         return _roles[role][account];
     }
@@ -94,13 +94,13 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
     /**
      * @dev give an account access to a role
      */
-    function _add(uint8 role, address account) internal {
+    function _add(bytes32 role, address account) internal {
         require(account != address(0), 'zero address');
         require(!hasRole(role, account), 'account already has this role');
 
         _roles[role][account] = true;
 
-        emit RoleAdded(role, account);
+        emit RoleGranted(role, account, _msgSender());
     }
 
     /**
@@ -109,17 +109,17 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * cannot remove own ADMIN role
      * address must have role
      */
-    function _remove(uint8 role, address account) internal {
+    function _remove(bytes32 role, address account) internal {
         require(account != address(0), 'zero address');
         require(
-            !(role == 0 && account == _msgSender()),
+            !(role == bytes32("ADMIN") && account == _msgSender()),
             'cannot remove your own ADMIN role'
         );
         require(hasRole(role, account), 'account does not have this role');
 
         _roles[role][account] = false;
 
-        emit RoleRemoved(role, account);
+        emit RoleRevoked(role, account, _msgSender());
     }
 
 }

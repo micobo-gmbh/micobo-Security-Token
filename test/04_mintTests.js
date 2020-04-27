@@ -27,7 +27,7 @@ contract('Test Minting', async (accounts) => {
 			)
 		)
 
-		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,

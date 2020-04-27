@@ -86,7 +86,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
      * @param documentHash Hash of the document [optional parameter].
      */
     function setDocument(bytes32 documentName, string calldata uri, bytes32 documentHash) external override {
-        require(hasRole(7, _msgSender()), "A7");
+        require(hasRole(bytes32("DOCUMENT_EDITOR"), _msgSender()), "A7");
         _documents[documentName] = Doc({
             docURI : uri,
             docHash : documentHash
@@ -164,7 +164,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData)
     external override
     {
-        // only BURNER can burn tokens (checked in _redeem())
+        // only REDEEMER can burn tokens (checked in _redeem())
 
         // require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
         // Transfer Blocked - Identity restriction
@@ -359,7 +359,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function renounceControl()
     external override
     {
-        require(hasRole(0, _msgSender()), "A7");
+        require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
         _isControllable = false;
     }
 
@@ -371,7 +371,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function renounceIssuance()
     external override
     {
-        require(hasRole(0, _msgSender()), "A7");
+        require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
         _isIssuable = false;
     }
 
@@ -400,7 +400,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     function setPartitionControllers(bytes32 partition, address[] calldata operators)
     external override
     {
-        require(hasRole(0, _msgSender()), "A7");
+        require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
         _setPartitionControllers(partition, operators);
     }
 
@@ -423,7 +423,7 @@ contract ERC1400Capped is IERC1400Capped, ERC1400Partition {
     }
 
     function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public override {
-        require(hasRole(5, _msgSender()), 'A7, not allowed to set cap');
+        require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), 'A7, not allowed to set cap');
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 
         _setCapByPartition(partition, newPartitionCap);

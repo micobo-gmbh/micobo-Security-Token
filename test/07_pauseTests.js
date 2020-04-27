@@ -20,7 +20,7 @@ contract('Test Pausing', async (accounts) => {
 		contracts = await getDeployedContracts(accounts)
 
 		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.MINTER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(

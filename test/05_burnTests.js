@@ -20,7 +20,7 @@ contract('Test Burning', async (accounts) => {
 
 	it('burns tokens of test addresses if burner', async () => {
 		// make minter
-		await contracts.micoboSecurityToken.addRole(Role.MINTER, minter)
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, minter)
 
 		// mint
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -54,7 +54,7 @@ contract('Test Burning', async (accounts) => {
 		)
 
 		// make burner
-		await contracts.micoboSecurityToken.addRole(Role.BURNER, burner)
+		await contracts.micoboSecurityToken.addRole(Role.REDEEMER, burner)
 
 		//should pass now
 		await truffleAssert.passes(
