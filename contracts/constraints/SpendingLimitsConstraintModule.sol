@@ -8,6 +8,8 @@ import "../interfaces/ISecurityToken.sol";
 
 contract SpendingLimitsConstraintModule is IConstraintsModule {
 
+    // TODO partition-ready
+
     using SafeMath for uint256;
 
 
@@ -70,17 +72,20 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         _spendinglimits.pop();
     }
 
+    // TODO find a solution for record keeping (altering the state during validation)
+    /*
     function isValid(
-        address /* msg_sender */,
+        address msg_sender,
         bytes32 partition,
-        address /* operator */,
+        address operator,
         address from,
-        address /* to */,
+        address to,
         uint256 value,
-        bytes memory /* data */,
-        bytes memory /* operatorData */
+        bytes memory data,
+        bytes memory operatorData
     )
-    public override
+    public
+    override
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
@@ -125,8 +130,72 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
         return (!invalid, message);
     }
+    */
 
     // VIEW
+
+    function isValid(
+        address /* msg_sender */,
+        bytes32 partition,
+        address /* operator */,
+        address from,
+        address /* to */,
+        uint256 value,
+        bytes memory /* data */,
+        bytes memory /* operatorData */
+    )
+    public
+    view
+    override
+    returns (
+        // we start with false here to save gas and negate it before returning --> (!invalid)
+        bool invalid,
+        string memory message
+    )
+    {
+
+        // if any of the timelocks are violated, valid is set to false
+        for (uint i = 0; i < _spendinglimits.length; i++) {
+
+            User storage user = _cPATU[partition][from][i];
+
+            // period has not ended => there has been at least 1 tx
+            if(now <= user.periodEnd) {
+
+                // accumulated amount plus the amount to be transferred exceeds the allowed amount
+                if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
+                    invalid = true;
+                    message = 'A8 - spending limit for this period reached';
+                }
+
+                // accumulated amount plus the amount to be transferred does not exceed the allowed amount
+                else {
+                    // increase accumulated amount and leave periodEnd
+
+                    // TODO no record keeping for view
+                    // user.amount = user.amount.add(value);
+                    this;
+                }
+            }
+
+            // period ended => no tx in the relevant timeperiod
+            else {
+                if (value > _spendinglimits[i].amountAllowed) {
+                    invalid = true;
+                    message = 'A8 - spending limit for this period reached';
+                }
+
+                else {
+                    // TODO no record keeping for view
+                    // user.amount = value;
+                    // user.periodEnd = _spendinglimits[i].periodLength.add(now);
+                    this;
+                }
+            }
+        }
+
+        return (!invalid, message);
+    }
 
     function getModuleName() public override view returns (string memory) {
         return _module_name;

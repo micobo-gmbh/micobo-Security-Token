@@ -14,19 +14,20 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * Traditionally, CONTROLLER can transfer anybody's tokens and set the document
      * we outsource the last one to a new DOCUMENT_EDITOR role
      *
-     * 0 ADMIN   (can add and remove roles)
-     * 1 CONTROLLER (ERC1400, can move tokens if contract _isControllable),
-     * 2 ISSUER (ISSUER)
-     * 3 PAUSER
-     * 4 REDEEMER (REDEEMER)
-     * 5 CAP_EDITOR
-     * 6 MODULE_EDITOR (can edit constraint modules),
-     * 7 DOCUMENT_EDITOR
-     * 8 WHITELIST_EDITOR
-     * 9 TIME_LOCK_EDITOR
-     * 10 SPENDING_LIMITS_EDITOR
-     * 11 VESTING_PERIOD_EDITOR
-     * 12 GSN_CONTROLLER
+     * ADMIN   (can add and remove roles)
+     * CONTROLLER (ERC1400, can move tokens if contract _isControllable),
+     * ISSUER (ISSUER)
+     * PAUSER
+     * REDEEMER (BURNER)
+     * CAP_EDITOR
+     * MODULE_EDITOR (can edit constraint modules),
+     * DOCUMENT_EDITOR
+     * WHITELIST_EDITOR
+     * TIME_LOCK_EDITOR
+     * SPENDING_LIMITS_EDITOR
+     * VESTING_PERIOD_EDITOR
+     * GSN_CONTROLLER
+     * DEFAULT_PARTITION_EDITOR
      */
 
     mapping(bytes32 => mapping(address => bool)) internal _roles;

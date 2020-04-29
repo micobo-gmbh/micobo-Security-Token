@@ -18,6 +18,7 @@ interface IConstraintsModule {
         bytes calldata operatorData
     )
     external
+    view
     returns (
         bool valid,
         string memory message

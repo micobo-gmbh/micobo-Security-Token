@@ -13,7 +13,7 @@ import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
  * information on how to use the pre-built {GSNRecipientSignature} and
  * {GSNRecipientERC20Fee}, or how to write your own.
  */
-abstract contract GSNRecipient is IRelayRecipient {
+abstract contract GSNModule is IRelayRecipient {
    
     uint256 constant private _RELAYED_CALL_ACCEPTED = 0;
     uint256 constant private _RELAYED_CALL_REJECTED = 11;

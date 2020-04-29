@@ -63,10 +63,6 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 			18
 		)
 
-		assert.deepEqual(
-			(await contracts.securityTokenPartition.granularity()).toNumber(),
-			conf.granularity
-		)
 
 		assert.deepEqual(
 			(await contracts.securityTokenPartition.totalSupply()).toNumber(),
@@ -124,68 +120,6 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 				accounts[1],
 				accounts[0],
 				value,
-				{ from: accounts[0] }
-			)
-		)
-	})
-
-	it('can transferWithData using proxy', async () => {
-		await truffleAssert.passes(
-			contracts.securityTokenPartition.transferWithData(
-				accounts[1],
-				value,
-				'0x0',
-				{
-					from: accounts[0],
-				}
-			)
-		)
-
-		let balance = (
-			await contracts.securityTokenPartition.balanceOf(accounts[1])
-		).toNumber()
-
-		// console.log(balance)
-
-		assert.deepEqual(balance, value * 2)
-	})
-
-	it('can approve and transferFromWithData using proxy', async () => {
-		// fails without approval
-		await truffleAssert.fails(
-			contracts.securityTokenPartition.transferFrom(
-				accounts[1],
-				accounts[0],
-				value,
-				{ from: accounts[0] }
-			)
-		)
-
-		// 1 approves 0 to transfer value
-		await truffleAssert.passes(
-			contracts.securityTokenPartition.approve(accounts[0], value, {
-				from: accounts[1],
-			})
-		)
-
-		assert.deepEqual(
-			(
-				await contracts.securityTokenPartition.allowance(
-					accounts[1],
-					accounts[0]
-				)
-			).toNumber(),
-			value
-		)
-
-		// 0 transfers value to itself
-		await truffleAssert.passes(
-			contracts.securityTokenPartition.transferFromWithData(
-				accounts[1],
-				accounts[0],
-				value,
-				'0x0',
-				'0x0',
 				{ from: accounts[0] }
 			)
 		)

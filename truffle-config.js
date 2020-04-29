@@ -109,12 +109,12 @@ module.exports = {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 32768,
+					runs: 16384, // 2^14
 				},
 				evmVersion: 'petersburg',
 			},
 		},
 	},
 
-	plugins: ['truffle-security'],
+	plugins: ['truffle-security', 'solidity-coverage'],
 }

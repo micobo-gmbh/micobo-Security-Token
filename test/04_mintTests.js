@@ -97,7 +97,7 @@ contract('Test Minting', async (accounts) => {
 		assert.deepEqual(balance3, 30)
 	})
 
-	it('can mint up to 40 in bulk', async () => {
+	it('can mint multiple times in bulk', async () => {
 		var tokenHolders = []
 		var values = []
 
@@ -109,20 +109,6 @@ contract('Test Minting', async (accounts) => {
 		}
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.bulkIssueByPartition(
-				conf.standardPartition,
-				tokenHolders,
-				values,
-				'0x0'
-			)
-		)
-
-		// add one more
-		tokenHolders.push(accounts[0])
-		values.push(10)
-
-		// now it fails, cause not <= 40
-		await truffleAssert.fails(
 			contracts.micoboSecurityToken.bulkIssueByPartition(
 				conf.standardPartition,
 				tokenHolders,

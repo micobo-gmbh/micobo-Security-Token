@@ -1,7 +1,3 @@
-/*
- * This code has not been reviewed.
- * Do not use or deploy this code before reviewing it personally first.
- */
 pragma solidity 0.6.6;
 
 
@@ -13,11 +9,17 @@ interface IERC1400Raw {
 
   function name() external view returns (string memory); // 1/13
   function symbol() external view returns (string memory); // 2/13
-  function totalSupply() external view returns (uint256); // 3/13
-  function balanceOf(address owner) external view returns (uint256); // 4/13
+
+  // implemented in ERC20
+  // function totalSupply() external view returns (uint256); // 3/13
+  // function balanceOf(address owner) external view returns (uint256); // 4/13
+
   function granularity() external view returns (uint256); // 5/13
 
-  // deleted function controllers() external view returns (address[] memory); // 6/13
+  // deleted (TODO maybe add again plus for admin)
+  // function controllers() external view returns (address[] memory); // 6/13
+
+  // not necessary for ERC1400Partition
   // function authorizeOperator(address operator) external; // 7/13
   // function revokeOperator(address operator) external; // 8/13
   // function isOperator(address operator, address tokenHolder) external view returns (bool); // 9/13

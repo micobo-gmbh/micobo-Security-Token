@@ -6,6 +6,8 @@ import "../interfaces/ISecurityToken.sol";
 
 contract WhitelistConstraintModule is IConstraintsModule {
 
+    // TODO partition-ready
+
     ISecurityToken _securityToken;
 
     string private _module_name = "WHITELIST";
@@ -56,7 +58,9 @@ contract WhitelistConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public override
+    public
+    view
+    override
     returns (
         bool valid,
         string memory message

@@ -1,7 +1,3 @@
-/*
- * This code has not been reviewed.
- * Do not use or deploy this code before reviewing it personally first.
- */
 pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
@@ -111,9 +107,9 @@ ERC1820Client
      * @dev Get the total number of issued tokens.
      * @return Total supply of tokens currently in circulation.
      */
-    function totalSupply() public override view returns (uint256) {
+    /* function totalSupply() public override view returns (uint256) {
         return _totalSupply;
-    }
+    } */
 
     /**
      * [ERC1400Raw INTERFACE (4/13)]
@@ -121,9 +117,9 @@ ERC1820Client
      * @param tokenHolder Address for which the balance is returned.
      * @return Amount of token held by 'tokenHolder' in the token contract.
      */
-    function balanceOf(address tokenHolder) public override view returns (uint256) {
+    /* function balanceOf(address tokenHolder) public override view returns (uint256) {
         return _balances[tokenHolder];
-    }
+    } */
 
     /**
      * [ERC1400Raw INTERFACE (5/13)]
@@ -335,7 +331,7 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
+        _validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
 
 
         // _callSender(partition, operator, from, to, value, data, operatorData);
@@ -372,7 +368,7 @@ ERC1820Client
         // is REDEEMER
         require(hasRole(bytes32("REDEEMER"), _msgSender()), "A7");
 
-        validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
+        _validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
 
 
         // _callSender(partition, operator, from, address(0), value, data, operatorData);

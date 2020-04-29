@@ -4,19 +4,15 @@ import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ISecurityToken.sol";
-import "../interfaces/IERC1400Raw.sol";
 import "../gsn/GSNable.sol";
 
-contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
+contract SecurityTokenPartition is IERC20, GSNable {
 
     using SafeMath for uint256;
 
     ISecurityToken internal _securityToken;
 
     bytes32 internal _partitionId;
-
-    // Mapping from (tokenHolder, spender) to allowed value.
-    mapping(address => mapping(address => uint256)) internal _allowed;
 
 
     constructor(address securityTokenAddress, bytes32 partition) public {
@@ -44,11 +40,11 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
     // ERC20Detailed
     //******************/
 
-    function name() external override view returns (string memory) {
+    function name() external view returns (string memory) {
         return _securityToken.name();
     }
 
-    function symbol() external override view returns (string memory) {
+    function symbol() external view returns (string memory) {
         return _securityToken.symbol();
     }
 
@@ -59,6 +55,9 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
     //******************/
     // ERC20
     //******************/
+
+    // Mapping from (tokenHolder, spender) to allowed value.
+    mapping(address => mapping(address => uint256)) internal _allowed;
 
     function transfer(address to, uint256 value) external override returns (bool) {
 
@@ -93,67 +92,17 @@ contract SecurityTokenPartition is IERC20, IERC1400Raw, GSNable {
         return true;
     }
 
-    function totalSupply() external override(IERC20, IERC1400Raw) view returns (uint256) {
+    function totalSupply() external override(IERC20) view returns (uint256) {
         return _securityToken.totalSupplyByPartition(_partitionId);
     }
 
-    function balanceOf(address who) external override(IERC20, IERC1400Raw) view returns (uint256) {
+    function balanceOf(address who) external override(IERC20) view returns (uint256) {
         return _securityToken.balanceOfByPartition(_partitionId, who);
     }
 
     function allowance(address owner, address spender) external override view returns (uint256) {
         return _allowed[owner][spender];
     }
-
-
-    //******************/
-    // ERC1400Raw
-    //******************/
-
-    // ERC20Detailed  function name() external view returns (string memory); // 1/13
-    // ERC20Detailed  function symbol() external view returns (string memory); // 2/13
-    // ERC20  function totalSupply() external view returns (uint256); // 3/13
-    // ERC20  function balanceOf(address owner) external view returns (uint256); // 4/13
-
-    function granularity() external override view returns (uint256) {
-        return _securityToken.granularity();
-    }
-
-    function transferWithData(address to, uint256 value, bytes calldata data)
-    external
-    {
-        _securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, data, '');
-    }
-
-    // this is where the operator functionality is used
-    function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata /*operatorData*/)
-    external
-    {
-        // check if is operator by partition or has enough allowance here
-        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from) ||
-        (value <= _allowed[from][_msgSender()]), "A7");
-        // Transfer Blocked - Identity restriction
-
-        if (_allowed[from][_msgSender()] >= value) {
-            _allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
-        } else {
-            _allowed[from][_msgSender()] = 0;
-        }
-
-        // transfer by partition with data
-        _securityToken.operatorTransferByPartition(_partitionId, from, to, value, data, '');
-    }
-
-    // only REDEEMERS can redeem tokens
-
-    event TransferWithData(
-        address indexed operator,
-        address indexed from,
-        address indexed to,
-        uint256 value,
-        bytes data,
-        bytes operatorData
-    );
 
     // GSN
     function isGSNController() internal view override returns (bool) {

@@ -15,7 +15,7 @@ contract Constrainable is Administrable {
 
     IConstraintsModule[] private _modules;
 
-    function validateTransaction(
+    function _validateTransaction(
         address sender,
         bytes32 partition,
         address operator,
@@ -26,6 +26,7 @@ contract Constrainable is Administrable {
         bytes memory operatorData
     )
     internal
+    view
     {
 
         for (uint i = 0; i < _modules.length; i++) {
@@ -43,7 +44,6 @@ contract Constrainable is Administrable {
 
             require(valid, message);
         }
-
     }
 
     function modules() external view returns (IConstraintsModule[] memory) {

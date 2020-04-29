@@ -38,7 +38,9 @@ contract TimeLockConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public override
+    public
+    view
+    override
     returns (
         bool,
         string memory

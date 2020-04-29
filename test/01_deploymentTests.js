@@ -1,7 +1,3 @@
-/*
-	Test if all contracts can be deployed
- */
-
 const MicoboSecurityToken = artifacts.require("SecurityToken");
 SecurityTokenPartition = artifacts.require("SecurityTokenPartition");
 

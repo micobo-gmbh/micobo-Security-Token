@@ -3,8 +3,6 @@ const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
 ISecurityTokenPartition = artifacts.require('ISecurityTokenPartition')
 
-const conf = require('../token-config')
-
 getDeployedContracts = async () => {
 	return {
 		micoboSecurityToken: await MicoboSecurityToken.deployed(),

@@ -76,7 +76,7 @@ contract GSNable is GSNRecipient {
         _gsnMode = gsnMode(m);
     }
 
-    function setGSNModuleAndActivate(IRelayRecipient newGSNModule) public onlyGSNController {
+    function setGSNModule(IRelayRecipient newGSNModule) public onlyGSNController {
         _gsnModule = newGSNModule;
     }
 

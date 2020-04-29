@@ -1,7 +1,3 @@
-/*
-	Test admin functionality
- */
-
 const truffleAssert = require('truffle-assertions')
 
 const { getDeployedContracts, Role } = require('./deployment.js')

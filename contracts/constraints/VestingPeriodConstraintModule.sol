@@ -59,7 +59,9 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public override
+    public
+    view
+    override
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,

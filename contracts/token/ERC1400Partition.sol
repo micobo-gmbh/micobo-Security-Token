@@ -1,7 +1,3 @@
-/*
- * This code has not been reviewed.
- * Do not use or deploy this code before reviewing it personally first.
- */
 pragma solidity 0.6.6;
 
 import "./ERC1400Raw.sol";
@@ -33,7 +29,8 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     // Mapping from (tokenHolder, partition) to balance of corresponding partition.
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;
 
-
+    // List of token default partitions (for ERC20 compatibility).
+    bytes32[] internal _defaultPartitions;
     /****************************************************************************/
 
     /**************** Mappings to find partition operators ************************/
@@ -152,6 +149,29 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 
         return _transferByPartition(partition, _msgSender(), from, to, value, data, operatorData);
     }
+
+    /**
+     * [ERC1400Partition INTERFACE (5/10)]
+     * @dev Get default partitions to transfer from.
+     * Function used for ERC1400Raw and ERC20 backwards compatibility.
+     * For example, a security token may return the bytes32("unrestricted").
+     * @return Array of default partitions.
+     */
+    function getDefaultPartitions() external view returns (bytes32[] memory) {
+        return _defaultPartitions;
+    }
+
+    /**
+     * [ERC1400Partition INTERFACE (6/10)]
+     * @dev Set default partitions to transfer from.
+     * Function used for ERC1400Raw and ERC20 backwards compatibility.
+     * @param partitions partitions to use by default when not specified.
+     */
+    function setDefaultPartitions(bytes32[] calldata partitions) external {
+        require(hasRole(bytes32("DEFAULT_PARTITION_EDITOR"), _msgSender()), "A7");
+        _defaultPartitions = partitions;
+    }
+
 
     /**
      * [ERC1400Partition INTERFACE (7/10)]
@@ -458,17 +478,15 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer, and intended for the token holder ('from') [CAN CONTAIN THE DESTINATION PARTITION].
      * @param operatorData Information attached to the transfer by the operator (if any).
-     * @param preventLocking 'true' if you want this function to throw when tokens are sent to a contract not
      * implementing 'erc777tokenHolder'.
-     *//*
+     */
     function _transferByDefaultPartitions(
         address operator,
         address from,
         address to,
         uint256 value,
         bytes memory data,
-        bytes memory operatorData,
-        bool preventLocking
+        bytes memory operatorData
     )
     internal
     {
@@ -480,15 +498,15 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         for (uint i = 0; i < _defaultPartitions.length; i++) {
             _localBalance = _balanceOfByPartition[from][_defaultPartitions[i]];
             if(_remainingValue <= _localBalance) {
-                _transferByPartition(_defaultPartitions[i], operator, from, to, _remainingValue, data, operatorData, preventLocking);
+                _transferByPartition(_defaultPartitions[i], operator, from, to, _remainingValue, data, operatorData);
                 _remainingValue = 0;
                 break;
             } else if (_localBalance != 0) {
-                _transferByPartition(_defaultPartitions[i], operator, from, to, _localBalance, data, operatorData, preventLocking);
+                _transferByPartition(_defaultPartitions[i], operator, from, to, _localBalance, data, operatorData);
                 _remainingValue = _remainingValue - _localBalance;
             }
         }
 
         require(_remainingValue == 0, "A8"); // Transfer Blocked - Token restriction
-    }*/
+    }
 }

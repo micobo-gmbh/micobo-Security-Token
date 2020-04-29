@@ -6,6 +6,8 @@ import "../interfaces/ISecurityToken.sol";
 
 contract PauseConstraintModule is IConstraintsModule {
 
+    // TODO partition-ready
+
     ISecurityToken _securityToken;
 
     string public _module_name = "PAUSE";
@@ -44,7 +46,9 @@ contract PauseConstraintModule is IConstraintsModule {
         bytes memory /* data */,
         bytes memory /* operatorData */
     )
-    public override
+    public
+    view
+    override
     returns (
         bool,
         string memory

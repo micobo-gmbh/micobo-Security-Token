@@ -14,12 +14,19 @@ look for the brew installation
 
 You need truffle installed globally
 
+### Compatibility
+
+We implement ERC1400Partition.  
+We implement ERC20 with default partitions.  
+We implement ERC20 as proxies for specific partitions.  
+
+We don't implement operator and transfer functionality of ERC1400Raw.  
+We don't implement ERC777.  
+
+
 ### Components
 
-There are 2 main components:
-
-1. _Security Token_  
-2. _Security Token Partitions_
+// TODO
 
 #
 ### Architecture
@@ -94,4 +101,27 @@ Simply open the corresponding XML file in the editor and export into JPEG to upd
 
 
 
+#
+# Explanations
+
+## Admin
+
+Admin is a role.
+It controls assignment and removal of all roles.  
+It can also assign and remove other admins.  
+It cannot renounce itself, as this would leave the contract potentially without admin.
+
+## Controller
+
+Controllers is a role.
+As every role, it can be assigned or removed by the admin role, as well as renounce itself.  
+If the contract is `isControllable()`,  
+Controllers can force-transfer tokens disregarding ownership and constraints using `operatorTransferByPartition`.  
+In this case, the controller is regarded as a kind of master-operator.
+
+## Operator
+
+Operators can transfer tokens on behalf of users that authorized them to do so using `operatorTransferByPartition`.  
+Users can authorize addresses to transfer tokens on their behalf on a "by partition"-basis.  
+This authorization can be revoked at any time.
 
