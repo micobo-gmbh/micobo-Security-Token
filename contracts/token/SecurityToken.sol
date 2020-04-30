@@ -103,17 +103,12 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     // Indicate whether the token can still be issued by the issuer or not anymore.
     bool internal _isIssuable;
 
-    /**
-     * @dev Modifier to verify if token is issuable.
-     */
-
 
     //**************CAPPED*******************
 
     uint256 private _cap;
 
     mapping(bytes32 => uint256) private _capByPartition;
-
 
     //**************CAPPED*******************
 
