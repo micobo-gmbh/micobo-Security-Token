@@ -1,8 +1,8 @@
-const { getDeployedContracts, Role } = require('./deployment.js')
-
 const truffleAssert = require('truffle-assertions')
+const MicoboSecurityToken = artifacts.require('SecurityToken')
 
-const conf = require('../token-config')
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
 
 contract('Test Burning', async (accounts) => {
 	let contracts
@@ -15,7 +15,20 @@ contract('Test Burning', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
 	})
 
 	it('burns tokens of test addresses if burner', async () => {

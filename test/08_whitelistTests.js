@@ -1,10 +1,10 @@
 const WhitelistConstraintModule = artifacts.require('WhitelistConstraintModule')
+const MicoboSecurityToken = artifacts.require('SecurityToken')
 
 const truffleAssert = require('truffle-assertions')
 
-const conf = require('../token-config')
-
-const { getDeployedContracts, Role, Code } = require('./deployment.js')
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
 
 contract('Test Whitelist', async (accounts) => {
 	let contracts, whitelistConstraintModule
@@ -14,7 +14,20 @@ contract('Test Whitelist', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])

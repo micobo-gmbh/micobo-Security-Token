@@ -1,12 +1,16 @@
 const truffleAssert = require('truffle-assertions')
+const MicoboSecurityToken = artifacts.require("SecurityToken");
 
-const { getDeployedContracts, Role } = require('./deployment.js')
+const { Role } = require('./Roles')
+
 
 contract('Test Admin Contract', async (accounts) => {
 	let contracts
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
 	})
 
 	it('accounts[0] is admin', async () => {

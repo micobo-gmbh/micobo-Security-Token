@@ -27,7 +27,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * SPENDING_LIMITS_EDITOR
      * VESTING_PERIOD_EDITOR
      * GSN_CONTROLLER
-     * DEFAULT_PARTITION_EDITOR
+     * DEFAULT_PARTITIONS_EDITOR
      */
 
     mapping(bytes32 => mapping(address => bool)) internal _roles;

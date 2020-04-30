@@ -43,15 +43,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
         // TODO activate when live
         // setInterfaceImplementation("ERC1400Token", address(this));
+
         _isIssuable = true;
     }
 
 
     // add a new Partition proxy contract
-    function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) public{
+    function addPartitionProxy(bytes32 partition, address proxyAddress) public{
         require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
-
-        _setCapByPartition(partition, partitionCap);
 
         _partitionProxies.push(proxyAddress);
 
@@ -490,10 +489,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), 'A7, not allowed to set cap');
         require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
 
-        _setCapByPartition(partition, newPartitionCap);
-    }
-
-    function _setCapByPartition(bytes32 partition, uint256 newPartitionCap) internal {
         // add difference to total cap
         _cap = _cap.add((newPartitionCap.sub(_capByPartition[partition])));
 

@@ -168,7 +168,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param partitions partitions to use by default when not specified.
      */
     function setDefaultPartitions(bytes32[] calldata partitions) external {
-        require(hasRole(bytes32("DEFAULT_PARTITION_EDITOR"), _msgSender()), "A7");
+        require(hasRole(bytes32("DEFAULT_PARTITIONS_EDITOR"), _msgSender()), "A7");
         _defaultPartitions = partitions;
     }
 

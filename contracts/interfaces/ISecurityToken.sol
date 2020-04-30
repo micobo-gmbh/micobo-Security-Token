@@ -11,7 +11,7 @@ import "./IAdmin.sol";
 
 interface ISecurityToken {
 
-    function addPartition(bytes32 partition, address proxyAddress, uint256 partitionCap) external;
+    function addPartitionProxy(bytes32 partition, address proxyAddress) external;
 
     function bulkIssueByPartition(
         bytes32 partition,
@@ -116,7 +116,6 @@ interface ISecurityToken {
 
     // Partition proxy contracts
     function partitionProxies() external view returns (address[] memory);
-    // function addPartition(bytes32 partition) external;
 
     // Token Information
     function balanceOfByPartition(bytes32 partition, address tokenHolder) external view returns (uint256); // 1/10

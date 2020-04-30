@@ -1,98 +1,105 @@
-const MicoboSecurityToken = artifacts.require("SecurityToken");
-SecurityTokenPartition = artifacts.require("SecurityTokenPartition");
+const MicoboSecurityToken = artifacts.require('SecurityToken')
+const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
-const conf = require("../token-config");
+const truffleAssert = require('truffle-assertions')
 
-contract("Test Deployment", async accounts => {
-    let micoboSecurityToken, securityTokenPartition;
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
 
-    // deepEqual compares with '==='
+contract('Test Deployment', async (accounts) => {
+	let micoboSecurityToken, securityTokenPartition
 
-    it("deploys micobo security token", async () => {
-        micoboSecurityToken = await MicoboSecurityToken.new(
-            conf.name,
-            conf.symbol,
-            conf.granularity,
-            [accounts[0]],
-            [accounts[0]]
-        );
-    });
+	// deepEqual compares with '==='
 
-    it("adds the standard partition", async () => {
+	it('deploys micobo security token', async () => {
+		micoboSecurityToken = await MicoboSecurityToken.new(
+			conf.name,
+			conf.symbol,
+			conf.granularity,
+			[accounts[0]],
+			[accounts[0]]
+		)
+	})
 
-        securityTokenPartition = await SecurityTokenPartition.new(
-            micoboSecurityToken.address,
-            conf.standardPartition
-        );
+	it('adds the standard partition', async () => {
+		securityTokenPartition = await SecurityTokenPartition.new(
+			micoboSecurityToken.address,
+			conf.standardPartition
+		)
 
-        await micoboSecurityToken.addPartition(
-            conf.standardPartition,
-            securityTokenPartition.address,
-            conf.standardPartitionCap
-        );
+		// add CAP_EDITOR role
+		await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
 
-        assert.deepEqual(
-            await securityTokenPartition.securityTokenAddress(),
-            micoboSecurityToken.address
-        );
+		// set cap for new partition
+		await truffleAssert.passes(
+			micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
 
-        assert.deepEqual(
-            await securityTokenPartition.partitionId(),
-            conf.standardPartition
-        );
+		// add partition
+		await micoboSecurityToken.addPartitionProxy(
+			conf.standardPartition,
+			securityTokenPartition.address
+		)
 
-        assert.deepEqual(
-            (
-                await micoboSecurityToken.capByPartition(conf.standardPartition)
-            ).toNumber(),
-            conf.standardPartitionCap
-        );
+		// remove CAP_EDITOR role
+		await micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
 
-        assert.deepEqual(await micoboSecurityToken.partitionProxies(), [
-            securityTokenPartition.address
-        ]);
-    });
+		assert.deepEqual(
+			await securityTokenPartition.securityTokenAddress(),
+			micoboSecurityToken.address
+		)
 
-    it("Token gives me all the correct token information", async () => {
-        assert.deepEqual(await micoboSecurityToken.name(), conf.name);
+		assert.deepEqual(
+			await securityTokenPartition.partitionId(),
+			conf.standardPartition
+		)
 
-        assert.deepEqual(await micoboSecurityToken.symbol(), conf.symbol);
+		assert.deepEqual(
+			(
+				await micoboSecurityToken.capByPartition(conf.standardPartition)
+			).toNumber(),
+			conf.standardPartitionCap
+		)
 
-        assert.deepEqual(
-            (await micoboSecurityToken.granularity()).toNumber(),
-            conf.granularity
-        );
+		assert.deepEqual(await micoboSecurityToken.partitionProxies(), [
+			securityTokenPartition.address,
+		])
+	})
 
-        // total cap should be equal to standard partition cap at this point
-        assert.deepEqual(
-            (await micoboSecurityToken.cap()).toNumber(),
-            conf.standardPartitionCap
-        );
+	it('Token gives me all the correct token information', async () => {
+		assert.deepEqual(await micoboSecurityToken.name(), conf.name)
 
-        assert.deepEqual(
-            (await micoboSecurityToken.totalSupply()).toNumber(),
-            0
-        );
-    });
+		assert.deepEqual(await micoboSecurityToken.symbol(), conf.symbol)
 
-    it("partition gives me all the correct token information", async () => {
-        assert.deepEqual(await securityTokenPartition.name(), conf.name);
+		assert.deepEqual(
+			(await micoboSecurityToken.granularity()).toNumber(),
+			conf.granularity
+		)
 
-        assert.deepEqual(await securityTokenPartition.symbol(), conf.symbol);
+		// total cap should be equal to standard partition cap at this point
+		assert.deepEqual(
+			(await micoboSecurityToken.cap()).toNumber(),
+			conf.standardPartitionCap
+		)
 
-        assert.deepEqual(
-            (await securityTokenPartition.decimals()).toNumber(),
-            18
-        );
+		assert.deepEqual((await micoboSecurityToken.totalSupply()).toNumber(), 0)
+	})
 
-        assert.deepEqual(
-            (await securityTokenPartition.cap()).toNumber(),
-            conf.standardPartitionCap
-        );
+	it('partition gives me all the correct token information', async () => {
+		assert.deepEqual(await securityTokenPartition.name(), conf.name)
 
-        assert.deepEqual(
-            (await securityTokenPartition.totalSupply()).toNumber(),
-            0
-        );
-    });
-});
+		assert.deepEqual(await securityTokenPartition.symbol(), conf.symbol)
+
+		assert.deepEqual((await securityTokenPartition.decimals()).toNumber(), 18)
+
+		assert.deepEqual(
+			(await securityTokenPartition.cap()).toNumber(),
+			conf.standardPartitionCap
+		)
+
+		assert.deepEqual((await securityTokenPartition.totalSupply()).toNumber(), 0)
+	})
+})

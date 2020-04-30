@@ -1,13 +1,15 @@
 const truffleAssert = require('truffle-assertions')
-const conf = require('../token-config')
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
+const MicoboSecurityToken = artifacts.require('SecurityToken')
+const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
+
 const {
 	deployRelayHub,
 	runRelayer,
 	fundRecipient,
 	registerRelay,
 } = require('@openzeppelin/gsn-helpers')
-
-const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
 const GSNMode = {
 	ALL: 0,
@@ -25,7 +27,37 @@ contract('Test GSN functionality', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
+
+		// deploy proxy
+		contracts['securityTokenPartition'] = await SecurityTokenPartition.new(
+			contracts.micoboSecurityToken.address,
+			conf.standardPartition
+		)
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
+
+		// add partition
+		await contracts.micoboSecurityToken.addPartitionProxy(
+			conf.standardPartition,
+			contracts.securityTokenPartition.address
+		)
+
+		// remove CAP_EDITOR role
+		await contracts.micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
+
+
 
 		// console.log(contracts.micoboSecurityToken.address)
 
@@ -54,7 +86,7 @@ contract('Test GSN functionality', async (accounts) => {
 				// amount: 0, // use standard 1 eth
 			})
 		} catch (e) {
-			console.error('Error setting up GSN', e)
+			throw e
 		}
 
 		// mint some tokens
@@ -102,15 +134,12 @@ contract('Test GSN functionality', async (accounts) => {
 				'0x0',
 				{
 					from: accounts[0],
-					useGSN: true
+					useGSN: true,
 				}
 			)
 		)
 
-		assert.deepEqual(
-			await web3.eth.getBalance(accounts[0]),
-			balance
-		)
+		assert.deepEqual(await web3.eth.getBalance(accounts[0]), balance)
 	})
 
 	it('cannot deactivate GSN if not GSN_CONTROLLER', async () => {
@@ -122,7 +151,10 @@ contract('Test GSN functionality', async (accounts) => {
 	})
 
 	it('can deactivate GSN if GSN_CONTROLLER', async () => {
-		await contracts.micoboSecurityToken.addRole(Role.GSN_CONTROLLER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(
+			Role.GSN_CONTROLLER,
+			accounts[0]
+		)
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
@@ -152,6 +184,7 @@ contract('Test GSN functionality', async (accounts) => {
 	})
 
 	it('can transfer using proxy and GSN', async () => {
+	
 		const balance = (
 			await contracts.securityTokenPartition.balanceOf(accounts[1])
 		).toNumber()
@@ -168,7 +201,9 @@ contract('Test GSN functionality', async (accounts) => {
 		// console.log(balance)
 
 		assert.deepEqual(
-			(await contracts.securityTokenPartition.balanceOf(accounts[1])).toNumber(),
+			(
+				await contracts.securityTokenPartition.balanceOf(accounts[1])
+			).toNumber(),
 			balance + value
 		)
 	})

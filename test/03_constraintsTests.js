@@ -1,4 +1,5 @@
-const { getDeployedContracts, Role } = require('./deployment.js')
+const { Role } = require('./Roles')
+const MicoboSecurityToken = artifacts.require("SecurityToken");
 
 const truffleAssert = require('truffle-assertions')
 
@@ -10,8 +11,9 @@ contract('Test Constraint Contract', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
-	})
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}	})
 
 	it('can set modules only when constraints editor', async () => {
 		await truffleAssert.fails(

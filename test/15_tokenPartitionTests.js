@@ -1,10 +1,12 @@
 const truffleAssert = require('truffle-assertions')
+const MicoboSecurityToken = artifacts.require('SecurityToken')
+const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
-const conf = require('../token-config')
 
-const { getDeployedContracts, Role, Code } = require('./deployment.js')
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
 
-contract('Test Partition ERC20 Proxy', async (accounts) => {
+contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -12,7 +14,34 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
+
+		contracts["securityTokenPartition"] = await SecurityTokenPartition.new(
+			contracts.micoboSecurityToken.address,
+			conf.standardPartition
+		),
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
+
+		// add partition
+		await contracts.micoboSecurityToken.addPartitionProxy(
+			conf.standardPartition,
+			contracts.securityTokenPartition.address
+		)
+
+		// remove CAP_EDITOR role
+		await contracts.micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
 
 		// mint some tokens
 
@@ -62,7 +91,6 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 			(await contracts.securityTokenPartition.decimals()).toNumber(),
 			18
 		)
-
 
 		assert.deepEqual(
 			(await contracts.securityTokenPartition.totalSupply()).toNumber(),
@@ -129,7 +157,6 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 		const somePartition =
 			'0x736f6d65506172746974696f6e00000000000000000000000000000000000000' // somePartition
 
-		const cap = 1000
 		const value = 100
 
 		// add CAP_EDITOR role
@@ -137,7 +164,10 @@ contract('Test Partition ERC20 Proxy', async (accounts) => {
 
 		// set cap for new partition
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(somePartition, cap)
+			contracts.micoboSecurityToken.setCapByPartition(
+				somePartition,
+				conf.standardPartitionCap
+			)
 		)
 
 		// already is ISSUER

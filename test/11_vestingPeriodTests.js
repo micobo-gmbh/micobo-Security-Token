@@ -1,12 +1,12 @@
 const truffleAssert = require('truffle-assertions')
+const MicoboSecurityToken = artifacts.require('SecurityToken')
 
-const conf = require('../token-config')
+const { conf } = require('../token-config')
+const { Role } = require('./Roles')
 
 const VestingPeriodConstraintModule = artifacts.require(
 	'VestingPeriodConstraintModule'
 )
-
-const { getDeployedContracts, Role, Code } = require('./deployment.js')
 
 contract('Test Vesting Period', async (accounts) => {
 	let day = 86400
@@ -18,7 +18,20 @@ contract('Test Vesting Period', async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = await getDeployedContracts(accounts)
+		contracts = {
+			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+		}
+
+		// add CAP_EDITOR role
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		// set cap for new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCapByPartition(
+				conf.standardPartition,
+				conf.standardPartitionCap
+			)
+		)
 
 		// make me minter
 		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
