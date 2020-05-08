@@ -59,7 +59,7 @@ contract('Test Whitelist', async (accounts) => {
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules([
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
 				whitelistConstraintModule.address,
 			])
 		)

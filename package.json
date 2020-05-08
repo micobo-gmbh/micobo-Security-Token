@@ -11,10 +11,10 @@
     "deploy": "truffle migrate --reset",
     "compile-token": "solcjs --abi --hashes --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
     "compile-vesting": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/constraints/VestingPeriodConstraintModule.sol",
-    "compile-constraints": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintsModule.sol",
+    "compile-constraints": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
     "abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
     "abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
-    "abigen-constraints": "abigen --abi ./build/solc/IConstraintsModule.abi --bin ./build/solc/IConstraintsModule.bin --pkg app --type IConstraintsModule --out ./build/go/IConstraintsModule.go",
+    "abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",
     "size": "truffle compile --all && truffle exec scripts/check-size.js"
   },
   "repository": {
@@ -33,7 +33,7 @@
     "@openzeppelin/gsn-provider": "^0.1.10",
     "erc1820": "^0.0.2",
     "web3": "^1.2.6",
-    "solc": "^0.6.6",
+    "solc": "0.6.6",
     "@codechecks/client": "^0.1.10",
     "@truffle/hdwallet-provider": "^1.0.21",
     "acorn": "^7.1.1",

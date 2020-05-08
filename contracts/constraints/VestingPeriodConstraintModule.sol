@@ -1,12 +1,12 @@
 pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import '../../node_modules/@openzeppelin/contracts/math/SafeMath.sol';
 
-import "../interfaces/IConstraintsModule.sol";
-import "../interfaces/ISecurityToken.sol";
+import '../interfaces/IConstraintModule.sol';
+import '../interfaces/ISecurityToken.sol';
 
 
-contract VestingPeriodConstraintModule is IConstraintsModule {
+contract VestingPeriodConstraintModule is IConstraintModule {
 
     // accounts can only transfer tokens when they are vested
 
@@ -14,18 +14,18 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = "VESTING";
+    string private _module_name = 'VESTING';
 
     // time until vesting starts
-    mapping(bytes32 => uint256) vestingStartByPartition;
+    uint256 _vestingStart;
 
     // fraction vested after starting
-    mapping(bytes32 => uint256) vestedFractionAfterStartByPartition;
+    uint256 _vestedFraction;
 
     // fraction of tokens vested in 1 month
-    mapping(bytes32 => uint256) vestingRatioByPartition;
+    uint256 _vestingRatio;
 
-    mapping(bytes32 => mapping(address => uint256)) amountSpentByUserByPartition;
+    mapping(address => uint256) _amountSpentByUser;
 
     address _owner;
 
@@ -36,20 +36,46 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         _securityToken = ISecurityToken(tokenAddress);
     }
 
-    function setVestingOptionsByPartition (
-        bytes32 partition,
+    function setVestingOptions (
         uint256 vestingStart,               // timestamp in seconds when vesting should start
         uint256 vestedFractionAfterStart,   // i.e. 4  => 1/4
         uint256 vestingRatio                // i.e. 48 => 1/48
     ) public {
-        require(_securityToken.hasRole(bytes32("VESTING_PERIOD_EDITOR"), msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32('VESTING_PERIOD_EDITOR'), msg.sender), 'A8');
 
-        vestingStartByPartition[partition] = vestingStart;
-        vestedFractionAfterStartByPartition[partition] = vestedFractionAfterStart;
-        vestingRatioByPartition[partition] = vestingRatio;
+        _vestingStart = vestingStart;
+        _vestedFraction = vestedFractionAfterStart;
+        _vestingRatio = vestingRatio;
     }
 
-    function isValid(
+    function executeTransfer(
+        address msg_sender,
+        bytes32 partition,
+        address operator,
+        address from,
+        address to,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    )
+    external
+    override
+    returns (bool, string memory) {
+        (bool valid, , , string memory reason) = validateTransfer(
+            msg_sender,
+            partition,
+            operator,
+            from,
+            to,
+            value,
+            data,
+            operatorData
+        );
+
+        return (valid, reason);
+    }
+
+    function validateTransfer(
         address /* msg_sender */,
         bytes32 partition,
         address /* operator */,
@@ -65,43 +91,47 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
-        string memory message
+        byte code,
+        bytes32 extradata,
+        string memory reason
     )
     {
         // dormant Period not over
-        if (now < vestingStartByPartition[partition]) {
+        if (now < _vestingStart) {
             invalid = true;
-            message = 'A8 - vesting has not started yet';
+            reason = 'A8 - vesting has not started yet';
+            code = hex'A8';
 
         // dormant period is over
         } else {
 
             // amount exceeds allowance minus amountAlreadySpent by this acount
             if (value > getAmountAllowed(partition, from)
-                .sub(amountSpentByUserByPartition[partition][from])
+                .sub(_amountSpentByUser[from])
             ) {
                 invalid = true;
-                message = 'A8 - amount exceeds allowance';
+                reason = 'A8 - amount exceeds allowance';
+                code = hex'A8';
 
             // amount is OK
             } else {
                 // add value to this users spendings
-                amountSpentByUserByPartition[partition][from].add(value);
+                _amountSpentByUser[from].add(value);
             }
         }
-        return (!invalid, message);
+        return (!invalid, code, extradata, reason);
     }
 
     function getAmountAllowed(bytes32 partition, address from) internal view returns (uint256) {
         // calculate the original amount of tokens this account got
         uint256 userOriginalBalance = _securityToken
             .balanceOfByPartition(partition, from)
-            .add(amountSpentByUserByPartition[partition][from]);
+            .add(_amountSpentByUser[from]);
 
         return
             // the starting amount after the dormant period has passed
             // (i.e 1/4 where 4 is the fraction, hence originalBalance / fraction)
-            (userOriginalBalance.div(vestedFractionAfterStartByPartition[partition]))
+            (userOriginalBalance.div(_vestedFraction))
 
             // add to this
             .add(
@@ -110,13 +140,13 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
                     // the seconds that have passed since the dormant period was over
                     // now - vestingStart
                     (now
-                    .sub(vestingStartByPartition[partition]))
+                    .sub(_vestingStart))
                     // divided by 1 month in seconds, gives us the number in months
                     .div(2628288)
                 )
                 // so by multiplying with the monthsPassed and now dividing by the fraction the amount grows every month
                 // (i.e. 48),
-                .div(vestingRatioByPartition[partition])
+                .div(_vestingRatio)
             );
 
             // we get the total amountAllowed at this point in time
@@ -129,19 +159,19 @@ contract VestingPeriodConstraintModule is IConstraintsModule {
         return _module_name;
     }
 
-    function getVestingStartByPartition(bytes32 partition) public view returns (uint256) {
-        return vestingStartByPartition[partition];
+    function getVestingStart() public view returns (uint256) {
+        return _vestingStart;
     }
 
-    function getVestedFractionAfterStartByPartition(bytes32 partition) public view returns (uint256) {
-        return vestedFractionAfterStartByPartition[partition];
+    function getVestedFractionAfterStart() public view returns (uint256) {
+        return _vestedFraction;
     }
 
-    function getVestingRatioByPartition(bytes32 partition) public view returns (uint256) {
-        return vestingRatioByPartition[partition];
+    function getVestingRatio() public view returns (uint256) {
+        return _vestingRatio;
     }
 
-    function getAmountSpentByUserByPartition(bytes32 partition, address user) public view returns (uint256) {
-        return amountSpentByUserByPartition[partition][user];
+    function getAmountSpentByUser(address user) public view returns (uint256) {
+        return _amountSpentByUser[user];
     }
 }

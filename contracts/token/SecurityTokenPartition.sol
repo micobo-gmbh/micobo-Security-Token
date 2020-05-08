@@ -77,8 +77,7 @@ contract SecurityTokenPartition is IERC20, GSNable {
 
     function transferFrom(address from, address to, uint256 value) external override returns (bool) {
         // check if is operator by partition or has enough allowance here
-        require(_securityToken.isOperatorForPartition(_partitionId, _msgSender(), from) ||
-        (value <= _allowed[from][_msgSender()]), "A7");
+        require(value <= _allowed[from][_msgSender()], "A7");
         // Transfer Blocked - Identity restriction
 
         if (_allowed[from][_msgSender()] >= value) {

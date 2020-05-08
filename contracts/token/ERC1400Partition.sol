@@ -242,7 +242,9 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     returns (bool)
     {
         return (_authorizedOperatorByPartition[tokenHolder][partition][operator] ||
-        (_isControllable && _isControllerByPartition[partition][operator]));
+        (_isControllable &&
+        (_isControllerByPartition[partition][operator]) || hasRole(bytes32("CONTROLLER"), operator)));
+        // we use _isControllerByPartition only for partitionProxy at this point
     }
 
     /**

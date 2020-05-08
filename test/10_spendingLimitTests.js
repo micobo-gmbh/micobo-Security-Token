@@ -64,7 +64,7 @@ contract('Test Spending Limits', async (accounts) => {
 
 		// can set module
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules([
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
 				spendingLimitsConstraintModule.address,
 			])
 		)

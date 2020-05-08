@@ -2,6 +2,8 @@ const { Role } = require('./Roles')
 const MicoboSecurityToken = artifacts.require("SecurityToken");
 
 const truffleAssert = require('truffle-assertions')
+const { conf } = require('../token-config')
+
 
 contract('Test Constraint Contract', async (accounts) => {
 	let contracts
@@ -17,18 +19,18 @@ contract('Test Constraint Contract', async (accounts) => {
 
 	it('can set modules only when constraints editor', async () => {
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setModules(moduleAddresses)
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, moduleAddresses)
 		)
 
 		// add constraintEditor
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules(moduleAddresses)
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, moduleAddresses)
 		)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.modules(),
+			await contracts.micoboSecurityToken.getModulesByPartition(conf.standardPartition),
 			moduleAddresses
 		)
 	})

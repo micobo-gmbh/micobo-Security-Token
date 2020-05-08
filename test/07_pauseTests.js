@@ -59,14 +59,14 @@ contract('Test Pausing', async (accounts) => {
 
 	it('register PauseConstraintModule', async () => {
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setModules([pauseConstraintModule.address])
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [pauseConstraintModule.address])
 		)
 
 		// adding MODULE_EDITOR
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules([pauseConstraintModule.address])
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [pauseConstraintModule.address])
 		)
 	})
 
@@ -117,7 +117,7 @@ contract('Test Pausing', async (accounts) => {
 	// LIMITS WHEN PAUSED
 
 	it('cannot transfer tokens if paused', async () => {
-		// if setModules succeeded
+		// if setModulesByPartition succeeded
 
 		await truffleAssert.passes(pauseConstraintModule.pause())
 

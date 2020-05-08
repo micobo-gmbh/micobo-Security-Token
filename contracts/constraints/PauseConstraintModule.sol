@@ -1,16 +1,14 @@
 pragma solidity 0.6.6;
 
 
-import "../interfaces/IConstraintsModule.sol";
-import "../interfaces/ISecurityToken.sol";
+import '../interfaces/IConstraintModule.sol';
+import '../interfaces/ISecurityToken.sol';
 
-contract PauseConstraintModule is IConstraintsModule {
-
-    // TODO partition-ready
+contract PauseConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string public _module_name = "PAUSE";
+    string public _module_name = 'PAUSE';
 
     /**
     * @dev Emitted when the pause is triggered by a pauser (`account`).
@@ -36,7 +34,34 @@ contract PauseConstraintModule is IConstraintsModule {
         _paused = false;
     }
 
-    function isValid(
+    function executeTransfer(
+        address msg_sender,
+        bytes32 partition,
+        address operator,
+        address from,
+        address to,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    )
+    external
+    override
+    returns (bool, string memory) {
+        (bool valid, , , string memory reason) = validateTransfer(
+            msg_sender,
+            partition,
+            operator,
+            from,
+            to,
+            value,
+            data,
+            operatorData
+        );
+
+        return (valid, reason);
+    }
+
+    function validateTransfer(
         address /* msg_sender */,
         bytes32 /* partition */,
         address /* operator */,
@@ -50,14 +75,16 @@ contract PauseConstraintModule is IConstraintsModule {
     view
     override
     returns (
-        bool,
-        string memory
+        bool valid,
+        byte code,
+        bytes32 extradata,
+        string memory reason
     )
     {
         if (_paused) {
-            return (false, 'A8 - contract is paused');
+            return (false, hex'A8', '', 'A8 - contract is paused');
         } else {
-            return (true, '');
+            return (true, code, extradata, '');
         }
     }
 
@@ -98,7 +125,7 @@ contract PauseConstraintModule is IConstraintsModule {
     * @dev Called by a pauser to pause, triggers stopped state.
     */
     function pause() public whenNotPaused {
-        require(_securityToken.hasRole(bytes32("PAUSER"), msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32('PAUSER'), msg.sender), 'A7');
         _paused = true;
         emit Paused(msg.sender);
     }
@@ -109,7 +136,7 @@ contract PauseConstraintModule is IConstraintsModule {
      * @dev Called by a pauser to unpause, returns to normal state.
      */
     function unpause() public whenPaused {
-        require(_securityToken.hasRole(bytes32("PAUSER"), msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32('PAUSER'), msg.sender), 'A7');
         _paused = false;
         emit Unpaused(msg.sender);
     }

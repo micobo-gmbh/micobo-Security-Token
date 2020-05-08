@@ -331,8 +331,7 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        _validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
-
+        _executeTransfer(_msgSender(), partition, operator, from, to, value, data, operatorData);
 
         // _callSender(partition, operator, from, to, value, data, operatorData);
 
@@ -347,14 +346,13 @@ ERC1820Client
     /**
      * [INTERNAL]
      * @dev Perform the token redemption.
-     * @param partition Name of the partition (bytes32 to be left empty for ERC1400Raw transfer).
      * @param operator The address performing the redemption.
      * @param from Token holder whose tokens will be redeemed.
      * @param value Number of tokens to redeem.
      * @param data Information attached to the redemption.
      * @param operatorData Information attached to the redemption, by the operator (if any).
      */
-    function _redeem(bytes32 partition, address operator, address from, uint256 value, bytes memory data, bytes memory operatorData)
+    function _redeem(address operator, address from, uint256 value, bytes memory data, bytes memory operatorData)
     internal
     nonReentrant
     {
@@ -368,10 +366,7 @@ ERC1820Client
         // is REDEEMER
         require(hasRole(bytes32("REDEEMER"), _msgSender()), "A7");
 
-        _validateTransaction(_msgSender(), partition, operator, from, address(0), value, data, operatorData);
-
-
-        // _callSender(partition, operator, from, address(0), value, data, operatorData);
+        // we don't validate when redeeming
 
         _balances[from] = _balances[from].sub(value);
         _totalSupply = _totalSupply.sub(value);
@@ -475,9 +470,7 @@ ERC1820Client
 
         require(hasRole(bytes32("ISSUER"), _msgSender()), "A7");
 
-        // don't validate when minting
-        // validateTransaction(_msgSender(), partition, operator, address(0), to, value, data, operatorData);
-
+        // we don't validate when minting
 
         _totalSupply = _totalSupply.add(value);
         _balances[to] = _balances[to].add(value);

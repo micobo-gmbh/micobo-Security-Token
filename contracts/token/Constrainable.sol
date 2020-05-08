@@ -1,21 +1,43 @@
 pragma solidity 0.6.6;
 
 import './Administrable.sol';
-import "../interfaces/IConstraintsModule.sol";
+import "../interfaces/IConstraintModule.sol";
 
 
 contract Constrainable is Administrable {
 
-    // Questions for OffChainValidator
-    // ??? when data or operator data are left empty, how does OffChainValidator know which one it is supposed to check for the certificate
-    // i guess we will just let it try both when in doubt
-    // we need to keep this modifier open though, so the internal transfer functions can dynamically use this
-    // even when some variables remain empty
+    mapping(bytes32 => IConstraintModule[]) private _modulesByPartition;
 
+    function _executeTransfer(
+        address sender,
+        bytes32 partition,
+        address operator,
+        address from,
+        address to,
+        uint256 value,
+        bytes memory data,
+        bytes memory operatorData
+    )
+    internal
+    {
+        for (uint i = 0; i < _modulesByPartition[partition].length; i++) {
 
-    IConstraintsModule[] private _modules;
+            (bool valid, string memory reason) = _modulesByPartition[partition][i].executeTransfer(
+                sender,
+                partition,
+                operator,
+                from,
+                to,
+                value,
+                data,
+                operatorData
+            );
 
-    function _validateTransaction(
+            require(valid, reason);
+        }
+    }
+
+    function _validateTransfer(
         address sender,
         bytes32 partition,
         address operator,
@@ -27,11 +49,17 @@ contract Constrainable is Administrable {
     )
     internal
     view
+    returns (
+        bool valid,
+        byte code,
+        bytes32 extradata,
+        string memory reason
+    )
     {
 
-        for (uint i = 0; i < _modules.length; i++) {
+        for (uint i = 0; i < _modulesByPartition[partition].length; i++) {
 
-            (bool valid, string memory message) = _modules[i].isValid(
+            (valid, code, extradata, reason) = _modulesByPartition[partition][i].validateTransfer(
                 sender,
                 partition,
                 operator,
@@ -42,17 +70,20 @@ contract Constrainable is Administrable {
                 operatorData
             );
 
-            require(valid, message);
+            if(!valid) {
+                return (valid, code, extradata, reason);
+            }
         }
+        return (true, "", "", "");
     }
 
-    function modules() external view returns (IConstraintsModule[] memory) {
-        return _modules;
+    function getModulesByPartition(bytes32 partition) external view returns (IConstraintModule[] memory) {
+        return _modulesByPartition[partition];
     }
 
-    function setModules(IConstraintsModule[] calldata newModules) external {
+    function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external {
         require(hasRole(bytes32("MODULE_EDITOR"), msg.sender), 'A7');
-        _modules = newModules;
+        _modulesByPartition[partition] = newModules;
     }
 
 }

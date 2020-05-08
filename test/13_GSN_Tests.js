@@ -57,8 +57,6 @@ contract('Test GSN functionality', async (accounts) => {
 		// remove CAP_EDITOR role
 		await contracts.micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
 
-
-
 		// console.log(contracts.micoboSecurityToken.address)
 
 		// setup GSN
@@ -112,7 +110,7 @@ contract('Test GSN functionality', async (accounts) => {
 			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1], {
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 147049,
+				gasLimit: 50000, // 47900
 			})
 		)
 
@@ -125,6 +123,16 @@ contract('Test GSN functionality', async (accounts) => {
 	it('can transfer tokens for free', async () => {
 		const balance = await web3.eth.getBalance(accounts[0])
 
+		const tokenBalance0 = await contracts.micoboSecurityToken.balanceOfByPartition(
+			conf.standardPartition,
+			accounts[0]
+		)
+
+		const tokenBalance1 = await contracts.micoboSecurityToken.balanceOfByPartition(
+			conf.standardPartition,
+			accounts[1]
+		)
+
 		// can transfer tokens
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(
@@ -135,10 +143,33 @@ contract('Test GSN functionality', async (accounts) => {
 				{
 					from: accounts[0],
 					useGSN: true,
+					gasLimit: 65000, // 61616
 				}
 			)
 		)
 
+		// tokens have been transferred
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			tokenBalance0 - value
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			tokenBalance1 - - value
+		)
+
+		// ether balance is unchanged
 		assert.deepEqual(await web3.eth.getBalance(accounts[0]), balance)
 	})
 
@@ -173,7 +204,7 @@ contract('Test GSN functionality', async (accounts) => {
 			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[2], {
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 147049,
+				gasLimit: 50000, // 47900
 			})
 		)
 
@@ -184,7 +215,6 @@ contract('Test GSN functionality', async (accounts) => {
 	})
 
 	it('can transfer using proxy and GSN', async () => {
-	
 		const balance = (
 			await contracts.securityTokenPartition.balanceOf(accounts[1])
 		).toNumber()
@@ -194,7 +224,7 @@ contract('Test GSN functionality', async (accounts) => {
 			contracts.securityTokenPartition.transfer(accounts[1], value, {
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 154988,
+				gasLimit: 65000 // 62719
 			})
 		)
 

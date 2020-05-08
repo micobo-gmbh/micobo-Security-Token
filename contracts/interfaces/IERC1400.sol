@@ -16,6 +16,7 @@ interface IERC1400  {
 
     // Token Issuance
     function isIssuable() external view returns (bool); // 4/9
+
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data) external; // 5/9
     event IssuedByPartition(
         bytes32 indexed partition,
@@ -28,6 +29,7 @@ interface IERC1400  {
 
     // Token Redemption
     function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data) external; // 6/9
+
     function operatorRedeemByPartition(
         bytes32 partition,
         address tokenHolder,
@@ -51,6 +53,7 @@ interface IERC1400  {
         uint256 value,
         bytes calldata data
     ) external view returns (byte, bytes32, bytes32); // 8/9
+
     function canOperatorTransferByPartition(
         bytes32 partition,
         address from,

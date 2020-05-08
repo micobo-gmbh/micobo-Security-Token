@@ -218,22 +218,21 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     {
         // only REDEEMER can burn tokens (checked in _redeem())
 
-        // require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
+        require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
         // Transfer Blocked - Identity restriction
 
         _redeemByPartition(partition, _msgSender(), tokenHolder, value, data, operatorData);
     }
 
-    // TODO were these only used for standardized use of the off-chain validator?
+    // only used for standardized use of the off-chain validator?
     // we could test-run transfers locally if we want to find out if they succeed
-
     /**
      * [ERC1400 INTERFACE (8/9)]
      * @dev Know the reason on success or failure based on the EIP-1066 application-specific status codes.
      * @param partition Name of the partition.
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
-     * @param data Information attached to the transfer, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the transfer, by the token holder.
      * @return ESC (Ethereum Status Code) following the EIP-1066 standard.
      * @return Additional bytes32 parameter that can be used to define
      * application specific reason codes with additional details (for example the
@@ -327,32 +326,47 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
             return (hex"A6", "", partition);
         // Transfer Blocked - Receiver not eligible
 
-        _validateTransaction(_msgSender(), partition, operator, from, to, value, data, operatorData);
+        // NO ERC777
 
-
-        address senderImplementation;
+        /* address senderImplementation;
         address recipientImplementation;
         senderImplementation = interfaceAddr(from, "ERC1400TokensSender");
-        recipientImplementation = interfaceAddr(to, "ERC1400TokensRecipient");
+        recipientImplementation = interfaceAddr(to, "ERC1400TokensRecipient"); */
 
-        // no ERC777
-        /*if ((senderImplementation != address(0))
+        /* if ((senderImplementation != address(0))
             && !IERC1400TokensSender(senderImplementation).canTransfer(partition, from, to, value, data, operatorData))
-            return (hex"A5", "", partition);
+            return (hex"A5", "", partition); */
         // Transfer Blocked - Sender not eligible
 
-        if ((recipientImplementation != address(0))
+        /* if ((recipientImplementation != address(0))
             && !IERC1400TokensRecipient(recipientImplementation).canReceive(partition, from, to, value, data, operatorData))
-            return (hex"A6", "", partition);
-        // Transfer Blocked - Receiver not eligible*/
+            return (hex"A6", "", partition); */
+        // Transfer Blocked - Receiver not eligible
 
         if (!_isMultiple(value))
             return (hex"A9", "", partition);
         // Transfer Blocked - Token granularity
 
+
+        (bool valid, byte code, bytes32 extradata, ) = _validateTransfer(
+            _msgSender(),
+            partition,
+            operator,
+            from,
+            to,
+            value,
+            data,
+            operatorData
+        );
+
+        if (!valid) {
+            return (code, extradata, partition);
+        }
+
         return (hex"A2", "", partition);
         // Transfer Verified - Off-Chain approval for restricted token
     }
+
 
     /**
      * [INTERNAL]
@@ -406,7 +420,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         // Transfer Blocked - Sender balance insufficient
 
         _removeTokenFromPartition(from, fromPartition, value);
-        _redeem(fromPartition, operator, from, value, data, operatorData);
+        _redeem(operator, from, value, data, operatorData);
 
         emit RedeemedByPartition(fromPartition, operator, from, value, data, operatorData);
     }

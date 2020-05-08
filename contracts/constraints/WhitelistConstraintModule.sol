@@ -1,16 +1,14 @@
 pragma solidity 0.6.6;
 
-import "../interfaces/IConstraintsModule.sol";
-import "../interfaces/ISecurityToken.sol";
+import '../interfaces/IConstraintModule.sol';
+import '../interfaces/ISecurityToken.sol';
 
 
-contract WhitelistConstraintModule is IConstraintsModule {
-
-    // TODO partition-ready
+contract WhitelistConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = "WHITELIST";
+    string private _module_name = 'WHITELIST';
 
     // module data
     mapping(address => bool) private _whitelist;
@@ -33,13 +31,13 @@ contract WhitelistConstraintModule is IConstraintsModule {
 
     // function editWhitelist
     function editWhitelist(address account, bool whitelisted) public {
-        require(_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32('WHITELIST_EDITOR'), msg.sender), 'A8');
         _whitelist[account] = whitelisted;
     }
 
     // function bulkEditWhitelist
     function bulkEditWhitelist(address[] memory accounts, bool whitelisted) public {
-        require(_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender), 'A8');
+        require(_securityToken.hasRole(bytes32('WHITELIST_EDITOR'), msg.sender), 'A8');
         require(accounts.length <= 40, 'too many accounts');
 
         for(uint i = 0; i < accounts.length; i++) {
@@ -47,8 +45,35 @@ contract WhitelistConstraintModule is IConstraintsModule {
         }
     }
 
+    function executeTransfer(
+        address msg_sender,
+        bytes32 partition,
+        address operator,
+        address from,
+        address to,
+        uint256 value,
+        bytes calldata data,
+        bytes calldata operatorData
+    )
+    external
+    override
+    returns (bool, string memory) {
+        (bool valid, , , string memory reason) = validateTransfer(
+            msg_sender,
+            partition,
+            operator,
+            from,
+            to,
+            value,
+            data,
+            operatorData
+        );
 
-    function isValid(
+        return (valid, reason);
+    }
+
+
+    function validateTransfer(
         address /* msg_sender */,
         bytes32 /* partition */,
         address /* operator */,
@@ -63,15 +88,17 @@ contract WhitelistConstraintModule is IConstraintsModule {
     override
     returns (
         bool valid,
-        string memory message
+        byte code,
+        bytes32 extradata,
+        string memory reason
     )
     {
         if(_whitelist[from] && _whitelist[to]) {
-            return (true, '');
+            return (true, code, extradata, '');
         } else if (!_whitelist[from]) {
-            return (false, 'sender not whitelisted');
+            return (false, hex'A8', '', 'A8 - sender not whitelisted');
         } else {
-            return (false, 'recipient not whitelisted');
+            return (false, hex'A8', '', 'A8 - recipient not whitelisted');
         }
     }
 

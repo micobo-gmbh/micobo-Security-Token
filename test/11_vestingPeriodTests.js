@@ -64,7 +64,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// can set module
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModules([
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
 				vestingPeriodConstraintModule.address,
 			])
 		)
@@ -91,8 +91,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// cannot set vesting options
 		await truffleAssert.fails(
-			vestingPeriodConstraintModule.setVestingOptionsByPartition(
-				conf.standardPartition,
+			vestingPeriodConstraintModule.setVestingOptions(
 				vestingStart,
 				4,
 				48
@@ -107,8 +106,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// now it can set vesting options
 		await truffleAssert.passes(
-			vestingPeriodConstraintModule.setVestingOptionsByPartition(
-				conf.standardPartition,
+			vestingPeriodConstraintModule.setVestingOptions(
 				vestingStart,
 				4,
 				48

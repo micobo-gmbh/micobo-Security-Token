@@ -1,11 +1,11 @@
 pragma solidity 0.6.6;
 
 /*
-import "../interfaces/IConstraintsModule.sol";
-import "../interfaces/ISecurityToken.sol";
+import '../interfaces/IConstraintModule.sol';
+import '../interfaces/ISecurityToken.sol';
 
 
-contract OffChainValidator is IConstraintsModule {
+contract OffChainValidator is IConstraintModule {
 
     // TODO
 

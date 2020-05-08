@@ -1,6 +1,6 @@
 pragma solidity 0.6.6;
 
-import "./IConstraintsModule.sol";
+import "./IConstraintModule.sol";
 import "./IAdmin.sol";
 
 /**
@@ -24,9 +24,9 @@ interface ISecurityToken {
     // Constrainable INTERFACE
     //******************/
 
-    function modules() external view returns (IConstraintsModule[] memory);
+    function getModulesByPartition() external view returns (IConstraintModule[] memory);
 
-    function setModules(IConstraintsModule[] calldata newModules) external;
+    function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external;
 
 
     //******************/

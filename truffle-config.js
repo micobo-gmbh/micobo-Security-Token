@@ -51,10 +51,7 @@ module.exports = {
 					useGSN: false,
 				})
 			},
-			host: 'localhost',
-			port: '8545',
 			network_id: '*',
-			gas: 0x989680, // 10 000 000
 		},
 
 		rinkeby: {
@@ -96,7 +93,7 @@ module.exports = {
 		reporterOptions: {
 			currency: 'EUR',
 			gasPrice: 2,
-			url:'http://localhost:8545'
+			url: 'http://localhost:8545',
 		},
 	},
 
@@ -109,7 +106,7 @@ module.exports = {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 16384, // 2^14
+					runs: 16384 / 2, // 2^14
 				},
 				evmVersion: 'petersburg',
 			},

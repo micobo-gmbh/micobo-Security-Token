@@ -1,14 +1,12 @@
 pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import '../../node_modules/@openzeppelin/contracts/math/SafeMath.sol';
 
-import "../interfaces/IConstraintsModule.sol";
-import "../interfaces/ISecurityToken.sol";
+import '../interfaces/IConstraintModule.sol';
+import '../interfaces/ISecurityToken.sol';
 
 
-contract SpendingLimitsConstraintModule is IConstraintsModule {
-
-    // TODO partition-ready
+contract SpendingLimitsConstraintModule is IConstraintModule {
 
     using SafeMath for uint256;
 
@@ -19,7 +17,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = "SPENDING_LIMIT";
+    string private _module_name = 'SPENDING_LIMIT';
 
     // module data
 
@@ -31,8 +29,8 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
         uint256 amountAllowed;
     }
 
-    // tracks the current spending of accounts in a period, current Partition - Account - TimelockIndex - User
-    mapping(bytes32 => mapping(address => mapping(uint256 => User))) private _cPATU;
+    // tracks the current spending of accounts in a period, Account - TimelockIndex - User
+    mapping(address => mapping(uint256 => User)) private _ATU;
 
     struct User {
         uint256 amount;
@@ -53,7 +51,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
 
 
     modifier onlySpendingLimitsEditor {
-        require(_securityToken.hasRole(bytes32("SPENDING_LIMITS_EDITOR"), msg.sender), 'A7');
+        require(_securityToken.hasRole(bytes32('SPENDING_LIMITS_EDITOR'), msg.sender), 'A7');
         _;
     }
 
@@ -62,41 +60,40 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     }
 
     function setTimelock (uint256 index, uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        require(_spendinglimits.length > index, "out of bounds");
+        require(_spendinglimits.length > index, 'out of bounds');
         _spendinglimits[index] = SpendingLimit(periodLength, amountAllowed);
     }
 
     function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
-        require(_spendinglimits.length > index, "out of bounds");
+        require(_spendinglimits.length > index, 'out of bounds');
         _spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
         _spendinglimits.pop();
     }
 
-    // TODO find a solution for record keeping (altering the state during validation)
-    /*
-    function isValid(
-        address msg_sender,
-        bytes32 partition,
-        address operator,
+
+    function executeTransfer(
+        address /* msg_sender */,
+        bytes32 /* partition */,
+        address /* operator */,
         address from,
-        address to,
+        address /* to */,
         uint256 value,
-        bytes memory data,
-        bytes memory operatorData
+        bytes memory /* data */,
+        bytes memory /* operatorData */
     )
     public
     override
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
-        string memory message
+        string memory reason
     )
     {
 
         // if any of the timelocks are violated, valid is set to false
         for (uint i = 0; i < _spendinglimits.length; i++) {
 
-            User storage user = _cPATU[partition][from][i];
+            User storage user = _ATU[from][i];
 
             // period has not ended => there has been at least 1 tx
             if(now <= user.periodEnd) {
@@ -104,7 +101,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
                 // accumulated amount plus the amount to be transferred exceeds the allowed amount
                 if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
                     invalid = true;
-                    message = 'A8 - spending limit for this period reached';
+                    reason = 'A8 - spending limit for this period reached';
                 }
 
                 // accumulated amount plus the amount to be transferred does not exceed the allowed amount
@@ -118,7 +115,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
             else {
                 if (value > _spendinglimits[i].amountAllowed) {
                     invalid = true;
-                    message = 'A8 - spending limit for this period reached';
+                    reason = 'A8 - spending limit for this period reached';
                 }
 
                 else {
@@ -128,15 +125,16 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
             }
         }
 
-        return (!invalid, message);
+        return (!invalid, reason);
     }
-    */
+
+
 
     // VIEW
 
-    function isValid(
+    function validateTransfer(
         address /* msg_sender */,
-        bytes32 partition,
+        bytes32 /* partition */,
         address /* operator */,
         address from,
         address /* to */,
@@ -150,14 +148,16 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
     returns (
         // we start with false here to save gas and negate it before returning --> (!invalid)
         bool invalid,
-        string memory message
+        byte code,
+        bytes32 extradata,
+        string memory reason
     )
     {
 
         // if any of the timelocks are violated, valid is set to false
         for (uint i = 0; i < _spendinglimits.length; i++) {
 
-            User storage user = _cPATU[partition][from][i];
+            User storage user = _ATU[from][i];
 
             // period has not ended => there has been at least 1 tx
             if(now <= user.periodEnd) {
@@ -165,14 +165,15 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
                 // accumulated amount plus the amount to be transferred exceeds the allowed amount
                 if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
                     invalid = true;
-                    message = 'A8 - spending limit for this period reached';
+                    reason = 'spending limit for this period reached';
+                    code = hex'A8';
                 }
 
                 // accumulated amount plus the amount to be transferred does not exceed the allowed amount
                 else {
                     // increase accumulated amount and leave periodEnd
 
-                    // TODO no record keeping for view
+                    // INFO no record keeping for view
                     // user.amount = user.amount.add(value);
                     this;
                 }
@@ -182,11 +183,12 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
             else {
                 if (value > _spendinglimits[i].amountAllowed) {
                     invalid = true;
-                    message = 'A8 - spending limit for this period reached';
+                    reason = 'spending limit for this period reached';
+                    code = hex'A8';
                 }
 
                 else {
-                    // TODO no record keeping for view
+                    // INFO no record keeping for view
                     // user.amount = value;
                     // user.periodEnd = _spendinglimits[i].periodLength.add(now);
                     this;
@@ -194,7 +196,7 @@ contract SpendingLimitsConstraintModule is IConstraintsModule {
             }
         }
 
-        return (!invalid, message);
+        return (!invalid, code, extradata, reason);
     }
 
     function getModuleName() public override view returns (string memory) {
