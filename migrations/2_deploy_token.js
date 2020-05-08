@@ -12,7 +12,6 @@ module.exports = async (deployer, network, accounts) => {
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			[accounts[0]],
 			[accounts[0]]
 		)
 

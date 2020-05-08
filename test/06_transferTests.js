@@ -74,7 +74,132 @@ contract('Test Security Token', async (accounts) => {
 					accounts[1]
 				)
 			).toNumber(),
-			value + value
+			value - -value
+		)
+	})
+
+	it('can send tokens using operator functionality', async () => {
+		// cannot transfer when not operator or controller
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x0',
+				'0x0'
+			)
+		)
+
+		// authorize 0 from 1
+		await contracts.micoboSecurityToken.authorizeOperatorByPartition(
+			conf.standardPartition,
+			accounts[0],
+			{
+				from: accounts[1],
+			}
+		)
+
+		// now can transfer
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x0',
+				'0x0',
+			)
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			value
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			value
+		)
+
+		// revoke 0 from 1
+		await contracts.micoboSecurityToken.revokeOperatorByPartition(
+			conf.standardPartition,
+			accounts[0],
+			{
+				from: accounts[1],
+			}
+		)
+
+		// cannot transfer when not operator or controller
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x0',
+				'0x0'
+			)
+		)
+	})
+
+	it('can send tokens if controller', async () => {
+		// cannot transfer when not operator or controller
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x0',
+				'0x0'
+			)
+		)
+
+		// make controller
+		await contracts.micoboSecurityToken.addRole(Role.CONTROLLER, accounts[0])
+
+		// can force transfer when controller
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x0',
+				'0x0'
+			)
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			value - - value
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			value - value
 		)
 	})
 })

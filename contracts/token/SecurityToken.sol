@@ -28,17 +28,13 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address[] memory admins,
-        address[] memory controllers
+        address[] memory admins
     )
     public
     ERC1400ERC20(name, symbol, granularity)
     {
         for (uint i = 0; i < admins.length; i++) {
             _add(bytes32("ADMIN"), admins[i]);
-        }
-        for (uint i = 0; i < controllers.length; i++) {
-            _add(bytes32("CONTROLLER"), controllers[i]);
         }
 
         // TODO activate when live

@@ -16,7 +16,6 @@ contract('Test Deployment', async (accounts) => {
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			[accounts[0]],
 			[accounts[0]]
 		)
 	})
