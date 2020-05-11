@@ -1,6 +1,6 @@
 const truffleAssert = require('truffle-assertions')
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role } = require('./Constants')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
@@ -64,15 +64,9 @@ contract('Test GSN functionality', async (accounts) => {
 			await deployRelayHub(web3)
 
 			// start relayer before with
-			// % npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545 --quiet
+			// % npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
 
-			await registerRelay(web3, {
-				relayUrl: 'http://localhost:8090',
-				stake: 1000000000000000000, // 1 eth
-				unstakeDelay: 604800, // 1 week
-				funds: 0,
-				from: accounts[0],
-			})
+			await registerRelay(web3)
 
 			await fundRecipient(web3, {
 				recipient: contracts.micoboSecurityToken.address,
@@ -101,18 +95,23 @@ contract('Test GSN functionality', async (accounts) => {
 		)
 	})
 
-	// TODO test other functions
+	// TODO test other functions than addRole, transferByPartition and transfer
 	// although this should work with all of them
 
 	it('can add a role over GSN', async () => {
 		// Sends the transaction via the GSN
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1], {
+
+		let tx = await contracts.micoboSecurityToken.addRole(
+			Role.ADMIN,
+			accounts[1],
+			{
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 50000, // 47900
-			})
+				gas: 104310,
+				gasPrice: 2000000000,
+			}
 		)
+		console.log(tx["tx"])
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
@@ -133,20 +132,20 @@ contract('Test GSN functionality', async (accounts) => {
 			accounts[1]
 		)
 
-		// can transfer tokens
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				value,
-				'0x0',
-				{
-					from: accounts[0],
-					useGSN: true,
-					gasLimit: 65000, // 61616
-				}
-			)
+		// can transfer tokens≤
+		let tx = await contracts.micoboSecurityToken.transferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			value,
+			'0x0',
+			{
+				from: accounts[0],
+				useGSN: true,
+				gas: 231532,
+				gasPrice: 2000000000,
+			}
 		)
+		console.log(tx["tx"])
 
 		// tokens have been transferred
 		assert.deepEqual(
@@ -166,7 +165,7 @@ contract('Test GSN functionality', async (accounts) => {
 					accounts[1]
 				)
 			).toNumber(),
-			tokenBalance1 - - value
+			tokenBalance1 - -value
 		)
 
 		// ether balance is unchanged
@@ -204,7 +203,8 @@ contract('Test GSN functionality', async (accounts) => {
 			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[2], {
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 50000, // 47900
+				gas: 104310,
+				gasPrice: 2000000000,
 			})
 		)
 
@@ -220,13 +220,18 @@ contract('Test GSN functionality', async (accounts) => {
 		).toNumber()
 
 		// Sends the transaction via the GSN
-		await truffleAssert.passes(
-			contracts.securityTokenPartition.transfer(accounts[1], value, {
+
+		let tx = await contracts.securityTokenPartition.transfer(
+			accounts[1],
+			value,
+			{
 				from: accounts[0],
 				useGSN: true,
-				gasLimit: 65000 // 62719
-			})
+				gas: 105000, // 92366
+				gasPrice: 2000000000,
+			}
 		)
+		console.log(tx["tx"])
 
 		// console.log(balance)
 

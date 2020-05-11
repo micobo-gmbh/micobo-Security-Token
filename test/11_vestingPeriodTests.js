@@ -2,7 +2,7 @@ const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role, Module } = require('./Constants')
 
 const VestingPeriodConstraintModule = artifacts.require(
 	'VestingPeriodConstraintModule'
@@ -64,9 +64,10 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// can set module
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
-				vestingPeriodConstraintModule.address,
-			])
+			contracts.micoboSecurityToken.setModulesByPartition(
+				conf.standardPartition,
+				[vestingPeriodConstraintModule.address]
+			)
 		)
 	})
 
@@ -91,11 +92,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// cannot set vesting options
 		await truffleAssert.fails(
-			vestingPeriodConstraintModule.setVestingOptions(
-				vestingStart,
-				4,
-				48
-			)
+			vestingPeriodConstraintModule.setVestingOptions(vestingStart, 4, 48)
 		)
 
 		// add role
@@ -106,11 +103,7 @@ contract('Test Vesting Period', async (accounts) => {
 
 		// now it can set vesting options
 		await truffleAssert.passes(
-			vestingPeriodConstraintModule.setVestingOptions(
-				vestingStart,
-				4,
-				48
-			)
+			vestingPeriodConstraintModule.setVestingOptions(vestingStart, 4, 48)
 		)
 	})
 
@@ -143,6 +136,13 @@ contract('Test Vesting Period', async (accounts) => {
 				'0x0',
 				{ from: accounts[0] }
 			)
+		)
+	})
+
+	it('gets correct module name', async () => {
+		assert.deepEqual(
+			await vestingPeriodConstraintModule.getModuleName(),
+			Module.VESTING
 		)
 	})
 })

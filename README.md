@@ -43,12 +43,11 @@ Autonomy means that no test will fail or succeed dependant on the outcome of a d
 - Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
 
 
-- Also make sure that **Ganache** is running on port ```:8545```
+- Also make sure that **Ganache** is running on port `:8545`
 
-- if you test GSN, also run the dev-relayer with:
-
+- **GSN_Relayer**: If you test GSN functionality, also run the dev-relayer:
     ```
-    npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545 --quiet
+    npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
     ```
 
 Use the test script to run all tests:
@@ -57,9 +56,37 @@ Use the test script to run all tests:
 
 #
 
-#### Gas report
+## Gas report
 
-Gas report is configured by default in ``truffle-config.js``
+Gas report is configured by default in `truffle-config.js`  
+
+It can be configured here:
+
+    mocha: {
+            reporter: 'eth-gas-reporter',
+            reporterOptions: {
+                currency: 'EUR',
+                gasPrice: 2,
+                url: 'http://localhost:8545',
+            },
+        },
+    }
+
+#
+## Code Coverage
+
+Start the coverage plugin with: 
+
+    truffle run coverage --temp /build/solcover --network development
+
+_(also run the GSN relayer if you don't want GSN tests to fail)_  
+
+For specific files, add 
+
+    --file="test/10_spendingLimitTests.js"
+
+
+[solidity-coverage package on npm](https://www.npmjs.com/package/solidity-coverage#config-options)
 
 #
 ## Deployment
@@ -67,9 +94,9 @@ Gas report is configured by default in ``truffle-config.js``
 Edit the ``token-config.json`` file to set token **name**, **symbol** and **cap** etc.
 
 Use the deploy script to deploy all contracts on local testnet (localhost:8454):
-```
-npm run deploy
-```
+
+    npm run deploy
+
 #
 #### Administration Logic Contract
 

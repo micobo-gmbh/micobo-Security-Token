@@ -42,5 +42,5 @@ interface IConstraintModule {
         string memory reason
     );
 
-    function getModuleName() external view returns (string memory);
+    function getModuleName() external view returns (bytes32);
 }

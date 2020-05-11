@@ -14,7 +14,8 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = 'VESTING';
+    bytes32 private _module_name = keccak256('VESTING');
+
 
     // time until vesting starts
     uint256 _vestingStart;
@@ -155,10 +156,6 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
     // VIEW
 
-    function getModuleName() public override view returns (string memory) {
-        return _module_name;
-    }
-
     function getVestingStart() public view returns (uint256) {
         return _vestingStart;
     }
@@ -173,5 +170,9 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
     function getAmountSpentByUser(address user) public view returns (uint256) {
         return _amountSpentByUser[user];
+    }
+    
+    function getModuleName() public override view returns (bytes32) {
+        return _module_name;
     }
 }

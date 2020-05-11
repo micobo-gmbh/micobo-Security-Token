@@ -51,6 +51,7 @@ module.exports = {
 					useGSN: false,
 				})
 			},
+			port: 8545,
 			network_id: '*',
 		},
 

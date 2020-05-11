@@ -8,7 +8,7 @@ contract PauseConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string public _module_name = 'PAUSE';
+    bytes32 private _module_name = keccak256('PAUSE');
 
     /**
     * @dev Emitted when the pause is triggered by a pauser (`account`).
@@ -144,7 +144,7 @@ contract PauseConstraintModule is IConstraintModule {
 
     // VIEW
 
-    function getModuleName() public override view returns (string memory) {
+    function getModuleName() public override view returns (bytes32) {
         return _module_name;
     }
 

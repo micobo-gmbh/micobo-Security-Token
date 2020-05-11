@@ -8,7 +8,8 @@ contract WhitelistConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = 'WHITELIST';
+    bytes32 private _module_name = keccak256('WHITELIST');
+
 
     // module data
     mapping(address => bool) private _whitelist;
@@ -104,7 +105,7 @@ contract WhitelistConstraintModule is IConstraintModule {
 
     // VIEW
 
-    function getModuleName() public override view returns (string memory) {
+    function getModuleName() public override view returns (bytes32) {
         return _module_name;
     }
 }

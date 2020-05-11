@@ -275,6 +275,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     override
     returns (byte, bytes32, bytes32)
     {
+        if (!_isOperatorForPartition(partition, _msgSender(), from))
+            return (hex"A7", "", partition);
+        // "Transfer Blocked - Identity restriction"
+
         return _canTransfer(partition, _msgSender(), from, to, value, data, operatorData);
     }
 
@@ -310,10 +314,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     view
     returns (byte, bytes32, bytes32)
     {
-        if (!_isOperatorForPartition(partition, operator, from))
-            return (hex"A7", "", partition);
-        // "Transfer Blocked - Identity restriction"
-
         if ((_balances[from] < value) || (_balanceOfByPartition[from][partition] < value))
             return (hex"A4", "", partition);
         // Transfer Blocked - Sender balance insufficient

@@ -2,9 +2,8 @@ const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
-
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role } = require('./Constants')
 
 contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 	let contracts
@@ -18,13 +17,12 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
 
-		contracts["securityTokenPartition"] = await SecurityTokenPartition.new(
+		;(contracts['securityTokenPartition'] = await SecurityTokenPartition.new(
 			contracts.micoboSecurityToken.address,
 			conf.standardPartition
-		),
-
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+		)),
+			// add CAP_EDITOR role
+			await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
 
 		// set cap for new partition
 		await truffleAssert.passes(

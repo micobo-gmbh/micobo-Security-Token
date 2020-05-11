@@ -17,7 +17,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = 'SPENDING_LIMIT';
+    bytes32 private _module_name = keccak256('SPENDING_LIMIT');
 
     // module data
 
@@ -199,7 +199,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
         return (!invalid, code, extradata, reason);
     }
 
-    function getModuleName() public override view returns (string memory) {
+    function getModuleName() public override view returns (bytes32) {
         return _module_name;
     }
 }

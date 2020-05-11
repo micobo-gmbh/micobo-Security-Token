@@ -4,7 +4,7 @@ const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 const truffleAssert = require('truffle-assertions')
 
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role } = require('./Constants')
 
 contract('Test Deployment', async (accounts) => {
 	let micoboSecurityToken, securityTokenPartition

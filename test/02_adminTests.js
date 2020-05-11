@@ -1,8 +1,7 @@
 const truffleAssert = require('truffle-assertions')
-const MicoboSecurityToken = artifacts.require("SecurityToken");
+const MicoboSecurityToken = artifacts.require('SecurityToken')
 
-const { Role } = require('./Roles')
-
+const { Role } = require('./Constants')
 
 contract('Test Admin Contract', async (accounts) => {
 	let contracts

@@ -4,7 +4,7 @@ const MicoboSecurityToken = artifacts.require('SecurityToken')
 const truffleAssert = require('truffle-assertions')
 
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role, Module } = require('./Constants')
 
 contract('Test Pausing', async (accounts) => {
 	let contracts, pauseConstraintModule
@@ -59,14 +59,20 @@ contract('Test Pausing', async (accounts) => {
 
 	it('register PauseConstraintModule', async () => {
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [pauseConstraintModule.address])
+			contracts.micoboSecurityToken.setModulesByPartition(
+				conf.standardPartition,
+				[pauseConstraintModule.address]
+			)
 		)
 
 		// adding MODULE_EDITOR
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [pauseConstraintModule.address])
+			contracts.micoboSecurityToken.setModulesByPartition(
+				conf.standardPartition,
+				[pauseConstraintModule.address]
+			)
 		)
 	})
 
@@ -143,6 +149,13 @@ contract('Test Pausing', async (accounts) => {
 				'0x0',
 				{ from: accounts[0] }
 			)
+		)
+	})
+
+	it('gets correct module name', async () => {
+		assert.deepEqual(
+			await pauseConstraintModule.getModuleName(),
+			Module.PAUSE
 		)
 	})
 })

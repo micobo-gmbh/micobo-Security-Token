@@ -7,7 +7,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 
     ISecurityToken _securityToken;
 
-    string private _module_name = 'TIME_LOCK';
+    bytes32 private _module_name = keccak256('TIME_LOCK');
 
     // module data
     mapping(bytes32 => uint256) private _partitionTimeLock;
@@ -84,7 +84,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 
     // VIEW
 
-    function getModuleName() public override view returns (string memory) {
+    function getModuleName() public override view returns (bytes32) {
         return _module_name;
     }
 }

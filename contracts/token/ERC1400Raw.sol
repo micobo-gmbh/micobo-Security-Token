@@ -1,7 +1,7 @@
 pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
-import "../../node_modules/erc1820/contracts/ERC1820Client.sol";
+import "../erc1820/ERC1820Client.sol";
 
 import "./Constrainable.sol";
 import "../interfaces/IERC1400Raw.sol";

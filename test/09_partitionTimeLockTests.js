@@ -4,7 +4,7 @@ const MicoboSecurityToken = artifacts.require('SecurityToken')
 const truffleAssert = require('truffle-assertions')
 
 const { conf } = require('../token-config')
-const { Role } = require('./Roles')
+const { Role, Module } = require('./Constants')
 
 contract('Test TimeLock Module', async (accounts) => {
 	let contracts, timeLockConstraintModule
@@ -59,9 +59,10 @@ contract('Test TimeLock Module', async (accounts) => {
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
-				timeLockConstraintModule.address,
-			])
+			contracts.micoboSecurityToken.setModulesByPartition(
+				conf.standardPartition,
+				[timeLockConstraintModule.address]
+			)
 		)
 	})
 
@@ -119,6 +120,13 @@ contract('Test TimeLock Module', async (accounts) => {
 				'0x0',
 				{ from: accounts[0] }
 			)
+		)
+	})
+
+	it('gets correct module name', async () => {
+		assert.deepEqual(
+			await timeLockConstraintModule.getModuleName(),
+			Module.TIME_LOCK
 		)
 	})
 })

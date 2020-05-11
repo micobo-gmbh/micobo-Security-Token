@@ -1,5 +1,5 @@
 module.exports = {
-    Role: {
+	Role: {
 		ADMIN: web3.utils.fromAscii('ADMIN'),
 		CONTROLLER: web3.utils.fromAscii('CONTROLLER'),
 		ISSUER: web3.utils.fromAscii('ISSUER'),
@@ -13,5 +13,14 @@ module.exports = {
 		SPENDING_LIMITS_EDITOR: web3.utils.fromAscii('SPENDING_LIMITS_EDITOR'),
 		VESTING_PERIOD_EDITOR: web3.utils.fromAscii('VESTING_PERIOD_EDITOR'),
 		GSN_CONTROLLER: web3.utils.fromAscii('GSN_CONTROLLER'),
-	}
+	},
+
+	Module: {
+		TIME_LOCK: web3.utils.keccak256('TIME_LOCK'),
+		PAUSE: web3.utils.keccak256('PAUSE'),
+		SPENDING_LIMIT: web3.utils.keccak256('SPENDING_LIMIT'),
+		VESTING: web3.utils.keccak256('VESTING'),
+		WHITELIST: web3.utils.keccak256('WHITELIST'),
+		OFF_CHAIN: web3.utils.keccak256('OFF_CHAIN'),
+	},
 }
