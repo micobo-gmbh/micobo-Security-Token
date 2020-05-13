@@ -91,19 +91,51 @@ Use the deploy script to deploy all contracts on local testnet (localhost:8454):
 #
 ## Architecture
 
-![architecture](./resources/security_token.png "Architecture")
+![architecture](resources/security_token.png "Architecture")
 
 #
 
 
 
-#### Constrainable.sol
+## Constrainable
 
 Constraint Modules can be set to implement any kind of on-chain checks.
 
-#
-#### Administrable.sol
+![roles](resources/modular-constraints.png "Roles")
 
+
+These are constraints modules that already exist, but you can write your own,  
+as long as the implement the `IConstraintModule.sol` interface!
+
+I.e., the off-chain validation module checks for the signature of an offline validator in the transactions extra data.
+
+
+#
+## Administrable.sol
+
+Roles can be **added** and **removed** by the `ADMIN`
+
+This is and overview of roles that can be used.  
+**Additional roles can always be added after deployment!** (i.e. for new constraint modules)
+
+![roles](resources/CommonRoles.png "Roles")
+
+#
+## Cap
+
+There is 1 overall cap for the whole token (`_cap`)
+
+It is set during deployment in the constructor.
+
+Get cap with `cap()`  
+
+When `CAP_EDITOR`, use `setCap(uint256 newCap)` to set to new value.  
+The new cap must always be greater than the old one!
+
+--> SecurityTokenPartitions return overall cap with their `cap()` function.
+
+When using `issueByPartition` or `bulkIssueByPartition`,  
+the issued value must not exceed `_cap`
 
 
 #
@@ -112,11 +144,17 @@ Constraint Modules can be set to implement any kind of on-chain checks.
 TODO
 
 #  
-#### Diagrams
+## Free Transactions
 
-All diagrams were made with the free software [draw.io](draw.io)  
-Simply open the corresponding XML file in the editor and export into JPEG to update any diagram.
+**Gas Station Network (GSN)**
 
+![gsn](resources/gsn.png "GSN")
+
+Using a relayer, you can pay for the transactions of your token users.
+
+The GSN Module can be configured even after the token is deployed.
+
+GSN can also be turned off completely!
 
 
 #
@@ -143,3 +181,8 @@ Operators can transfer tokens on behalf of users that authorized them to do so u
 Users can authorize addresses to transfer tokens on their behalf on a "by partition"-basis.  
 This authorization can be revoked at any time.
 
+
+#
+#### Diagrams
+All diagrams were made with the free software [draw.io](draw.io)  
+Simply open the corresponding XML file in the editor and export into JPEG to update any diagram.
