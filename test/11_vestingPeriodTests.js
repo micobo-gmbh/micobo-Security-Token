@@ -22,20 +22,6 @@ contract('Test Vesting Period', async (accounts) => {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
 
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
-
-		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
-
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
@@ -59,9 +45,6 @@ contract('Test Vesting Period', async (accounts) => {
 	})
 
 	it('register VestingPeriodConstraintModule', async () => {
-		// adding MODULE_EDITOR
-		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
-
 		// can set module
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModulesByPartition(

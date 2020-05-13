@@ -17,11 +17,14 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * ADMIN   (can add and remove roles)
      * CONTROLLER (ERC1400, can force-transfer tokens if contract _isControllable),
      * ISSUER (ISSUER)
-     * PAUSER
      * REDEEMER (BURNER, can redeem tokens, their own OR others IF _isOperatorForPartition())
-     * CAP_EDITOR
      * MODULE_EDITOR (can edit constraint modules),
+
      * DOCUMENT_EDITOR
+     * CAP_EDITOR
+
+     // constraint module roles
+     * PAUSER
      * WHITELIST_EDITOR
      * TIME_LOCK_EDITOR
      * SPENDING_LIMITS_EDITOR

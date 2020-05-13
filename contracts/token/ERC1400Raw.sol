@@ -65,9 +65,6 @@ ERC1820Client
         string memory name,
         string memory symbol,
         uint256 granularity
-        // this is not being used,
-        // as this functionality can be realised with the OffChainValidator module
-        // address certificateSigner
     )
     public
     {
@@ -77,9 +74,6 @@ ERC1820Client
         require(granularity >= 1, 'granularity >= 1');
         // Constructor Blocked - Token granularity can not be lower than 1
         _granularity = granularity;
-
-        // we use the Administrable constructor to set these
-        // _setControllers(controllers);
     }
 
     /********************** ERC1400Raw EXTERNAL FUNCTIONS ***************************/

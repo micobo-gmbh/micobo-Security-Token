@@ -16,7 +16,12 @@ contract('Test Deployment', async (accounts) => {
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			[accounts[0]]
+			conf.standardCap,
+			accounts[0],
+			accounts[0],
+			accounts[0],
+			accounts[0],
+			accounts[0]
 		)
 	})
 
@@ -26,25 +31,11 @@ contract('Test Deployment', async (accounts) => {
 			conf.standardPartition
 		)
 
-		// add CAP_EDITOR role
-		await micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
-
 		// add partition
 		await micoboSecurityToken.addPartitionProxy(
 			conf.standardPartition,
 			securityTokenPartition.address
 		)
-
-		// remove CAP_EDITOR role
-		await micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
 
 		assert.deepEqual(
 			await securityTokenPartition.securityTokenAddress(),
@@ -57,10 +48,8 @@ contract('Test Deployment', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			(
-				await micoboSecurityToken.capByPartition(conf.standardPartition)
-			).toNumber(),
-			conf.standardPartitionCap
+			(await micoboSecurityToken.cap()).toNumber(),
+			conf.standardCap
 		)
 
 		assert.deepEqual(await micoboSecurityToken.partitionProxies(), [
@@ -81,7 +70,7 @@ contract('Test Deployment', async (accounts) => {
 		// total cap should be equal to standard partition cap at this point
 		assert.deepEqual(
 			(await micoboSecurityToken.cap()).toNumber(),
-			conf.standardPartitionCap
+			conf.standardCap
 		)
 
 		assert.deepEqual((await micoboSecurityToken.totalSupply()).toNumber(), 0)
@@ -96,7 +85,7 @@ contract('Test Deployment', async (accounts) => {
 
 		assert.deepEqual(
 			(await securityTokenPartition.cap()).toNumber(),
-			conf.standardPartitionCap
+			conf.standardCap
 		)
 
 		assert.deepEqual((await securityTokenPartition.totalSupply()).toNumber(), 0)

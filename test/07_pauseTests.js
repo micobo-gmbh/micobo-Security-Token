@@ -21,20 +21,6 @@ contract('Test Pausing', async (accounts) => {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
 
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
-
-		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
-
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
@@ -58,16 +44,6 @@ contract('Test Pausing', async (accounts) => {
 	})
 
 	it('register PauseConstraintModule', async () => {
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setModulesByPartition(
-				conf.standardPartition,
-				[pauseConstraintModule.address]
-			)
-		)
-
-		// adding MODULE_EDITOR
-		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
-
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModulesByPartition(
 				conf.standardPartition,
@@ -153,9 +129,6 @@ contract('Test Pausing', async (accounts) => {
 	})
 
 	it('gets correct module name', async () => {
-		assert.deepEqual(
-			await pauseConstraintModule.getModuleName(),
-			Module.PAUSE
-		)
+		assert.deepEqual(await pauseConstraintModule.getModuleName(), Module.PAUSE)
 	})
 })

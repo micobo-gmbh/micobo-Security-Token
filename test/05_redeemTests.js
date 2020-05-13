@@ -7,7 +7,7 @@ const { Role } = require('./Constants')
 contract('Test Redeeming', async (accounts) => {
 	let contracts
 
-	let minter = accounts[1]
+	let issuer = accounts[1]
 	let redeemer = accounts[2]
 
 	let value = 1000
@@ -18,22 +18,10 @@ contract('Test Redeeming', async (accounts) => {
 		contracts = {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
-
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
 	})
 
 	it('can redeem tokens of other address if redeemer and controller', async () => {
-		// make minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, minter)
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, issuer)
 
 		// mint
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -41,7 +29,7 @@ contract('Test Redeeming', async (accounts) => {
 			accounts[0],
 			value,
 			'0x0',
-			{ from: minter }
+			{ from: issuer }
 		)
 
 		assert.deepEqual(
@@ -132,7 +120,7 @@ contract('Test Redeeming', async (accounts) => {
 			accounts[0],
 			value,
 			'0x0',
-			{ from: minter }
+			{ from: issuer }
 		)
 
 		await truffleAssert.passes(

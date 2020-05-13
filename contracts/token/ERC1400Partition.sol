@@ -62,10 +62,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         uint256 granularity
     )
     public
-    ERC1400Raw(name, symbol, granularity)
-    {
-        _isControllable = true;
-    }
+    ERC1400Raw(name, symbol, granularity){}
 
     /********************** NEW FUNCTIONS **************************/
 

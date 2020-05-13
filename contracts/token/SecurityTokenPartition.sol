@@ -32,7 +32,7 @@ contract SecurityTokenPartition is IERC20, GSNable {
     }
 
     function cap() external view returns (uint256) {
-        return _securityToken.capByPartition(_partitionId);
+        return _securityToken.cap();
     }
 
 

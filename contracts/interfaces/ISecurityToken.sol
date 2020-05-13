@@ -227,10 +227,7 @@ interface ISecurityToken {
 
     // Capped
     function cap() external view returns (uint256);
-
-    function capByPartition(bytes32 partition) external view returns (uint256);
-
-    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) external;
+    function setCap(uint256 newCap) external;
 
 
     // GSN

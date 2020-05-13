@@ -37,25 +37,11 @@ contract('Test GSN functionality', async (accounts) => {
 			conf.standardPartition
 		)
 
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
-
 		// add partition
 		await contracts.micoboSecurityToken.addPartitionProxy(
 			conf.standardPartition,
 			contracts.securityTokenPartition.address
 		)
-
-		// remove CAP_EDITOR role
-		await contracts.micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
 
 		// console.log(contracts.micoboSecurityToken.address)
 
@@ -80,11 +66,6 @@ contract('Test GSN functionality', async (accounts) => {
 		} catch (e) {
 			throw e
 		}
-
-		// mint some tokens
-
-		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -227,7 +208,7 @@ contract('Test GSN functionality', async (accounts) => {
 			{
 				from: accounts[0],
 				useGSN: true,
-				gas: 105000, // 92366
+				gas: 192366, // 92366
 				gasPrice: 2000000000,
 			}
 		)

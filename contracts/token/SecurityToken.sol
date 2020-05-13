@@ -28,19 +28,29 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address[] memory admins
+        uint256 cap,
+        address admin,
+        address controller,
+        address issuer,
+        address redeemer,
+        address module_editor
     )
     public
     ERC1400ERC20(name, symbol, granularity)
     {
-        for (uint i = 0; i < admins.length; i++) {
-            _add(bytes32("ADMIN"), admins[i]);
-        }
+        _add(bytes32("ADMIN"), admin);
+        _add(bytes32("CONTROLLER"), controller);
+        _add(bytes32("ISSUER"), issuer);
+        _add(bytes32("REDEEMER"), redeemer);
+        _add(bytes32("MODULE_EDITOR"), module_editor);
+
+        _cap = cap;
 
         // TODO activate when live
         // setInterfaceImplementation("ERC1400Token", address(this));
 
         _isIssuable = true;
+        _isControllable = true;
     }
 
 
@@ -68,8 +78,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
         for(uint i = 0; i < tokenHolders.length; i++) {
             require(
-                _totalSupplyByPartition[partition].add(values[i]) <= capByPartition(partition),
-                'totalSupplyByPartition would exceed capByPartition'
+                _totalSupply.add(values[i]) <= _cap,
+                'totalSupply would exceed cap'
             );
             _issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
         }
@@ -102,8 +112,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     //**************CAPPED*******************
 
     uint256 private _cap;
-
-    mapping(bytes32 => uint256) private _capByPartition;
 
     //**************CAPPED*******************
 
@@ -178,8 +186,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         // total cap is always the sum of all partitionCaps, so it can't be violated
 
         require(
-            _totalSupplyByPartition[partition].add(value) <= _capByPartition[partition],
-            'totalSupplyByPartition would exceed capByPartition'
+            _totalSupply.add(value) <= _cap,
+            'totalSupply would exceed cap'
         );
 
         _issueByPartition(partition, _msgSender(), tokenHolder, value, data, "");
@@ -491,19 +499,12 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         return _cap;
     }
 
-    function capByPartition(bytes32 partition) public override view returns (uint256) {
-        return _capByPartition[partition];
-    }
-
-    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public override {
+    function setCap(uint256 newCap) public override {
         require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), 'A7, not allowed to set cap');
-        require((newPartitionCap > _capByPartition[partition]), 'cap must be greater than old one');
-
-        // add difference to total cap
-        _cap = _cap.add((newPartitionCap.sub(_capByPartition[partition])));
+        require((newCap > _cap), 'cap must be greater than old one');
 
         // set new cap
-        _capByPartition[partition] = newPartitionCap;
+        _cap = newCap;
     }
 
     //**************CAPPED*******************

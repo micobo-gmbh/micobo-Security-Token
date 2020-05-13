@@ -16,20 +16,6 @@ contract('Test Security Token', async (accounts) => {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
 
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
-
-		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
-
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
@@ -46,14 +32,14 @@ contract('Test Security Token', async (accounts) => {
 		)
 	})
 
-	it('can send tokens from and to addresses', async () => {
+	it('can send tokens', async () => {
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
-				accounts[1],
+				accounts[0],
 				value,
 				'0x0',
-				{ from: accounts[0] }
+				{ from: accounts[1] }
 			)
 		)
 
@@ -64,7 +50,7 @@ contract('Test Security Token', async (accounts) => {
 					accounts[0]
 				)
 			).toNumber(),
-			value - value
+			value - -value
 		)
 
 		assert.deepEqual(
@@ -74,7 +60,7 @@ contract('Test Security Token', async (accounts) => {
 					accounts[1]
 				)
 			).toNumber(),
-			value - -value
+			value - value
 		)
 	})
 
@@ -83,20 +69,21 @@ contract('Test Security Token', async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
 				conf.standardPartition,
-				accounts[1],
 				accounts[0],
+				accounts[1],
 				value,
 				'0x0',
-				'0x0'
+				'0x0',
+				{ from: accounts[1] }
 			)
 		)
 
 		// authorize 0 from 1
 		await contracts.micoboSecurityToken.authorizeOperatorByPartition(
 			conf.standardPartition,
-			accounts[0],
+			accounts[1],
 			{
-				from: accounts[1],
+				from: accounts[0],
 			}
 		)
 
@@ -104,11 +91,12 @@ contract('Test Security Token', async (accounts) => {
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
 				conf.standardPartition,
-				accounts[1],
 				accounts[0],
+				accounts[1],
 				value,
 				'0x0',
 				'0x0',
+				{ from: accounts[1] }
 			)
 		)
 
@@ -135,9 +123,9 @@ contract('Test Security Token', async (accounts) => {
 		// revoke 0 from 1
 		await contracts.micoboSecurityToken.revokeOperatorByPartition(
 			conf.standardPartition,
-			accounts[0],
+			accounts[1],
 			{
-				from: accounts[1],
+				from: accounts[0],
 			}
 		)
 
@@ -145,11 +133,12 @@ contract('Test Security Token', async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
 				conf.standardPartition,
-				accounts[1],
 				accounts[0],
+				accounts[1],
 				value,
 				'0x0',
-				'0x0'
+				'0x0',
+				{ from: accounts[1] }
 			)
 		)
 	})
@@ -159,26 +148,28 @@ contract('Test Security Token', async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
 				conf.standardPartition,
-				accounts[1],
 				accounts[0],
+				accounts[1],
 				value,
 				'0x0',
-				'0x0'
+				'0x0',
+				{ from: accounts[1] }
 			)
 		)
 
 		// make controller
-		await contracts.micoboSecurityToken.addRole(Role.CONTROLLER, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.CONTROLLER, accounts[1])
 
 		// can force transfer when controller
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
 				conf.standardPartition,
-				accounts[1],
 				accounts[0],
+				accounts[1],
 				value,
 				'0x0',
-				'0x0'
+				'0x0',
+				{ from: accounts[1] }
 			)
 		)
 
@@ -189,7 +180,7 @@ contract('Test Security Token', async (accounts) => {
 					accounts[0]
 				)
 			).toNumber(),
-			value - - value
+			value - value
 		)
 
 		assert.deepEqual(
@@ -199,7 +190,7 @@ contract('Test Security Token', async (accounts) => {
 					accounts[1]
 				)
 			).toNumber(),
-			value - value
+			value - -value
 		)
 	})
 })

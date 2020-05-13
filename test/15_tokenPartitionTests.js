@@ -17,19 +17,9 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
 
-		;(contracts['securityTokenPartition'] = await SecurityTokenPartition.new(
+		contracts['securityTokenPartition'] = await SecurityTokenPartition.new(
 			contracts.micoboSecurityToken.address,
 			conf.standardPartition
-		)),
-			// add CAP_EDITOR role
-			await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
 		)
 
 		// add partition
@@ -37,14 +27,6 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 			conf.standardPartition,
 			contracts.securityTokenPartition.address
 		)
-
-		// remove CAP_EDITOR role
-		await contracts.micoboSecurityToken.removeRole(Role.CAP_EDITOR, accounts[0])
-
-		// mint some tokens
-
-		// make me minter
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -75,7 +57,7 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 
 		assert.deepEqual(
 			(await contracts.securityTokenPartition.cap()).toNumber(),
-			conf.standardPartitionCap
+			conf.standardCap
 		)
 
 		assert.deepEqual(await contracts.securityTokenPartition.name(), conf.name)
@@ -156,17 +138,6 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 			'0x736f6d65506172746974696f6e00000000000000000000000000000000000000' // somePartition
 
 		const value = 100
-
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				somePartition,
-				conf.standardPartitionCap
-			)
-		)
 
 		// already is ISSUER
 

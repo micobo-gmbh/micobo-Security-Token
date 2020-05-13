@@ -18,17 +18,20 @@ contract('Test Constraint Contract', async (accounts) => {
 	})
 
 	it('can set modules only when constraints editor', async () => {
-		await truffleAssert.fails(
+		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setModulesByPartition(
 				conf.standardPartition,
 				moduleAddresses
 			)
 		)
 
-		// add constraintEditor
-		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[0])
+		// remove constraintEditor
+		await contracts.micoboSecurityToken.removeRole(
+			Role.MODULE_EDITOR,
+			accounts[0]
+		)
 
-		await truffleAssert.passes(
+		await truffleAssert.fails(
 			contracts.micoboSecurityToken.setModulesByPartition(
 				conf.standardPartition,
 				moduleAddresses

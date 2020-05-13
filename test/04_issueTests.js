@@ -9,7 +9,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 
 	let minter = accounts[1]
 
-	let value = 1234567890
+	let value = 1000
 
 	// deepEqual compares with '==='
 
@@ -17,42 +17,33 @@ contract('Test Issuing and Cap', async (accounts) => {
 		contracts = {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
-
-		// add CAP_EDITOR role
-		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
-
-		// set cap for new partition
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCapByPartition(
-				conf.standardPartition,
-				conf.standardPartitionCap
-			)
-		)
 	})
 
 	it('mints tokens to test addresses if minter', async () => {
-		await truffleAssert.fails(
+		await truffleAssert.passes(
 			contracts.micoboSecurityToken.issueByPartition(
 				conf.standardPartition,
-				accounts[0],
+				accounts[1],
 				value,
 				'0x0'
 			)
 		)
 
-		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
+		await contracts.micoboSecurityToken.removeRole(Role.ISSUER, accounts[0])
 
-		await contracts.micoboSecurityToken.issueByPartition(
-			conf.standardPartition,
-			accounts[0],
-			value,
-			'0x0'
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.issueByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0'
+			)
 		)
 
 		let balance = (
 			await contracts.micoboSecurityToken.balanceOfByPartition(
 				conf.standardPartition,
-				accounts[0]
+				accounts[1]
 			)
 		).toNumber()
 
@@ -62,11 +53,13 @@ contract('Test Issuing and Cap', async (accounts) => {
 	})
 
 	it('cannot mint more than cap', async () => {
+		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
+
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.issueByPartition(
 				conf.standardPartition,
 				accounts[0],
-				conf.standardPartitionCap + 1,
+				conf.standardCap + 1,
 				'0x0'
 			)
 		)
@@ -89,7 +82,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 			)
 		).toNumber()
 
-		assert.deepEqual(balance1, value - -10)
+		assert.deepEqual(balance1, 10)
 
 		let balance2 = (
 			await contracts.micoboSecurityToken.balanceOfByPartition(
@@ -98,7 +91,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 			)
 		).toNumber()
 
-		assert.deepEqual(balance2, 20)
+		assert.deepEqual(balance2, value - -20)
 
 		let balance3 = (
 			await contracts.micoboSecurityToken.balanceOfByPartition(
@@ -153,7 +146,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 
 	it('cannot exceed cap', async () => {
 		// should be just too much for the partition
-		var capFraction = (conf.standardPartitionCap / 39).toFixed(0)
+		var capFraction = (conf.standardCap / 39).toFixed(0)
 
 		var tokenHolders = []
 		var values = []
@@ -173,7 +166,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 				'0x0'
 			),
 			'revert',
-			'would exceed capByPartition'
+			'would exceed cap'
 		)
 	})
 })

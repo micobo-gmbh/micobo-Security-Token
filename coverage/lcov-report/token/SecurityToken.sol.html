@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">74.14% </span>
+        <span class="strong">70.49% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>43/58</span>
+        <span class='fraction'>43/61</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">57.5% </span>
+        <span class="strong">52.5% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>23/40</span>
+        <span class='fraction'>21/40</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">68.18% </span>
+        <span class="strong">61.9% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>15/22</span>
+        <span class='fraction'>13/21</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">74.14% </span>
+        <span class="strong">70.49% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>43/58</span>
+        <span class='fraction'>43/61</span>
       </div>
     </div>
   </div>
@@ -575,7 +575,13 @@
 530
 531
 532
-533</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+533
+534</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -612,11 +618,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -655,8 +666,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1065,22 +1074,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">124×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12×</span>
-<span class="cline-any cline-yes">12×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1137,19 +1139,29 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         string memory name,
         string memory symbol,
         uint256 granularity,
-        address[] memory admins
+        uint256 cap,
+        address admin,
+        address controller,
+        address issuer,
+        address redeemer,
+        address module_editor
     )
     public
     ERC1400ERC20(name, symbol, granularity)
     {
-        for (uint i = 0; i &lt; admins.length; i++) {
-            _add(bytes32("ADMIN"), admins[i]);
-        }
+        _add(bytes32("ADMIN"), admin);
+        _add(bytes32("CONTROLLER"), controller);
+        _add(bytes32("ISSUER"), issuer);
+        _add(bytes32("REDEEMER"), redeemer);
+        _add(bytes32("MODULE_EDITOR"), module_editor);
+&nbsp;
+        _cap = cap;
 &nbsp;
         // TODO activate when live
         // setInterfaceImplementation("ERC1400Token", address(this));
 &nbsp;
         _isIssuable = true;
+        _isControllable = true;
     }
 &nbsp;
 &nbsp;
@@ -1177,8 +1189,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 &nbsp;
         for(uint i = 0; i &lt; tokenHolders.length; i++) {
             require(
-                _totalSupplyByPartition[partition].add(values[i]) &lt;= capByPartition(partition),
-                'totalSupplyByPartition would exceed capByPartition'
+                _totalSupply.add(values[i]) &lt;= _cap,
+                'totalSupply would exceed cap'
             );
             _issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
         }
@@ -1211,8 +1223,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     //**************CAPPED*******************
 &nbsp;
     uint256 private _cap;
-&nbsp;
-    mapping(bytes32 =&gt; uint256) private _capByPartition;
 &nbsp;
     //**************CAPPED*******************
 &nbsp;
@@ -1287,8 +1297,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         // total cap is always the sum of all partitionCaps, so it can't be violated
 &nbsp;
         require(
-            _totalSupplyByPartition[partition].add(value) &lt;= _capByPartition[partition],
-            'totalSupplyByPartition would exceed capByPartition'
+            _totalSupply.add(value) &lt;= _cap,
+            'totalSupply would exceed cap'
         );
 &nbsp;
         _issueByPartition(partition, _msgSender(), tokenHolder, value, data, "");
@@ -1600,19 +1610,12 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         return _cap;
     }
 &nbsp;
-    function capByPartition(bytes32 partition) public override view returns (uint256) {
-        return _capByPartition[partition];
-    }
-&nbsp;
-    function setCapByPartition(bytes32 partition, uint256 newPartitionCap) public override {
-        <span class="missing-if-branch" title="else path not taken" >E</span>require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), 'A7, not allowed to set cap');
-        <span class="missing-if-branch" title="else path not taken" >E</span>require((newPartitionCap &gt; _capByPartition[partition]), 'cap must be greater than old one');
-&nbsp;
-        // add difference to total cap
-        _cap = _cap.add((newPartitionCap.sub(_capByPartition[partition])));
+<span class="fstat-no" title="function not covered" >    function setCap(uint256 newCap) public overrid</span>e {
+<span class="cstat-no" title="statement not covered" >        require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), 'A7, not allowed to set cap')</span>;
+<span class="cstat-no" title="statement not covered" >        require((newCap &gt; _cap), 'cap must be greater than old one')</span>;
 &nbsp;
         // set new cap
-        _capByPartition[partition] = newPartitionCap;
+<span class="cstat-no" title="statement not covered" >        _cap = newCap</span>;
     }
 &nbsp;
     //**************CAPPED*******************
@@ -1645,7 +1648,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 11 2020 01:55:14 GMT+0200 (Central European Summer Time)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 13 2020 17:41:19 GMT+0200 (Central European Summer Time)
 </div>
 </div>
 <script src="../prettify.js"></script>

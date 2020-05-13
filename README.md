@@ -23,15 +23,6 @@ We implement ERC20 as proxies for specific partitions.
 We don't implement operator and transfer functionality of ERC1400Raw.  
 We don't implement ERC777.  
 
-
-### Components
-
-// TODO
-
-#
-### Architecture
-
-TODO
 #
 ## Tests
 
@@ -75,7 +66,7 @@ It can be configured here:
 #
 ## Code Coverage
 
-Start the coverage plugin with: 
+Stop you local blockchain and start the coverage plugin with: 
 
     truffle run coverage --temp /build/solcover --network development
 
@@ -98,20 +89,20 @@ Use the deploy script to deploy all contracts on local testnet (localhost:8454):
     npm run deploy
 
 #
-#### Administration Logic Contract
+## Architecture
 
-The Administration contract can endow addresses with one **Role** or more:
+![architecture](./resources/security_token.png "Architecture")
 
-// TODO
+#
 
-#### Constrainable
+
+
+#### Constrainable.sol
 
 Constraint Modules can be set to implement any kind of on-chain checks.
 
 #
-### Process Flows
-
-TODO
+#### Administrable.sol
 
 
 

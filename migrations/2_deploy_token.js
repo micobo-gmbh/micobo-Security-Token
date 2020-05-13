@@ -1,9 +1,7 @@
 const SecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
-const {conf} = require('../token-config')
-
-const checkSize = require('../scripts/check-size')
+const { conf } = require('../token-config')
 
 module.exports = async (deployer, network, accounts) => {
 	try {
@@ -12,7 +10,12 @@ module.exports = async (deployer, network, accounts) => {
 			conf.name,
 			conf.symbol,
 			conf.granularity,
-			[accounts[0]]
+			conf.standardCap,
+			accounts[0],
+			accounts[0],
+			accounts[0],
+			accounts[0],
+			accounts[0]
 		)
 
 		let st = await SecurityToken.deployed()
