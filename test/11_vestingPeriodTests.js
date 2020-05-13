@@ -122,6 +122,68 @@ contract('Test Vesting Period', async (accounts) => {
 		)
 	})
 
+	it('cannot transfer more than allowance', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				251,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+
+		// 1/4 of 1000 should now be vested, we take 249 since 1 has already been transferred
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				249,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+	})
+
+	it('gets amount spent by user', async () => {
+		assert.deepEqual(
+			(
+				await vestingPeriodConstraintModule.getAmountSpentByUser(accounts[0])
+			).toNumber(),
+			250
+		)
+	})
+
+	it('gets vesting ratio', async () => {
+		assert.deepEqual(
+			(await vestingPeriodConstraintModule.getVestingRatio()).toNumber(),
+			48
+		)
+	})
+
+	it('gets vesting start', async () => {
+		assert.deepEqual(
+			(await vestingPeriodConstraintModule.getVestingStart()).toNumber(),
+			vestingStart
+		)
+	})
+
+	it('gets vested fraction after start', async () => {
+		assert.deepEqual(
+			(
+				await vestingPeriodConstraintModule.getVestedFractionAfterStart()
+			).toNumber(),
+			4
+		)
+	})
+
+	it('gets vesting ratio', async () => {
+		assert.deepEqual(
+			(await vestingPeriodConstraintModule.getVestingRatio()).toNumber(),
+			48
+		)
+	})
+
 	it('gets correct module name', async () => {
 		assert.deepEqual(
 			await vestingPeriodConstraintModule.getModuleName(),

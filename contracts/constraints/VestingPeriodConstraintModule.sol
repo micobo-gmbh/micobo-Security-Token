@@ -71,6 +71,10 @@ contract VestingPeriodConstraintModule is IConstraintModule {
             operatorData
         );
 
+        if (valid) {
+            _amountSpentByUser[from] = _amountSpentByUser[from].add(value);
+        }
+
         return (valid, reason);
     }
 
@@ -97,39 +101,31 @@ contract VestingPeriodConstraintModule is IConstraintModule {
     {
         // dormant Period not over
         if (now < _vestingStart) {
-            invalid = true;
-            reason = 'A8 - vesting has not started yet';
-            code = hex'A8';
-
-        // dormant period is over
-        } else {
-
-            // amount exceeds allowance minus amountAlreadySpent by this acount
-            if (value > getAmountAllowed(partition, from)
-                .sub(_amountSpentByUser[from])
-            ) {
-                invalid = true;
-                reason = 'A8 - amount exceeds allowance';
-                code = hex'A8';
-
-            // amount is OK
-            } else {
-                // add value to this users spendings
-                _amountSpentByUser[from].add(value);
-            }
+            return(false, hex'A8', '', 'A8 - vesting has not started yet');
         }
-        return (!invalid, code, extradata, reason);
+        // dormant period is over
+
+        uint256 allowed = getAmountAllowed(partition, from, value);
+
+        // amount exceeds allowance minus amountAlreadySpent by this acount
+        if (value > (allowed.sub(_amountSpentByUser[from]))) {
+            return(false, hex'A8', '', 'A8 - amount exceeds vested amount');
+        }
+
+        return (true, code, extradata, reason);
     }
 
-    function getAmountAllowed(bytes32 partition, address from) internal view returns (uint256) {
+    function getAmountAllowed(bytes32 partition, address from, uint256 value) internal view returns (uint256) {
         // calculate the original amount of tokens this account got
-        uint256 userOriginalBalance = _securityToken
-            .balanceOfByPartition(partition, from)
+        uint256 userOriginalBalance = _securityToken.balanceOfByPartition(partition, from)
+            // we need to add the value of this transfer as well
+            .add(value)
             .add(_amountSpentByUser[from]);
 
         return
             // the starting amount after the dormant period has passed
             // (i.e 1/4 where 4 is the fraction, hence originalBalance / fraction)
+
             (userOriginalBalance.div(_vestedFraction))
 
             // add to this
@@ -169,7 +165,7 @@ contract VestingPeriodConstraintModule is IConstraintModule {
     function getAmountSpentByUser(address user) public view returns (uint256) {
         return _amountSpentByUser[user];
     }
-    
+
     function getModuleName() public override view returns (bytes32) {
         return _module_name;
     }
