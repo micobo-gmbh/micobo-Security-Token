@@ -36,14 +36,14 @@ contract('Test TimeLock Module', async (accounts) => {
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
 			accounts[0],
-			value,
+			value * 5,
 			'0x0'
 		)
 
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
 			accounts[1],
-			value,
+			value * 5,
 			'0x0'
 		)
 	})
@@ -68,7 +68,11 @@ contract('Test TimeLock Module', async (accounts) => {
 
 	it('can edit timelock when time_lock_editor', async () => {
 		await truffleAssert.fails(
-			timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
+			timeLockConstraintModule.editTimeLock(1893456000) // 01/01/2030 @ 12:00 (UTC)
+		)
+
+		await truffleAssert.fails(
+			timeLockConstraintModule.editAccountTimeLock(accounts[0], 1893456000) // 01/01/2030 @ 12:00 (UTC)
 		)
 
 		await contracts.micoboSecurityToken.addRole(
@@ -77,12 +81,20 @@ contract('Test TimeLock Module', async (accounts) => {
 		)
 
 		await truffleAssert.passes(
-			timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
+			timeLockConstraintModule.editTimeLock(1893456000) // 01/01/2030 @ 12:00 (UTC)
 		)
+
+		await truffleAssert.passes(
+			timeLockConstraintModule.editAccountTimeLock(accounts[0], 1893456000) // 01/01/2030 @ 12:00 (UTC)
+		)
+
+		//reset
+		await timeLockConstraintModule.editTimeLock(1577836800) // 01/01/2020 @ 12:00 (UTC)
+		await timeLockConstraintModule.editAccountTimeLock(accounts[0], 1577836800) // 01/01/2020 @ 12:00 (UTC)
 	})
 
 	it('cannot transfer when timelocked', async () => {
-		timeLockConstraintModule.editTimeLock(conf.standardPartition, 1893456000) // 01/01/2030 @ 12:00 (UTC)
+		await timeLockConstraintModule.editTimeLock(1893456000) // 01/01/2030 @ 12:00 (UTC)
 
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.transferByPartition(
@@ -96,21 +108,36 @@ contract('Test TimeLock Module', async (accounts) => {
 	})
 
 	it('can transfer when timelock over', async () => {
-		await timeLockConstraintModule.editTimeLock(
-			conf.standardPartition,
-			1577836800
-		) // 01/01/2020 @ 12:00 (UTC)
+		await timeLockConstraintModule.editTimeLock(1577836800) // 01/01/2020 @ 12:00 (UTC)
 
-		// check if balance is enough
-		assert.deepEqual(
-			(
-				await contracts.micoboSecurityToken.balanceOfByPartition(
-					conf.standardPartition,
-					accounts[0]
-				)
-			).toNumber(),
-			value
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{ from: accounts[0] }
+			)
 		)
+	})
+
+	it('cannot transfer when account timelocked', async () => {
+		await timeLockConstraintModule.editAccountTimeLock(accounts[0], 1893456000) // 01/01/2030 @ 12:00 (UTC)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{ from: accounts[0] }
+			),
+			'A8 - account is still locked'
+		)
+	})
+
+	it('can transfer when account timelock over', async () => {
+		await timeLockConstraintModule.editAccountTimeLock(accounts[0], 1577836800) // 01/01/2020 @ 12:00 (UTC)
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(

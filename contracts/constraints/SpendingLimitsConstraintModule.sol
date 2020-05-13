@@ -37,12 +37,9 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
         uint256 periodEnd;
     }
 
-    address _owner;
-
     constructor(
         address tokenAddress
     ) public {
-        _owner = msg.sender;
         _securityToken = ISecurityToken(tokenAddress);
     }
 

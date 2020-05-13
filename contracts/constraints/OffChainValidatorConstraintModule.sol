@@ -23,7 +23,6 @@ contract OffChainValidator is IConstraintModule {
         string memory module_name,
         address signer
     ) public {
-        _owner = msg.sender;
         _module_name = module_name;
         _securityToken = ISecurityToken(tokenAddress);
         _signer = signer;

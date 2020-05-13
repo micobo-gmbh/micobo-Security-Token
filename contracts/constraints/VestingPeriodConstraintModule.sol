@@ -28,12 +28,10 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
     mapping(address => uint256) _amountSpentByUser;
 
-    address _owner;
 
     constructor(
         address tokenAddress
     ) public {
-        _owner = msg.sender;
         _securityToken = ISecurityToken(tokenAddress);
     }
 

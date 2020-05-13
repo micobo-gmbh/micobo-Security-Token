@@ -24,12 +24,9 @@ contract PauseConstraintModule is IConstraintModule {
     bool private _paused;
 
 
-    address _owner;
-
     constructor(
         address tokenAddress
     ) public {
-        _owner = msg.sender;
         _securityToken = ISecurityToken(tokenAddress);
         _paused = false;
     }

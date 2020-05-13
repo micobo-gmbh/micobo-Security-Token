@@ -16,12 +16,10 @@ contract WhitelistConstraintModule is IConstraintModule {
 
     // TODO maybe change to canSend and can Receive
 
-    address _owner;
 
     constructor(
         address tokenAddress
     ) public {
-        _owner = msg.sender;
         _securityToken = ISecurityToken(tokenAddress);
     }
 

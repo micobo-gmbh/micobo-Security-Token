@@ -10,22 +10,26 @@ contract TimeLockConstraintModule is IConstraintModule {
     bytes32 private _module_name = keccak256('TIME_LOCK');
 
     // module data
-    mapping(bytes32 => uint256) private _partitionTimeLock;
+    mapping(address => uint256) private _accountTimeLock;
 
+    uint256 _timeLock;
 
-    address _owner;
 
     constructor(
         address tokenAddress
     ) public {
-        _owner = msg.sender;
         _securityToken = ISecurityToken(tokenAddress);
     }
 
     // function to edit limits
-    function editTimeLock(bytes32 partition, uint256 time) public {
+    function editAccountTimeLock(address account, uint256 time) public {
         require(_securityToken.hasRole(bytes32('TIME_LOCK_EDITOR'), msg.sender), 'A7');
-        _partitionTimeLock[partition] = time;
+        _accountTimeLock[account] = time;
+    }
+
+    function editTimeLock(uint256 time) public {
+        require(_securityToken.hasRole(bytes32('TIME_LOCK_EDITOR'), msg.sender), 'A7');
+        _timeLock = time;
     }
 
     function executeTransfer(
@@ -56,8 +60,8 @@ contract TimeLockConstraintModule is IConstraintModule {
     }
 
     function validateTransfer(
-        address /* msg_sender */,
-        bytes32 partition,
+        address msg_sender,
+        bytes32 /* partition */,
         address /* operator */,
         address /* from */,
         address /* to */,
@@ -75,8 +79,10 @@ contract TimeLockConstraintModule is IConstraintModule {
         string memory reason
     )
     {
-        if(_partitionTimeLock[partition] > now) {
-            return(false, hex'A8', '', 'A8 - partition is still locked');
+        if(_timeLock > now ) {
+             return(false, hex'A8', '', 'A8 - partition is still locked');
+        } else if(_accountTimeLock[msg_sender] > now) {
+            return(false, hex'A8', '', 'A8 - account is still locked');
         } else {
             return(true, code, extradata, '');
         }
