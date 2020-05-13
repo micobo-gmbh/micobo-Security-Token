@@ -49,18 +49,6 @@ contract('Test Whitelist', async (accounts) => {
 		)
 	})
 
-	it('cannot transfer when not whitelisted', async () => {
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				value,
-				'0x0',
-				{ from: accounts[0] }
-			)
-		)
-	})
-
 	it('cannot edit whitelist whithout being Whitelist_editor', async () => {
 		await truffleAssert.fails(
 			whitelistConstraintModule.editWhitelist(accounts[0], true)
@@ -79,21 +67,59 @@ contract('Test Whitelist', async (accounts) => {
 			whitelistConstraintModule.editWhitelist(accounts[0], true)
 		)
 
-		await truffleAssert.passes(
-			whitelistConstraintModule.bulkEditWhitelist(accounts, true)
-		)
-	})
-
-	it('can transfer when whitelisted', async () => {
 		assert.deepEqual(
 			await whitelistConstraintModule.isWhitelisted(accounts[0]),
 			true
+		)
+
+		await truffleAssert.passes(
+			whitelistConstraintModule.bulkEditWhitelist(accounts, true)
 		)
 
 		assert.deepEqual(
 			await whitelistConstraintModule.isWhitelisted(accounts[1]),
 			true
 		)
+
+		await truffleAssert.passes(
+			whitelistConstraintModule.bulkEditWhitelist(accounts, false)
+		)
+
+		assert.deepEqual(
+			await whitelistConstraintModule.isWhitelisted(accounts[0]),
+			false
+		)
+
+		assert.deepEqual(
+			await whitelistConstraintModule.isWhitelisted(accounts[1]),
+			false
+		)
+	})
+
+	it('can transfer when whitelisted', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+		
+		await whitelistConstraintModule.editWhitelist(accounts[0], true)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+
+		await whitelistConstraintModule.editWhitelist(accounts[1], true)
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(
