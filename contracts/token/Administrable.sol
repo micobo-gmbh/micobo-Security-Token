@@ -14,16 +14,18 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      * Traditionally, CONTROLLER can transfer anybody's tokens and set the document
      * we outsource the last one to a new DOCUMENT_EDITOR role
      *
+     * --main roles--
      * ADMIN   (can add and remove roles)
      * CONTROLLER (ERC1400, can force-transfer tokens if contract _isControllable),
      * ISSUER (ISSUER)
      * REDEEMER (BURNER, can redeem tokens, their own OR others IF _isOperatorForPartition())
      * MODULE_EDITOR (can edit constraint modules),
-
+     *
+     * --additional roles--
      * DOCUMENT_EDITOR
      * CAP_EDITOR
 
-     // constraint module roles
+     * --constraint module roles--
      * PAUSER
      * WHITELIST_EDITOR
      * TIME_LOCK_EDITOR
@@ -115,10 +117,11 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      */
     function _remove(bytes32 role, address account) internal {
         require(account != address(0), 'zero address');
-        require(
+        // dont allow to remove own admin role
+        /* require(
             !(role == bytes32("ADMIN") && account == _msgSender()),
             'cannot remove your own ADMIN role'
-        );
+        ); */
         require(hasRole(role, account), 'account does not have this role');
 
         _roles[role][account] = false;

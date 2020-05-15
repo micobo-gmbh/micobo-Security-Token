@@ -193,4 +193,82 @@ contract('Test Security Token', async (accounts) => {
 			value - -value
 		)
 	})
+
+	it('can transfer between partitions', async () => {
+		flag = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+		newPartition = web3.utils.keccak256('newPartition')
+
+		data = flag + newPartition.substring(2)
+
+		// console.log(data)
+
+		// transfer tokens to a new partition
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				data,
+				// operator data length > 0
+				'0x0',
+				{ from: accounts[1] }
+			)
+		)
+
+		// check balance on new partition
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					newPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			value
+		)
+
+		// on base partition
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			value
+		)
+	})
+
+	it('RIVER principle works as intended', async () => {
+
+		// 0 transfers fund from newPartition
+		contracts.micoboSecurityToken.transferByPartition(
+			newPartition,
+			accounts[1],
+			value,
+			'0x'
+		)
+
+		// check balance on new partition
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					newPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			0
+		)
+
+		// check balance on base partition
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			value * 2
+		)
+	})
 })

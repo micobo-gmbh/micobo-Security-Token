@@ -4,7 +4,7 @@ module.exports = {
 		symbol: 'MST',
 		granularity: 1,
 		standardPartition:
-			'0x7374616e64617264000000000000000000000000000000000000000000000000', // 'standard' in hex
+			'0x0000000000000000000000000000000000000000000000000000000000000000', // base partition
 		standardCap: 1000000,
 	}
 }

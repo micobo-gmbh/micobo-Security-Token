@@ -254,7 +254,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer. [CAN CONTAIN THE DESTINATION PARTITION]
      * @param operatorData Information attached to the transfer, by the operator (if any).
-     * implementing 'erc777tokenHolder'.
      * @return Destination partition.
      */
     function _transferByPartition(
@@ -272,8 +271,12 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         require(_balanceOfByPartition[from][fromPartition] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        bytes32 toPartition = fromPartition;
+        // The RIVER Principle
+        // all transaction go to base partition by default
+        // so over time, tokens converge towards the base!
+        bytes32 toPartition = bytes32(0);
 
+        // TODO why can only operators do this?
         if (operatorData.length != 0 && data.length >= 64) {
             toPartition = _getDestinationPartition(fromPartition, data);
         }
@@ -477,7 +480,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer, and intended for the token holder ('from') [CAN CONTAIN THE DESTINATION PARTITION].
      * @param operatorData Information attached to the transfer by the operator (if any).
-     * implementing 'erc777tokenHolder'.
      */
     function _transferByDefaultPartitions(
         address operator,

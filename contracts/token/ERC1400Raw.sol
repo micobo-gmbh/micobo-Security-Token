@@ -301,9 +301,6 @@ ERC1820Client
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer.
      * @param operatorData Information attached to the transfer by the operator (if any)..
-     * implementing 'erc777tokenHolder'.
-     * ERC1400Raw native transfer functions MUST set this parameter to 'true', and backwards compatible ERC20 transfer
-     * functions SHOULD set this parameter to 'false'.
      */
 
     function _transferWithData(

@@ -101,16 +101,6 @@ contract('Test Admin Contract', async (accounts) => {
 		)
 	})
 
-	it('cannot remove own ADMIN role', async () => {
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0])
-		)
-
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.renounceRole(Role.ADMIN)
-		)
-	})
-
 	it('non-admin cannot add nor remove roles', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
