@@ -51,6 +51,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
         _isIssuable = true;
         _isControllable = true;
+
+        
     }
 
 
@@ -204,6 +206,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data)
     external override
     {
+        // only REDEEMER can burn tokens (checked in _redeem())
+
         _redeemByPartition(partition, _msgSender(), _msgSender(), value, data, "");
     }
 

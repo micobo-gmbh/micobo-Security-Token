@@ -62,7 +62,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
         uint256 granularity
     )
     public
-    ERC1400Raw(name, symbol, granularity){}
+    ERC1400Raw(name, symbol, granularity){
+        // set base partition
+        _defaultPartitions.push(bytes32(0));
+    }
 
     /********************** NEW FUNCTIONS **************************/
 
@@ -238,9 +241,16 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     view
     returns (bool)
     {
+        // TODO renouncing control kills erc20 proxy contracts atm
+        // TODO allow CONTROLLER to transfer without validation
         return (_authorizedOperatorByPartition[tokenHolder][partition][operator] ||
-        (_isControllable &&
-        (_isControllerByPartition[partition][operator]) || hasRole(bytes32("CONTROLLER"), operator)));
+        (
+            _isControllable &&
+            (
+                _isControllerByPartition[partition][operator] ||
+                hasRole(bytes32("CONTROLLER"), operator))
+            )
+        );
         // we use _isControllerByPartition only for partitionProxy at this point
     }
 

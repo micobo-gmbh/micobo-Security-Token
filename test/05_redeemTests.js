@@ -18,9 +18,7 @@ contract('Test Redeeming', async (accounts) => {
 		contracts = {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
-	})
 
-	it('can redeem tokens of other address if redeemer and controller', async () => {
 		await contracts.micoboSecurityToken.addRole(Role.ISSUER, issuer)
 
 		// mint
@@ -31,6 +29,17 @@ contract('Test Redeeming', async (accounts) => {
 			'0x0',
 			{ from: issuer }
 		)
+
+		await contracts.micoboSecurityToken.issueByPartition(
+			conf.standardPartition,
+			accounts[3],
+			value,
+			'0x0',
+			{ from: issuer }
+		)
+	})
+
+	it('can redeem tokens of other address if redeemer and controller', async () => {
 
 		assert.deepEqual(
 			(
@@ -108,6 +117,42 @@ contract('Test Redeeming', async (accounts) => {
 				await contracts.micoboSecurityToken.balanceOfByPartition(
 					conf.standardPartition,
 					accounts[0]
+				)
+			).toNumber(),
+			value - value
+		)
+	})
+
+	it('can redeem own tokens only if redeemer', async () => {
+		// should fail because is not redeemer
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.redeemByPartition(
+				conf.standardPartition,
+				value,
+				'0x0',
+				{ from: accounts[3] }
+			)
+		)
+
+		// make redeemer
+		await contracts.micoboSecurityToken.addRole(Role.REDEEMER, accounts[3])
+
+		//should pass now
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.redeemByPartition(
+				conf.standardPartition,
+				value,
+				'0x0',
+				{ from: accounts[3] }
+			)
+		)
+
+		// new balance matches
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[3]
 				)
 			).toNumber(),
 			value - value

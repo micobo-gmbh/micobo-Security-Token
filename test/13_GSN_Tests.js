@@ -153,48 +153,6 @@ contract('Test GSN functionality', async (accounts) => {
 		assert.deepEqual(await web3.eth.getBalance(accounts[0]), balance)
 	})
 
-	it('cannot deactivate GSN if not GSN_CONTROLLER', async () => {
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
-				from: accounts[0],
-			})
-		)
-	})
-
-	it('can deactivate GSN if GSN_CONTROLLER', async () => {
-		await contracts.micoboSecurityToken.addRole(
-			Role.GSN_CONTROLLER,
-			accounts[0]
-		)
-
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
-				from: accounts[0],
-			})
-		)
-	})
-
-	it('cannot add a role over GSN if deactivated', async () => {
-		await contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
-			from: accounts[0],
-		})
-
-		// Sends the transaction via the GSN
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[2], {
-				from: accounts[0],
-				useGSN: true,
-				gas: 104310,
-				gasPrice: 2000000000,
-			})
-		)
-
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[2]),
-			false
-		)
-	})
-
 	it('can transfer using proxy and GSN', async () => {
 		const balance = (
 			await contracts.securityTokenPartition.balanceOf(accounts[1])
@@ -221,6 +179,64 @@ contract('Test GSN functionality', async (accounts) => {
 				await contracts.securityTokenPartition.balanceOf(accounts[1])
 			).toNumber(),
 			balance + value
+		)
+	})
+
+	it('cannot deactivate GSN if not GSN_CONTROLLER', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
+			})
+		)
+	})
+
+	it('cannot deactivate GSN if not GSN_CONTROLLER in PartitionProxy', async () => {
+		await truffleAssert.fails(
+			contracts.securityTokenPartition.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
+			})
+		)
+	})
+
+	it('can deactivate GSN if GSN_CONTROLLER', async () => {
+		await contracts.micoboSecurityToken.addRole(
+			Role.GSN_CONTROLLER,
+			accounts[0]
+		)
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
+			})
+		)
+	})
+
+	it('can deactivate GSN if GSN_CONTROLLER in PartitionProxy', async () => {
+		await truffleAssert.passes(
+			contracts.securityTokenPartition.setGSNMode(GSNMode.NONE, {
+				from: accounts[0],
+			})
+		)
+	})
+
+	it('cannot add a role over GSN if deactivated', async () => {
+		await contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
+			from: accounts[0],
+		})
+
+		// Sends the transaction via the GSN
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[2], {
+				from: accounts[0],
+				useGSN: true,
+				gas: 104310,
+				gasPrice: 2000000000,
+			})
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[2]),
+			false
 		)
 	})
 })

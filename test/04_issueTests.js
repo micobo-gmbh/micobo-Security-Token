@@ -19,6 +19,29 @@ contract('Test Issuing and Cap', async (accounts) => {
 		}
 	})
 
+	it('can get and set cap', async () => {
+		assert.deepEqual(
+			(await contracts.micoboSecurityToken.cap()).toNumber(),
+			conf.standardCap
+		)
+
+		// not cap editor
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.setCap(conf.standardCap - -100)
+		)
+
+		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setCap(conf.standardCap - -100)
+		)
+
+		assert.deepEqual(
+			(await contracts.micoboSecurityToken.cap()).toNumber(),
+			conf.standardCap - -100
+		)
+	})
+
 	it('mints tokens to test addresses if minter', async () => {
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.issueByPartition(
@@ -146,7 +169,7 @@ contract('Test Issuing and Cap', async (accounts) => {
 
 	it('cannot exceed cap', async () => {
 		// should be just too much for the partition
-		var capFraction = (conf.standardCap / 39).toFixed(0)
+		var capFraction = (conf.standardCap / 40).toFixed(0) + 2
 
 		var tokenHolders = []
 		var values = []

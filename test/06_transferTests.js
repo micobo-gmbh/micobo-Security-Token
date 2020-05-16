@@ -87,6 +87,15 @@ contract('Test Security Token', async (accounts) => {
 			}
 		)
 
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isOperatorForPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0]
+			),
+			true
+		)
+
 		// now can transfer
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.operatorTransferByPartition(
@@ -240,7 +249,6 @@ contract('Test Security Token', async (accounts) => {
 	})
 
 	it('RIVER principle works as intended', async () => {
-
 		// 0 transfers fund from newPartition
 		contracts.micoboSecurityToken.transferByPartition(
 			newPartition,
@@ -270,5 +278,69 @@ contract('Test Security Token', async (accounts) => {
 			).toNumber(),
 			value * 2
 		)
+	})
+
+	it('can CAN operatorTransfer', async () => {
+		// not if not controller
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.canOperatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x',
+				'0x',
+				{ from: accounts[3] }
+			)
+		)
+
+		// passes when controller
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.canOperatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x',
+				'0x'
+			)
+		)
+	})
+
+	it('can CAN transfer', async () => {
+
+		// not enough balance
+		let res = await contracts.micoboSecurityToken.canTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			value * 3,
+			'0x'
+		)
+
+		assert.deepEqual(res['0'], '0xa4')
+
+
+		// zero address
+		let res2 = await contracts.micoboSecurityToken.canTransferByPartition(
+			conf.standardPartition,
+			'0x0000000000000000000000000000000000000000',
+			value,
+			'0x',
+			{from : accounts[1]}
+		)
+
+		assert.deepEqual(res2['0'], '0xa6')
+
+
+		// granularity
+		let res3 = await contracts.micoboSecurityToken.canTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			1,
+			'0x',
+			{from : accounts[1]}
+		)
+
+		assert.deepEqual(res3['0'], '0xa9')
 	})
 })

@@ -98,7 +98,7 @@ contract('Test Vesting Period', async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
 				accounts[1],
-				1,
+				2,
 				'0x0',
 				{ from: accounts[0] }
 			)
@@ -115,7 +115,7 @@ contract('Test Vesting Period', async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
 				accounts[1],
-				1,
+				2,
 				'0x0',
 				{ from: accounts[0] }
 			)
@@ -127,7 +127,7 @@ contract('Test Vesting Period', async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
 				accounts[1],
-				251,
+				252,
 				'0x0',
 				{ from: accounts[0] }
 			)
@@ -138,7 +138,7 @@ contract('Test Vesting Period', async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
 				accounts[1],
-				249,
+				248,
 				'0x0',
 				{ from: accounts[0] }
 			)

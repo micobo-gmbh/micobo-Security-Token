@@ -2,6 +2,7 @@ const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 
 const { Role } = require('./Constants')
+const { conf } = require('../token-config')
 
 contract('Test Admin Contract', async (accounts) => {
 	let contracts
@@ -118,6 +119,134 @@ contract('Test Admin Contract', async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0], {
 				from: accounts[1],
+			})
+		)
+	})
+
+	it('can set and renew partition controllers', async () => {
+		// not admin
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.setPartitionControllers(
+				conf.standardPartition,
+				[accounts[0]],
+				{
+					from: accounts[1],
+				}
+			)
+		)
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setPartitionControllers(
+				conf.standardPartition,
+				[accounts[0]]
+			)
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.controllersByPartition(
+				conf.standardPartition
+			),
+			[accounts[0]]
+		)
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setPartitionControllers(
+				conf.standardPartition,
+				[accounts[1], accounts[2]]
+			)
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.controllersByPartition(
+				conf.standardPartition
+			),
+			[accounts[1], accounts[2]]
+		)
+	})
+
+	it('can renounce control', async () => {
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isControllable(),
+			true
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[0]),
+			true
+		)
+
+		// fails if not admin
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.renounceControl({
+				from: accounts[1]
+			})
+		)
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.renounceControl({
+				from: accounts[0]
+			})
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isControllable(),
+			false
+		)
+		
+
+		// mint some new tokens to test with
+		await contracts.micoboSecurityToken.issueByPartition(
+			conf.standardPartition,
+			accounts[0],
+			100,
+			'0x'
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[0],
+				accounts[1],
+				100,
+				'0x',
+				'0x'
+			)
+		)
+	})
+
+	it('can renounce issuance control', async () => {
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isIssuable(),
+			true
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.hasRole(Role.ISSUER, accounts[0]),
+			true
+		)
+
+		// fails if not admin
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.renounceIssuance({
+				from: accounts[1]
+			})
+		)
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.renounceIssuance({
+				from: accounts[0]
+			})
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isIssuable(),
+			false
+		)
+
+		// not able to mint anymore
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], 100, '', {
+				from: accounts[0]
 			})
 		)
 	})
