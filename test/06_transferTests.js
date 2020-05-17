@@ -220,9 +220,14 @@ contract('Test Security Token', async (accounts) => {
 				value,
 				data,
 				// operator data length > 0
-				'0x0',
-				{ from: accounts[1] }
+				'0x0'
 			)
+		)
+
+		// new partition added
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.totalPartitions(),
+			[conf.standardPartition, newPartition]
 		)
 
 		// check balance on new partition
@@ -246,6 +251,32 @@ contract('Test Security Token', async (accounts) => {
 			).toNumber(),
 			value
 		)
+
+		// if flag wrong, will use same partition
+		wrongFlag =
+			'0x00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+		data = wrongFlag + newPartition.substring(2)
+
+		await contracts.micoboSecurityToken.operatorTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			accounts[0],
+			value,
+			data,
+			// operator data length > 0
+			'0x0'
+		)
+
+		// check balance on base partition
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			0
+		)
 	})
 
 	it('RIVER principle works as intended', async () => {
@@ -255,6 +286,12 @@ contract('Test Security Token', async (accounts) => {
 			accounts[1],
 			value,
 			'0x'
+		)
+
+		// newPartition doesn't exist anymore
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.totalPartitions(),
+			[conf.standardPartition]
 		)
 
 		// check balance on new partition
@@ -276,7 +313,7 @@ contract('Test Security Token', async (accounts) => {
 					accounts[1]
 				)
 			).toNumber(),
-			value * 2
+			value
 		)
 	})
 
@@ -308,7 +345,6 @@ contract('Test Security Token', async (accounts) => {
 	})
 
 	it('can CAN transfer', async () => {
-
 		// not enough balance
 		let res = await contracts.micoboSecurityToken.canTransferByPartition(
 			conf.standardPartition,
@@ -319,18 +355,16 @@ contract('Test Security Token', async (accounts) => {
 
 		assert.deepEqual(res['0'], '0xa4')
 
-
 		// zero address
 		let res2 = await contracts.micoboSecurityToken.canTransferByPartition(
 			conf.standardPartition,
 			'0x0000000000000000000000000000000000000000',
 			value,
 			'0x',
-			{from : accounts[1]}
+			{ from: accounts[1] }
 		)
 
 		assert.deepEqual(res2['0'], '0xa6')
-
 
 		// granularity
 		let res3 = await contracts.micoboSecurityToken.canTransferByPartition(
@@ -338,7 +372,7 @@ contract('Test Security Token', async (accounts) => {
 			accounts[1],
 			1,
 			'0x',
-			{from : accounts[1]}
+			{ from: accounts[1] }
 		)
 
 		assert.deepEqual(res3['0'], '0xa9')

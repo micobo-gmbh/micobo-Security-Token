@@ -70,6 +70,11 @@ contract('Test Issuing and Cap', async (accounts) => {
 			)
 		).toNumber()
 
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.totalPartitions(),
+			[conf.standardPartition]
+		)
+
 		// console.log("balance: ", balance);
 
 		assert.deepEqual(balance, value)
