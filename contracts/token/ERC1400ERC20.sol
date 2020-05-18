@@ -34,9 +34,6 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
     }
 
     function transfer(address to, uint256 value) external override returns (bool) {
-
-        // transferByPartition contains "_msgSender()", which would be THIS contract's address
-        // this is why this contract is a controllerByPartition so we can still make transfers.
         _transferByDefaultPartitions(_msgSender(), _msgSender(), to, value, '', '');
         return true;
     }
@@ -54,11 +51,7 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
         require(value <= _allowed[from][_msgSender()], "A7");
         // Transfer Blocked - Identity restriction
 
-        if (_allowed[from][_msgSender()] >= value) {
-            _allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
-        } else {
-            _allowed[from][_msgSender()] = 0;
-        }
+        _allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
 
         // transfer by partition
         _transferByDefaultPartitions(from, from, to, value, '', '');

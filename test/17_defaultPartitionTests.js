@@ -66,5 +66,5 @@ contract('Test default partition behaviour', async (accounts) => {
 			Partitions.SECOND,
 			Partitions.THIRD,
 		])
-	})
+    })
 })
