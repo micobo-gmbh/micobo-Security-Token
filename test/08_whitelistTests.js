@@ -96,6 +96,20 @@ contract('Test Whitelist', async (accounts) => {
 		)
 	})
 
+	it('cannot bulk edit more than 40 at a time', async () => {
+		// create array of 50 accounts
+		let a = []
+		for (i = 0; i <= 5; i++) {
+			for (j = 0; j < 10; j++) {
+				a.push(accounts[j])
+			}
+		}
+
+		await truffleAssert.fails(
+			whitelistConstraintModule.bulkEditWhitelist(a, false)
+		)
+	})
+
 	it('can transfer when whitelisted', async () => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.transferByPartition(
