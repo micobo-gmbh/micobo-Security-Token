@@ -52,7 +52,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
         _isIssuable = true;
         _isControllable = true;
 
-        
+
     }
 
 
@@ -88,7 +88,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     }
 
     // GSN
-    function isGSNController() internal view override returns (bool) {
+    function _isGSNController() internal view override returns (bool) {
         return hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
     }
 

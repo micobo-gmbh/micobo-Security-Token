@@ -13,10 +13,16 @@ import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
  * information on how to use the pre-built {GSNRecipientSignature} and
  * {GSNRecipientERC20Fee}, or how to write your own.
  */
-abstract contract GSNModule is IRelayRecipient {
-   
+contract GSNModule is IRelayRecipient {
+
     uint256 constant private _RELAYED_CALL_ACCEPTED = 0;
     uint256 constant private _RELAYED_CALL_REJECTED = 11;
+
+    function getHubAddr() external view override returns (address) {
+        // this is not needed nor used
+        // only implemented to statisfy IRelayRecipient
+        return address(0);
+    }
 
     function acceptRelayedCall(
         address /* relay */,
@@ -58,9 +64,9 @@ abstract contract GSNModule is IRelayRecipient {
      * - the caller must be the `RelayHub` contract.
      */
     function postRelayedCall(
-        bytes memory /* context */, 
-        bool /* success */, 
-        uint256 /* actualCharge */, 
+        bytes memory /* context */,
+        bool /* success */,
+        uint256 /* actualCharge */,
         bytes32 /* preRetVal */
     ) public virtual override {
         this;

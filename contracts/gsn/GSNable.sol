@@ -1,13 +1,13 @@
 pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
-import "../../node_modules/@openzeppelin/contracts/GSN/GSNRecipient.sol";
+import "./GSNRecipient.sol";
 
 
 contract GSNable is GSNRecipient {
 
     // override this function to add access control
-    function isGSNController() internal view virtual returns (bool) {
+    function _isGSNController() internal view virtual returns (bool) {
         this;
         return true;
     }
@@ -18,10 +18,9 @@ contract GSNable is GSNRecipient {
     IRelayRecipient private _gsnModule = IRelayRecipient(address(0));
 
     modifier onlyGSNController() {
-        require(isGSNController(), "only GSN controller");
+        require(_isGSNController(), "only GSN controller");
         _;
     }
-
 
     function acceptRelayedCall(
         address relay,

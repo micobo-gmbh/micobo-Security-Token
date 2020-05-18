@@ -3,6 +3,7 @@ const { conf } = require('../token-config')
 const { Role } = require('./Constants')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
+const GSNModule = artifacts.require('GSNModule')
 
 const {
 	deployRelayHub,
@@ -23,6 +24,8 @@ contract('Test GSN functionality', async (accounts) => {
 	let contracts
 
 	let value = 1000
+
+	let relayHub
 
 	// deepEqual compares with '==='
 
@@ -47,7 +50,7 @@ contract('Test GSN functionality', async (accounts) => {
 
 		// setup GSN
 		try {
-			await deployRelayHub(web3)
+			relayHub = await deployRelayHub(web3)
 
 			// start relayer before with
 			// % npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
@@ -71,13 +74,17 @@ contract('Test GSN functionality', async (accounts) => {
 		await contracts.micoboSecurityToken.issueByPartition(
 			conf.standardPartition,
 			accounts[0],
-			value * 2,
+			value * 3,
 			'0x0'
 		)
 	})
 
-	// TODO test other functions than addRole, transferByPartition and transfer
-	// although this should work with all of them
+	it('can read relayHub version', async () => {
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.relayHubVersion(),
+			'1.0.0'
+		)
+	})
 
 	it('can add a role over GSN', async () => {
 		// Sends the transaction via the GSN
@@ -89,10 +96,10 @@ contract('Test GSN functionality', async (accounts) => {
 				from: accounts[0],
 				useGSN: true,
 				gas: 104310,
-				gasPrice: 2000000000,
+				gasPrice: 20000000000,
 			}
 		)
-		console.log(tx["tx"])
+		console.log(tx['tx'])
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
@@ -101,56 +108,7 @@ contract('Test GSN functionality', async (accounts) => {
 	})
 
 	it('can transfer tokens for free', async () => {
-		const balance = await web3.eth.getBalance(accounts[0])
-
-		const tokenBalance0 = await contracts.micoboSecurityToken.balanceOfByPartition(
-			conf.standardPartition,
-			accounts[0]
-		)
-
-		const tokenBalance1 = await contracts.micoboSecurityToken.balanceOfByPartition(
-			conf.standardPartition,
-			accounts[1]
-		)
-
-		// can transfer tokens≤
-		let tx = await contracts.micoboSecurityToken.transferByPartition(
-			conf.standardPartition,
-			accounts[1],
-			value,
-			'0x0',
-			{
-				from: accounts[0],
-				useGSN: true,
-				gas: 231532,
-				gasPrice: 2000000000,
-			}
-		)
-		console.log(tx["tx"])
-
-		// tokens have been transferred
-		assert.deepEqual(
-			(
-				await contracts.micoboSecurityToken.balanceOfByPartition(
-					conf.standardPartition,
-					accounts[0]
-				)
-			).toNumber(),
-			tokenBalance0 - value
-		)
-
-		assert.deepEqual(
-			(
-				await contracts.micoboSecurityToken.balanceOfByPartition(
-					conf.standardPartition,
-					accounts[1]
-				)
-			).toNumber(),
-			tokenBalance1 - -value
-		)
-
-		// ether balance is unchanged
-		assert.deepEqual(await web3.eth.getBalance(accounts[0]), balance)
+		await transferWithGSN()
 	})
 
 	it('can transfer using proxy and GSN', async () => {
@@ -167,10 +125,10 @@ contract('Test GSN functionality', async (accounts) => {
 				from: accounts[0],
 				useGSN: true,
 				gas: 192366, // 92366
-				gasPrice: 2000000000,
+				gasPrice: 20000000000,
 			}
 		)
-		console.log(tx["tx"])
+		console.log(tx['tx'])
 
 		// console.log(balance)
 
@@ -230,7 +188,7 @@ contract('Test GSN functionality', async (accounts) => {
 				from: accounts[0],
 				useGSN: true,
 				gas: 104310,
-				gasPrice: 2000000000,
+				gasPrice: 20000000000,
 			})
 		)
 
@@ -239,4 +197,105 @@ contract('Test GSN functionality', async (accounts) => {
 			false
 		)
 	})
+
+	it('can set and use GSN Module', async () => {
+		await contracts.micoboSecurityToken.setGSNMode(GSNMode.MODULE, {
+			from: accounts[0],
+		})
+
+		let gsnModule = await GSNModule.new()
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.setGSNModule(gsnModule.address)
+		)
+
+		await transferWithGSN()
+	})
+
+	it('can upgrade relay hub', async () => {
+		const newHub = '0x09226Fc4a70ff15Ed2E6aaa8eb37702122633d6A' //random address
+		await contracts.micoboSecurityToken.upgradeRelayHub(newHub)
+
+		assert.deepEqual(await contracts.micoboSecurityToken.getHubAddr(), newHub)
+
+		await contracts.micoboSecurityToken.upgradeRelayHub(relayHub)
+	})
+
+	it('can withdraw deposit', async () => {
+		// using account 1 so that gas consumption does not change eth balance of account 0
+		await contracts.micoboSecurityToken.addRole(
+			Role.GSN_CONTROLLER,
+			accounts[1]
+		)
+
+		const balance = await web3.eth.getBalance(accounts[0])
+
+		console.log(balance)
+
+		let tx = await contracts.micoboSecurityToken.withdrawDeposits(
+			1000,
+			accounts[0],
+			{ from: accounts[1] }
+		)
+
+		// console.log(tx)
+
+		assert.deepEqual(
+			(await web3.eth.getBalance(accounts[0])) - 0, // convert to number
+			balance - -1000
+		)
+	})
+
+	transferWithGSN = async () => {
+		const balance = await web3.eth.getBalance(accounts[0])
+
+		const tokenBalance0 = await contracts.micoboSecurityToken.balanceOfByPartition(
+			conf.standardPartition,
+			accounts[0]
+		)
+
+		const tokenBalance1 = await contracts.micoboSecurityToken.balanceOfByPartition(
+			conf.standardPartition,
+			accounts[1]
+		)
+
+		// can transfer tokens
+		let tx = await contracts.micoboSecurityToken.transferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			value,
+			'0x0',
+			{
+				from: accounts[0],
+				useGSN: true,
+				gas: 231532,
+				gasPrice: 20000000000,
+			}
+		)
+		console.log(tx['tx'])
+
+		// tokens have been transferred
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[0]
+				)
+			).toNumber(),
+			tokenBalance0 - value
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			tokenBalance1 - -value
+		)
+
+		// ether balance is unchanged
+		assert.deepEqual(await web3.eth.getBalance(accounts[0]), balance)
+	}
 })

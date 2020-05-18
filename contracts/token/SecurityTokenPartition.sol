@@ -100,7 +100,7 @@ contract SecurityTokenPartition is IERC20, GSNable {
     }
 
     // GSN
-    function isGSNController() internal view override returns (bool) {
+    function _isGSNController() internal view override returns (bool) {
         return _securityToken.hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
     }
 }
