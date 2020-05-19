@@ -9,103 +9,99 @@ import "../erc1820/ERC1820Client.sol";
 
 
 contract SecurityTokenPartition is IERC20, ERC1820Client, GSNable {
+	using SafeMath for uint256;
 
-    using SafeMath for uint256;
+	ISecurityToken internal _securityToken;
 
-    ISecurityToken internal _securityToken;
+	bytes32 internal _partitionId;
 
-    bytes32 internal _partitionId;
+	constructor(address securityTokenAddress, bytes32 partition) public {
+		setInterfaceImplementation("ERC20Token", address(this));
 
+		_securityToken = ISecurityToken(securityTokenAddress);
+		_partitionId = partition;
+	}
 
-    constructor(address securityTokenAddress, bytes32 partition) public {
+	function securityTokenAddress() external view returns (ISecurityToken) {
+		return _securityToken;
+	}
 
-        setInterfaceImplementation("ERC20Token", address(this));
+	function partitionId() external view returns (bytes32) {
+		return _partitionId;
+	}
 
-        _securityToken = ISecurityToken(securityTokenAddress);
-        _partitionId = partition;
-    }
+	function cap() external view returns (uint256) {
+		return _securityToken.cap();
+	}
 
-    function securityTokenAddress() external view returns (ISecurityToken) {
-        return _securityToken;
-    }
+	//******************/
+	// ERC20Detailed
+	//******************/
 
-    function partitionId() external view returns (bytes32) {
-        return _partitionId;
-    }
+	function name() external view returns (string memory) {
+		return _securityToken.name();
+	}
 
-    function cap() external view returns (uint256) {
-        return _securityToken.cap();
-    }
+	function symbol() external view returns (string memory) {
+		return _securityToken.symbol();
+	}
 
+	function decimals() external pure returns (uint8) {
+		return uint8(18);
+	}
 
-    //******************/
-    // ERC20Detailed
-    //******************/
+	//******************/
+	// ERC20
+	//******************/
 
-    function name() external view returns (string memory) {
-        return _securityToken.name();
-    }
+	// Mapping from (tokenHolder, spender) to allowed value.
+	mapping(address => mapping(address => uint256)) internal _allowed;
 
-    function symbol() external view returns (string memory) {
-        return _securityToken.symbol();
-    }
+	function transfer(address to, uint256 value) external override returns (bool) {
+		// transferByPartition contains "_msgSender()", which would be THIS contract's address
+		// this is why this contract is a controllerByPartition so we can still make transfers.
+		_securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, "", "");
+		return true;
+	}
 
-    function decimals() external pure returns (uint8) {
-        return uint8(18);
-    }
+	function approve(address spender, uint256 value) external override returns (bool) {
+		require(spender != address(0), "A5");
+		// Transfer Blocked - Sender not eligible
+		_allowed[_msgSender()][spender] = value;
+		emit Approval(_msgSender(), spender, value);
+		return true;
+	}
 
-    //******************/
-    // ERC20
-    //******************/
+	function transferFrom(
+		address from,
+		address to,
+		uint256 value
+	) external override returns (bool) {
+		// check if has enough allowance here
+		require(value <= _allowed[from][_msgSender()], "A7");
+		// Transfer Blocked - Identity restriction
 
-    // Mapping from (tokenHolder, spender) to allowed value.
-    mapping(address => mapping(address => uint256)) internal _allowed;
+		_allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
 
-    function transfer(address to, uint256 value) external override returns (bool) {
+		// transfer by partition
+		_securityToken.operatorTransferByPartition(_partitionId, from, to, value, "", "");
+		return true;
+	}
 
-        // transferByPartition contains "_msgSender()", which would be THIS contract's address
-        // this is why this contract is a controllerByPartition so we can still make transfers.
-        _securityToken.operatorTransferByPartition(_partitionId, _msgSender(), to, value, '', '');
-        return true;
-    }
+	function totalSupply() external override(IERC20) view returns (uint256) {
+		return _securityToken.totalSupplyByPartition(_partitionId);
+	}
 
-    function approve(address spender, uint256 value) external override returns (bool) {
-        require(spender != address(0), "A5");
-        // Transfer Blocked - Sender not eligible
-        _allowed[_msgSender()][spender] = value;
-        emit Approval(_msgSender(), spender, value);
-        return true;
-    }
+	function balanceOf(address who) external override(IERC20) view returns (uint256) {
+		return _securityToken.balanceOfByPartition(_partitionId, who);
+	}
 
-    function transferFrom(address from, address to, uint256 value) external override returns (bool) {
-        // check if has enough allowance here
-        require(value <= _allowed[from][_msgSender()], "A7");
-        // Transfer Blocked - Identity restriction
+	function allowance(address owner, address spender) external override view returns (uint256) {
+		return _allowed[owner][spender];
+	}
 
-        _allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
-
-        // transfer by partition
-        _securityToken.operatorTransferByPartition(_partitionId, from, to, value, '', '');
-        return true;
-    }
-
-    function totalSupply() external override(IERC20) view returns (uint256) {
-        return _securityToken.totalSupplyByPartition(_partitionId);
-    }
-
-    function balanceOf(address who) external override(IERC20) view returns (uint256) {
-        return _securityToken.balanceOfByPartition(_partitionId, who);
-    }
-
-    function allowance(address owner, address spender) external override view returns (uint256) {
-        return _allowed[owner][spender];
-    }
-
-    // GSN
-    function _isGSNController() internal view override returns (bool) {
-        return _securityToken.hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
-    }
+	// GSN
+	function _isGSNController() internal override view returns (bool) {
+		return _securityToken.hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
+	}
 }
-
-
-

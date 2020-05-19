@@ -1,10 +1,10 @@
-const truffleAssert = require('truffle-assertions')
-const MicoboSecurityToken = artifacts.require('SecurityToken')
+const truffleAssert = require("truffle-assertions")
+const MicoboSecurityToken = artifacts.require("SecurityToken")
 
-const { conf } = require('../token-config')
-const { Role } = require('./Constants')
+const { conf } = require("../token-config")
+const { Role } = require("./Constants")
 
-contract('Test Off-Chain Validation', async (accounts) => {
+contract("Test Off-Chain Validation", async (accounts) => {
 	// TODO
 
 	let contracts

@@ -1,199 +1,176 @@
 pragma solidity 0.6.6;
 
-import '../../node_modules/@openzeppelin/contracts/math/SafeMath.sol';
+import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 
-import '../interfaces/IConstraintModule.sol';
-import '../interfaces/ISecurityToken.sol';
+import "../interfaces/IConstraintModule.sol";
+import "../interfaces/ISecurityToken.sol";
 
 
 contract SpendingLimitsConstraintModule is IConstraintModule {
+	using SafeMath for uint256;
 
-    using SafeMath for uint256;
+	// Set spending limits like:
+	// Not more than 2000/500/100 tokens every 24h/12h/6h etc
 
+	ISecurityToken _securityToken;
 
-    // Set spending limits like:
-    // Not more than 2000/500/100 tokens every 24h/12h/6h etc
+	bytes32 private _module_name = keccak256("SPENDING_LIMIT");
 
+	// module data
 
-    ISecurityToken _securityToken;
+	// tracks limits for different time periods
+	SpendingLimit[] private _spendinglimits;
 
-    bytes32 private _module_name = keccak256('SPENDING_LIMIT');
+	struct SpendingLimit {
+		uint256 periodLength;
+		uint256 amountAllowed;
+	}
 
-    // module data
+	// tracks the current spending of accounts in a period, Account - TimelockIndex - User
+	mapping(address => mapping(uint256 => User)) private _ATU;
 
-    // tracks limits for different time periods
-    SpendingLimit[] private _spendinglimits;
+	struct User {
+		uint256 amount;
+		uint256 periodEnd;
+	}
 
-    struct SpendingLimit {
-        uint256 periodLength;
-        uint256 amountAllowed;
-    }
+	constructor(address tokenAddress) public {
+		_securityToken = ISecurityToken(tokenAddress);
+	}
 
-    // tracks the current spending of accounts in a period, Account - TimelockIndex - User
-    mapping(address => mapping(uint256 => User)) private _ATU;
+	modifier onlySpendingLimitsEditor {
+		require(_securityToken.hasRole(bytes32("SPENDING_LIMITS_EDITOR"), msg.sender), "A7");
+		_;
+	}
 
-    struct User {
-        uint256 amount;
-        uint256 periodEnd;
-    }
+	function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor {
+		_spendinglimits.push(SpendingLimit(periodLength, amountAllowed));
+	}
 
-    constructor(
-        address tokenAddress
-    ) public {
-        _securityToken = ISecurityToken(tokenAddress);
-    }
+	function setTimelock(
+		uint256 index,
+		uint256 periodLength,
+		uint256 amountAllowed
+	) public onlySpendingLimitsEditor {
+		require(_spendinglimits.length > index, "out of bounds");
+		_spendinglimits[index] = SpendingLimit(periodLength, amountAllowed);
+	}
 
+	function deleteTimelock(uint256 index) public onlySpendingLimitsEditor {
+		require(_spendinglimits.length > index, "out of bounds");
+		_spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
+		_spendinglimits.pop();
+	}
 
-    modifier onlySpendingLimitsEditor {
-        require(_securityToken.hasRole(bytes32('SPENDING_LIMITS_EDITOR'), msg.sender), 'A7');
-        _;
-    }
+	function executeTransfer(
+		address, /* msg_sender */
+		bytes32, /* partition */
+		address, /* operator */
+		address from,
+		address, /* to */
+		uint256 value,
+		bytes memory, /* data */
+		bytes memory /* operatorData */
+	)
+		public
+		override
+		returns (
+			// we start with false here to save gas and negate it before returning --> (!invalid)
+			bool invalid,
+			string memory reason
+		)
+	{
+		// if any of the timelocks are violated, valid is set to false
+		for (uint256 i = 0; i < _spendinglimits.length; i++) {
+			User storage user = _ATU[from][i];
 
-    function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        _spendinglimits.push(SpendingLimit(periodLength, amountAllowed));
-    }
+			// period has not ended, there has been at least 1 tx
+			if (now <= user.periodEnd) {
+				// accumulated amount plus the amount to be transferred exceeds the allowed amount
+				if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
+					invalid = true;
+					reason = "A8 - spending limit for this period reached";
+				} else {
+					// accumulated amount plus the amount to be transferred does not exceed the allowed amount
+					// increase accumulated amount and leave periodEnd
+					user.amount = user.amount.add(value);
+				}
+			} else {
+				// period ended, no tx in the relevant timeperiod
+				if (value > _spendinglimits[i].amountAllowed) {
+					invalid = true;
+					reason = "A8 - spending limit for this period reached";
+				} else {
+					user.amount = value;
+					user.periodEnd = _spendinglimits[i].periodLength.add(now);
+				}
+			}
+		}
 
-    function setTimelock (uint256 index, uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor{
-        require(_spendinglimits.length > index, 'out of bounds');
-        _spendinglimits[index] = SpendingLimit(periodLength, amountAllowed);
-    }
+		return (!invalid, reason);
+	}
 
-    function deleteTimelock (uint256 index) public onlySpendingLimitsEditor{
-        require(_spendinglimits.length > index, 'out of bounds');
-        _spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
-        _spendinglimits.pop();
-    }
+	// VIEW
 
+	function validateTransfer(
+		address, /* msg_sender */
+		bytes32, /* partition */
+		address, /* operator */
+		address from,
+		address, /* to */
+		uint256 value,
+		bytes memory, /* data */
+		bytes memory /* operatorData */
+	)
+		public
+		override
+		view
+		returns (
+			// we start with false here to save gas and negate it before returning --> (!invalid)
+			bool invalid,
+			bytes1 code,
+			bytes32 extradata,
+			string memory reason
+		)
+	{
+		// if any of the timelocks are violated, valid is set to false
+		for (uint256 i = 0; i < _spendinglimits.length; i++) {
+			User storage user = _ATU[from][i];
 
-    function executeTransfer(
-        address /* msg_sender */,
-        bytes32 /* partition */,
-        address /* operator */,
-        address from,
-        address /* to */,
-        uint256 value,
-        bytes memory /* data */,
-        bytes memory /* operatorData */
-    )
-    public
-    override
-    returns (
-        // we start with false here to save gas and negate it before returning --> (!invalid)
-        bool invalid,
-        string memory reason
-    )
-    {
+			// period has not ended => there has been at least 1 tx
+			if (now <= user.periodEnd) {
+				// accumulated amount plus the amount to be transferred exceeds the allowed amount
+				if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
+					invalid = true;
+					reason = "spending limit for this period reached";
+					code = hex"A8";
+				} else {
+					// accumulated amount plus the amount to be transferred does not exceed the allowed amount
+					// increase accumulated amount and leave periodEnd
 
-        // if any of the timelocks are violated, valid is set to false
-        for (uint i = 0; i < _spendinglimits.length; i++) {
+					// INFO no record keeping for view
+					// user.amount = user.amount.add(value);
+					this;
+				}
+			} else {
+				// period ended => no tx in the relevant timeperiod
+				if (value > _spendinglimits[i].amountAllowed) {
+					invalid = true;
+					reason = "spending limit for this period reached";
+					code = hex"A8";
+				} else {
+					// INFO no record keeping for view
+					// user.amount = value;
+					// user.periodEnd = _spendinglimits[i].periodLength.add(now);
+					this;
+				}
+			}
+		}
 
-            User storage user = _ATU[from][i];
+		return (!invalid, code, extradata, reason);
+	}
 
-            // period has not ended => there has been at least 1 tx
-            if(now <= user.periodEnd) {
-
-                // accumulated amount plus the amount to be transferred exceeds the allowed amount
-                if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
-                    invalid = true;
-                    reason = 'A8 - spending limit for this period reached';
-                }
-
-                // accumulated amount plus the amount to be transferred does not exceed the allowed amount
-                else {
-                    // increase accumulated amount and leave periodEnd
-                    user.amount = user.amount.add(value);
-                }
-            }
-
-            // period ended => no tx in the relevant timeperiod
-            else {
-                if (value > _spendinglimits[i].amountAllowed) {
-                    invalid = true;
-                    reason = 'A8 - spending limit for this period reached';
-                }
-
-                else {
-                    user.amount = value;
-                    user.periodEnd = _spendinglimits[i].periodLength.add(now);
-                }
-            }
-        }
-
-        return (!invalid, reason);
-    }
-
-
-
-    // VIEW
-
-    function validateTransfer(
-        address /* msg_sender */,
-        bytes32 /* partition */,
-        address /* operator */,
-        address from,
-        address /* to */,
-        uint256 value,
-        bytes memory /* data */,
-        bytes memory /* operatorData */
-    )
-    public
-    view
-    override
-    returns (
-        // we start with false here to save gas and negate it before returning --> (!invalid)
-        bool invalid,
-        byte code,
-        bytes32 extradata,
-        string memory reason
-    )
-    {
-
-        // if any of the timelocks are violated, valid is set to false
-        for (uint i = 0; i < _spendinglimits.length; i++) {
-
-            User storage user = _ATU[from][i];
-
-            // period has not ended => there has been at least 1 tx
-            if(now <= user.periodEnd) {
-
-                // accumulated amount plus the amount to be transferred exceeds the allowed amount
-                if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
-                    invalid = true;
-                    reason = 'spending limit for this period reached';
-                    code = hex'A8';
-                }
-
-                // accumulated amount plus the amount to be transferred does not exceed the allowed amount
-                else {
-                    // increase accumulated amount and leave periodEnd
-
-                    // INFO no record keeping for view
-                    // user.amount = user.amount.add(value);
-                    this;
-                }
-            }
-
-            // period ended => no tx in the relevant timeperiod
-            else {
-                if (value > _spendinglimits[i].amountAllowed) {
-                    invalid = true;
-                    reason = 'spending limit for this period reached';
-                    code = hex'A8';
-                }
-
-                else {
-                    // INFO no record keeping for view
-                    // user.amount = value;
-                    // user.periodEnd = _spendinglimits[i].periodLength.add(now);
-                    this;
-                }
-            }
-        }
-
-        return (!invalid, code, extradata, reason);
-    }
-
-    function getModuleName() public override view returns (bytes32) {
-        return _module_name;
-    }
+	function getModuleName() public override view returns (bytes32) {
+		return _module_name;
+	}
 }

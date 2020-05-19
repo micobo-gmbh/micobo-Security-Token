@@ -18,6 +18,19 @@
 		"size": "truffle compile --all && truffle exec scripts/check-size.js",
 		"solcover": "truffle run coverage --temp /build/solcover --network development"
 	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.js": [
+			"prettier --write"
+		],
+		"*.sol": [
+			"prettier --write"
+		]
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@gitlab.com/micoboteam/security-token.git"
@@ -28,14 +41,14 @@
 		"url": "https://gitlab.com:micoboteam/security-token/issues"
 	},
 	"prettier": {
-		"singleQuote": true,
-    "useTabs": true,
-    "tabWidth": 4,
-    "semi": false,
-    "printWidth": 80,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "arrowParens": "always"
+		"singleQuote": false,
+		"useTabs": true,
+		"tabWidth": 4,
+		"semi": false,
+		"printWidth": 120,
+		"trailingComma": "es5",
+		"bracketSpacing": true,
+		"arrowParens": "always"
 	},
 	"homepage": "",
 	"dependencies": {
@@ -55,6 +68,10 @@
 		"web3": "^1.2.7"
 	},
 	"devDependencies": {
+		"husky": "^4.2.5",
+		"lint-staged": "^10.2.4",
+		"prettier": "^2.0.5",
+		"prettier-plugin-solidity": "^1.0.0-alpha.51",
 		"truffle": "5.1.20"
 	}
 }

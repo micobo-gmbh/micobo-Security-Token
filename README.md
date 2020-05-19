@@ -1,11 +1,10 @@
 # micobo Security Token
 
-
 ## Setup
 
-1. Solidity  
+1. Solidity
 
-we use `solc` binary, for manual compilation, since `solcjs` npm module throws  error ("File import callback not supported")
+we use `solc` binary, for manual compilation, since `solcjs` npm module throws error ("File import callback not supported")
 
 [Install the binary here](https://solidity.readthedocs.io/en/latest/installing-solidity.html)  
 look for the brew installation
@@ -18,25 +17,25 @@ You need truffle installed globally
 
 We implement ERC1400Partition.  
 We implement ERC20 with default partitions.  
-We implement ERC20 as proxies for specific partitions.  
+We implement ERC20 as proxies for specific partitions.
 
 We don't implement operator and transfer functionality of ERC1400Raw.  
-We don't implement ERC777.  
+We don't implement ERC777.
 
 #
+
 ## Tests
 
-All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.  
+All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.
 
 The tests are kept as atomic (specific) and autonomous as possible.  
 Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
 
-- Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
+-   Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
 
+*   Also make sure that **Ganache** is running on port `:8545`
 
-- Also make sure that **Ganache** is running on port `:8545`
-
-- **GSN_Relayer**: If you test GSN functionality, also run the dev-relayer:
+*   **GSN_Relayer**: If you test GSN functionality, also run the dev-relayer:
     ```
     npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
     ```
@@ -49,7 +48,7 @@ Use the test script to run all tests:
 
 ## Gas report
 
-Gas report is configured by default in `truffle-config.js`  
+Gas report is configured by default in `truffle-config.js`
 
 It can be configured here:
 
@@ -64,38 +63,38 @@ It can be configured here:
     }
 
 #
+
 ## Code Coverage
 
-Stop you local blockchain and start the coverage plugin with: 
+Stop you local blockchain and start the coverage plugin with:
 
     truffle run coverage --temp /build/solcover --network development
 
-_(also run the GSN relayer if you don't want GSN tests to fail)_  
+_(also run the GSN relayer if you don't want GSN tests to fail)_
 
-For specific files, add 
+For specific files, add
 
     --file="test/10_spendingLimitTests.js"
-
 
 [solidity-coverage package on npm](https://www.npmjs.com/package/solidity-coverage#config-options)
 
 #
+
 ## Deployment
 
-Edit the ``token-config.json`` file to set token **name**, **symbol** and **cap** etc.
+Edit the `token-config.json` file to set token **name**, **symbol** and **cap** etc.
 
 Use the deploy script to deploy all contracts on local testnet (localhost:8454):
 
     npm run deploy
 
 #
+
 ## Architecture
 
 ![architecture](resources/security_token.png "Architecture")
 
 #
-
-
 
 ## Constrainable
 
@@ -103,14 +102,13 @@ Constraint Modules can be set to implement any kind of on-chain checks.
 
 ![roles](resources/modular-constraints.png "Roles")
 
-
 These are constraints modules that already exist, but you can write your own,  
 as long as the implement the `IConstraintModule.sol` interface!
 
 I.e., the off-chain validation module checks for the signature of an offline validator in the transactions extra data.
 
-
 #
+
 ## Administrable.sol
 
 Roles can be **added** and **removed** by the `ADMIN`
@@ -121,13 +119,14 @@ This is and overview of roles that can be used.
 ![roles](resources/CommonRoles.png "Roles")
 
 #
+
 ## Cap
 
 There is 1 overall cap for the whole token (`_cap`)
 
 It is set during deployment in the constructor.
 
-Get cap with `cap()`  
+Get cap with `cap()`
 
 When `CAP_EDITOR`, use `setCap(uint256 newCap)` to set to new value.  
 The new cap must always be greater than the old one!
@@ -137,13 +136,14 @@ The new cap must always be greater than the old one!
 When using `issueByPartition` or `bulkIssueByPartition`,  
 the issued value must not exceed `_cap`
 
-
 #
+
 ## Gas Consumption
 
 TODO
 
-#  
+#
+
 ## Free Transactions
 
 **Gas Station Network (GSN)**
@@ -156,8 +156,8 @@ The GSN Module can be configured even after the token is deployed.
 
 GSN can also be turned off completely!
 
-
 #
+
 # Explanations
 
 ## Admin
@@ -181,8 +181,9 @@ Operators can transfer tokens on behalf of users that authorized them to do so u
 Users can authorize addresses to transfer tokens on their behalf on a "by partition"-basis.  
 This authorization can be revoked at any time.
 
-
 #
+
 #### Diagrams
+
 All diagrams were made with the free software [draw.io](draw.io)  
 Simply open the corresponding XML file in the editor and export into JPEG to update any diagram.

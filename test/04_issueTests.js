@@ -1,10 +1,10 @@
-const truffleAssert = require('truffle-assertions')
-const MicoboSecurityToken = artifacts.require('SecurityToken')
+const truffleAssert = require("truffle-assertions")
+const MicoboSecurityToken = artifacts.require("SecurityToken")
 
-const { Role } = require('./Constants')
-const { conf } = require('../token-config')
+const { Role } = require("./Constants")
+const { conf } = require("../token-config")
 
-contract('Test Issuing and Cap', async (accounts) => {
+contract("Test Issuing and Cap", async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -17,68 +17,42 @@ contract('Test Issuing and Cap', async (accounts) => {
 		}
 	})
 
-	it('can get and set cap', async () => {
-		assert.deepEqual(
-			(await contracts.micoboSecurityToken.cap()).toNumber(),
-			conf.standardCap
-		)
+	it("can get and set cap", async () => {
+		assert.deepEqual((await contracts.micoboSecurityToken.cap()).toNumber(), conf.standardCap)
 
 		// not cap editor
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setCap(conf.standardCap - -100)
-		)
+		await truffleAssert.fails(contracts.micoboSecurityToken.setCap(conf.standardCap - -100))
 
 		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
 
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setCap(conf.standardCap - -100)
-		)
+		await truffleAssert.passes(contracts.micoboSecurityToken.setCap(conf.standardCap - -100))
 
-		assert.deepEqual(
-			(await contracts.micoboSecurityToken.cap()).toNumber(),
-			conf.standardCap - -100
-		)
+		assert.deepEqual((await contracts.micoboSecurityToken.cap()).toNumber(), conf.standardCap - -100)
 	})
 
-	it('mints tokens to test addresses if minter', async () => {
+	it("mints tokens to test addresses if minter", async () => {
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.issueByPartition(
-				conf.standardPartition,
-				accounts[1],
-				value,
-				'0x0'
-			)
+			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value, "0x0")
 		)
 
 		await contracts.micoboSecurityToken.removeRole(Role.ISSUER, accounts[0])
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.issueByPartition(
-				conf.standardPartition,
-				accounts[1],
-				value,
-				'0x0'
-			)
+			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value, "0x0")
 		)
 
 		let balance = (
-			await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[1]
-			)
+			await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[1])
 		).toNumber()
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.totalPartitions(),
-			[conf.standardPartition]
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [conf.standardPartition])
 
 		// console.log("balance: ", balance);
 
 		assert.deepEqual(balance, value)
 	})
 
-	it('cannot mint more than cap', async () => {
+	it("cannot mint more than cap", async () => {
 		await contracts.micoboSecurityToken.addRole(Role.ISSUER, accounts[0])
 
 		await truffleAssert.fails(
@@ -86,50 +60,41 @@ contract('Test Issuing and Cap', async (accounts) => {
 				conf.standardPartition,
 				accounts[0],
 				conf.standardCap + 1,
-				'0x0'
+				"0x0"
 			)
 		)
 	})
 
-	it('can mint in bulk', async () => {
+	it("can mint in bulk", async () => {
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.bulkIssueByPartition(
 				conf.standardPartition,
 				[accounts[0], accounts[1], accounts[2]],
 				[10, 20, 30],
-				'0x0'
+				"0x0"
 			)
 		)
 
 		let balance1 = (
-			await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[0]
-			)
+			await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[0])
 		).toNumber()
 
 		assert.deepEqual(balance1, 10)
 
 		let balance2 = (
-			await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[1]
-			)
+			await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[1])
 		).toNumber()
 
 		assert.deepEqual(balance2, value - -20)
 
 		let balance3 = (
-			await contracts.micoboSecurityToken.balanceOfByPartition(
-				conf.standardPartition,
-				accounts[2]
-			)
+			await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[2])
 		).toNumber()
 
 		assert.deepEqual(balance3, 30)
 	})
 
-	it('can mint multiple times in bulk', async () => {
+	it("can mint multiple times in bulk", async () => {
 		var tokenHolders = []
 		var values = []
 
@@ -141,16 +106,11 @@ contract('Test Issuing and Cap', async (accounts) => {
 		}
 
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.bulkIssueByPartition(
-				conf.standardPartition,
-				tokenHolders,
-				values,
-				'0x0'
-			)
+			contracts.micoboSecurityToken.bulkIssueByPartition(conf.standardPartition, tokenHolders, values, "0x0")
 		)
 	})
 
-	it('cannot submit different array lengths', async () => {
+	it("cannot submit different array lengths", async () => {
 		var tokenHolders = []
 		var values = []
 
@@ -159,18 +119,13 @@ contract('Test Issuing and Cap', async (accounts) => {
 		values.push(10)
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.bulkIssueByPartition(
-				conf.standardPartition,
-				tokenHolders,
-				values,
-				'0x0'
-			),
-			'revert',
-			'must be same length'
+			contracts.micoboSecurityToken.bulkIssueByPartition(conf.standardPartition, tokenHolders, values, "0x0"),
+			"revert",
+			"must be same length"
 		)
 	})
 
-	it('cannot exceed cap', async () => {
+	it("cannot exceed cap", async () => {
 		// should be just too much for the partition
 		var capFraction = (conf.standardCap / 40).toFixed(0) + 2
 
@@ -185,14 +140,9 @@ contract('Test Issuing and Cap', async (accounts) => {
 		}
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.bulkIssueByPartition(
-				conf.standardPartition,
-				tokenHolders,
-				values,
-				'0x0'
-			),
-			'revert',
-			'would exceed cap'
+			contracts.micoboSecurityToken.bulkIssueByPartition(conf.standardPartition, tokenHolders, values, "0x0"),
+			"revert",
+			"would exceed cap"
 		)
 	})
 })

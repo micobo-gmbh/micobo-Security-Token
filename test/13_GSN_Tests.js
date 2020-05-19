@@ -1,16 +1,11 @@
-const truffleAssert = require('truffle-assertions')
-const { conf } = require('../token-config')
-const { Role } = require('./Constants')
-const MicoboSecurityToken = artifacts.require('SecurityToken')
-const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
-const GSNModule = artifacts.require('GSNModule')
+const truffleAssert = require("truffle-assertions")
+const { conf } = require("../token-config")
+const { Role } = require("./Constants")
+const MicoboSecurityToken = artifacts.require("SecurityToken")
+const SecurityTokenPartition = artifacts.require("SecurityTokenPartition")
+const GSNModule = artifacts.require("GSNModule")
 
-const {
-	deployRelayHub,
-	runRelayer,
-	fundRecipient,
-	registerRelay,
-} = require('@openzeppelin/gsn-helpers')
+const { deployRelayHub, runRelayer, fundRecipient, registerRelay } = require("@openzeppelin/gsn-helpers")
 
 const GSNMode = {
 	ALL: 0,
@@ -18,7 +13,7 @@ const GSNMode = {
 	NONE: 2,
 }
 
-contract('Test GSN functionality', async (accounts) => {
+contract("Test GSN functionality", async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -33,7 +28,7 @@ contract('Test GSN functionality', async (accounts) => {
 		}
 
 		// deploy proxy
-		contracts['securityTokenPartition'] = await SecurityTokenPartition.new(
+		contracts["securityTokenPartition"] = await SecurityTokenPartition.new(
 			contracts.micoboSecurityToken.address,
 			conf.standardPartition
 		)
@@ -69,76 +64,50 @@ contract('Test GSN functionality', async (accounts) => {
 		}
 
 		// mint some new tokens to test with
-		await contracts.micoboSecurityToken.issueByPartition(
-			conf.standardPartition,
-			accounts[0],
-			value * 3,
-			'0x0'
-		)
+		await contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], value * 3, "0x0")
 	})
 
-	it('can read relayHub version', async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.relayHubVersion(),
-			'1.0.0'
-		)
+	it("can read relayHub version", async () => {
+		assert.deepEqual(await contracts.micoboSecurityToken.relayHubVersion(), "1.0.0")
 	})
 
-	it('can add a role over GSN', async () => {
+	it("can add a role over GSN", async () => {
 		// Sends the transaction via the GSN
 
-		let tx = await contracts.micoboSecurityToken.addRole(
-			Role.ADMIN,
-			accounts[1],
-			{
-				from: accounts[0],
-				useGSN: true,
-				gas: 104310,
-				gasPrice: 20000000000,
-			}
-		)
-		console.log(tx['tx'])
+		let tx = await contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1], {
+			from: accounts[0],
+			useGSN: true,
+			gas: 104310,
+			gasPrice: 20000000000,
+		})
+		console.log(tx["tx"])
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
-			true
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]), true)
 	})
 
-	it('can transfer tokens for free', async () => {
+	it("can transfer tokens for free", async () => {
 		await transferWithGSN()
 	})
 
-	it('can transfer using proxy and GSN', async () => {
-		const balance = (
-			await contracts.securityTokenPartition.balanceOf(accounts[1])
-		).toNumber()
+	it("can transfer using proxy and GSN", async () => {
+		const balance = (await contracts.securityTokenPartition.balanceOf(accounts[1])).toNumber()
 
 		// Sends the transaction via the GSN
 
-		let tx = await contracts.securityTokenPartition.transfer(
-			accounts[1],
-			value,
-			{
-				from: accounts[0],
-				useGSN: true,
-				gas: 192366, // 92366
-				gasPrice: 20000000000,
-			}
-		)
-		console.log(tx['tx'])
+		let tx = await contracts.securityTokenPartition.transfer(accounts[1], value, {
+			from: accounts[0],
+			useGSN: true,
+			gas: 192366, // 92366
+			gasPrice: 20000000000,
+		})
+		console.log(tx["tx"])
 
 		// console.log(balance)
 
-		assert.deepEqual(
-			(
-				await contracts.securityTokenPartition.balanceOf(accounts[1])
-			).toNumber(),
-			balance + value
-		)
+		assert.deepEqual((await contracts.securityTokenPartition.balanceOf(accounts[1])).toNumber(), balance + value)
 	})
 
-	it('cannot deactivate GSN if not GSN_CONTROLLER', async () => {
+	it("cannot deactivate GSN if not GSN_CONTROLLER", async () => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
 				from: accounts[0],
@@ -146,7 +115,7 @@ contract('Test GSN functionality', async (accounts) => {
 		)
 	})
 
-	it('cannot deactivate GSN if not GSN_CONTROLLER in PartitionProxy', async () => {
+	it("cannot deactivate GSN if not GSN_CONTROLLER in PartitionProxy", async () => {
 		await truffleAssert.fails(
 			contracts.securityTokenPartition.setGSNMode(GSNMode.NONE, {
 				from: accounts[0],
@@ -154,11 +123,8 @@ contract('Test GSN functionality', async (accounts) => {
 		)
 	})
 
-	it('can deactivate GSN if GSN_CONTROLLER', async () => {
-		await contracts.micoboSecurityToken.addRole(
-			Role.GSN_CONTROLLER,
-			accounts[0]
-		)
+	it("can deactivate GSN if GSN_CONTROLLER", async () => {
+		await contracts.micoboSecurityToken.addRole(Role.GSN_CONTROLLER, accounts[0])
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
@@ -167,7 +133,7 @@ contract('Test GSN functionality', async (accounts) => {
 		)
 	})
 
-	it('can deactivate GSN if GSN_CONTROLLER in PartitionProxy', async () => {
+	it("can deactivate GSN if GSN_CONTROLLER in PartitionProxy", async () => {
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.setGSNMode(GSNMode.NONE, {
 				from: accounts[0],
@@ -175,7 +141,7 @@ contract('Test GSN functionality', async (accounts) => {
 		)
 	})
 
-	it('cannot add a role over GSN if deactivated', async () => {
+	it("cannot add a role over GSN if deactivated", async () => {
 		await contracts.micoboSecurityToken.setGSNMode(GSNMode.NONE, {
 			from: accounts[0],
 		})
@@ -190,28 +156,23 @@ contract('Test GSN functionality', async (accounts) => {
 			})
 		)
 
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[2]),
-			false
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[2]), false)
 	})
 
-	it('can set and use GSN Module', async () => {
+	it("can set and use GSN Module", async () => {
 		await contracts.micoboSecurityToken.setGSNMode(GSNMode.MODULE, {
 			from: accounts[0],
 		})
 
 		let gsnModule = await GSNModule.new()
 
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setGSNModule(gsnModule.address)
-		)
+		await truffleAssert.passes(contracts.micoboSecurityToken.setGSNModule(gsnModule.address))
 
 		await transferWithGSN()
 	})
 
-	it('can upgrade relay hub', async () => {
-		const newHub = '0x09226Fc4a70ff15Ed2E6aaa8eb37702122633d6A' //random address
+	it("can upgrade relay hub", async () => {
+		const newHub = "0x09226Fc4a70ff15Ed2E6aaa8eb37702122633d6A" //random address
 		await contracts.micoboSecurityToken.upgradeRelayHub(newHub)
 
 		assert.deepEqual(await contracts.micoboSecurityToken.getHubAddr(), newHub)
@@ -219,22 +180,15 @@ contract('Test GSN functionality', async (accounts) => {
 		await contracts.micoboSecurityToken.upgradeRelayHub(relayHub)
 	})
 
-	it('can withdraw deposit', async () => {
+	it("can withdraw deposit", async () => {
 		// using account 1 so that gas consumption does not change eth balance of account 0
-		await contracts.micoboSecurityToken.addRole(
-			Role.GSN_CONTROLLER,
-			accounts[1]
-		)
+		await contracts.micoboSecurityToken.addRole(Role.GSN_CONTROLLER, accounts[1])
 
 		const balance = await web3.eth.getBalance(accounts[0])
 
 		console.log(balance)
 
-		let tx = await contracts.micoboSecurityToken.withdrawDeposits(
-			1000,
-			accounts[0],
-			{ from: accounts[1] }
-		)
+		let tx = await contracts.micoboSecurityToken.withdrawDeposits(1000, accounts[0], { from: accounts[1] })
 
 		// console.log(tx)
 
@@ -262,7 +216,7 @@ contract('Test GSN functionality', async (accounts) => {
 			conf.standardPartition,
 			accounts[1],
 			value,
-			'0x0',
+			"0x0",
 			{
 				from: accounts[0],
 				useGSN: true,
@@ -270,26 +224,16 @@ contract('Test GSN functionality', async (accounts) => {
 				gasPrice: 20000000000,
 			}
 		)
-		console.log(tx['tx'])
+		console.log(tx["tx"])
 
 		// tokens have been transferred
 		assert.deepEqual(
-			(
-				await contracts.micoboSecurityToken.balanceOfByPartition(
-					conf.standardPartition,
-					accounts[0]
-				)
-			).toNumber(),
+			(await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[0])).toNumber(),
 			tokenBalance0 - value
 		)
 
 		assert.deepEqual(
-			(
-				await contracts.micoboSecurityToken.balanceOfByPartition(
-					conf.standardPartition,
-					accounts[1]
-				)
-			).toNumber(),
+			(await contracts.micoboSecurityToken.balanceOfByPartition(conf.standardPartition, accounts[1])).toNumber(),
 			tokenBalance1 - -value
 		)
 

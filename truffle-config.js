@@ -18,13 +18,13 @@
  *
  */
 
-const HDWalletProvider = require('@truffle/hdwallet-provider')
-const { GSNProvider } = require('@openzeppelin/gsn-provider')
+const HDWalletProvider = require("@truffle/hdwallet-provider")
+const { GSNProvider } = require("@openzeppelin/gsn-provider")
 
 // const infuraKey = "fj4jll3k.....";
 
-const fs = require('fs')
-const mnemonic = fs.readFileSync('.mnemonic').toString().trim()
+const fs = require("fs")
+const mnemonic = fs.readFileSync(".mnemonic").toString().trim()
 
 module.exports = {
 	/**
@@ -46,21 +46,18 @@ module.exports = {
 
 		development: {
 			provider: () => {
-				return new GSNProvider('http://localhost:8545', {
+				return new GSNProvider("http://localhost:8545", {
 					// we set default to false here and use it explicitly when needed
 					useGSN: false,
 				})
 			},
 			port: 8545,
-			network_id: '*',
+			network_id: "*",
 		},
 
 		rinkeby: {
 			provider: () => {
-				return new HDWalletProvider(
-					mnemonic,
-					'https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af'
-				)
+				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
 			},
 			network_id: 4,
 			gas: 10000000, // 10.000.000
@@ -90,18 +87,18 @@ module.exports = {
 
 	// Set default mocha options here, use special reporters etc.
 	mocha: {
-		reporter: 'eth-gas-reporter',
+		reporter: "eth-gas-reporter",
 		reporterOptions: {
-			currency: 'EUR',
+			currency: "EUR",
 			gasPrice: 2,
-			url: 'http://localhost:8545',
+			url: "http://localhost:8545",
 		},
 	},
 
 	// Configure your compilers
 	compilers: {
 		solc: {
-			version: '0.6.6', // Version truffle should use, default: truffle's internal version
+			version: "0.6.6", // Version truffle should use, default: truffle's internal version
 			docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {
 				// See the solidity docs for advice about optimization and evmVersion
@@ -109,10 +106,10 @@ module.exports = {
 					enabled: true,
 					runs: 4096, // 2^12
 				},
-				evmVersion: 'petersburg',
+				evmVersion: "petersburg",
 			},
 		},
 	},
 
-	plugins: ['truffle-security', 'solidity-coverage'],
+	plugins: ["truffle-security", "solidity-coverage"],
 }

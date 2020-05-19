@@ -1,14 +1,12 @@
-const truffleAssert = require('truffle-assertions')
-const MicoboSecurityToken = artifacts.require('SecurityToken')
+const truffleAssert = require("truffle-assertions")
+const MicoboSecurityToken = artifacts.require("SecurityToken")
 
-const { conf } = require('../token-config')
-const { Role, Module } = require('./Constants')
+const { conf } = require("../token-config")
+const { Role, Module } = require("./Constants")
 
-const SpendingLimitsConstraintModule = artifacts.require(
-	'SpendingLimitsConstraintModule'
-)
+const SpendingLimitsConstraintModule = artifacts.require("SpendingLimitsConstraintModule")
 
-contract('Test Spending Limits', async (accounts) => {
+contract("Test Spending Limits", async (accounts) => {
 	let day = 86400
 
 	let value = 1000
@@ -27,76 +25,42 @@ contract('Test Spending Limits', async (accounts) => {
 		}
 
 		// mint some new tokens to test with
-		await contracts.micoboSecurityToken.issueByPartition(
-			conf.standardPartition,
-			accounts[0],
-			value,
-			'0x0'
-		)
+		await contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], value, "0x0")
 
-		await contracts.micoboSecurityToken.issueByPartition(
-			conf.standardPartition,
-			accounts[1],
-			value,
-			'0x0'
-		)
+		await contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value, "0x0")
 	})
 
-	it('deploy SpendingLimitsConstraintModule', async () => {
-		spendingLimitsConstraintModule = await SpendingLimitsConstraintModule.new(
-			contracts.micoboSecurityToken.address
-		)
+	it("deploy SpendingLimitsConstraintModule", async () => {
+		spendingLimitsConstraintModule = await SpendingLimitsConstraintModule.new(contracts.micoboSecurityToken.address)
 	})
 
-	it('register SpendingLimitsConstraintModule', async () => {
+	it("register SpendingLimitsConstraintModule", async () => {
 		// can set module
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModulesByPartition(
-				conf.standardPartition,
-				[spendingLimitsConstraintModule.address]
-			)
+			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
+				spendingLimitsConstraintModule.address,
+			])
 		)
 	})
 
-	it('can add spending limit when editor', async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(
-				Role.SPENDING_LIMITS_EDITOR,
-				accounts[0]
-			),
-			false
-		)
+	it("can add spending limit when editor", async () => {
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.SPENDING_LIMITS_EDITOR, accounts[0]), false)
 
 		// cannot add timelock yet
-		await truffleAssert.fails(
-			spendingLimitsConstraintModule.addTimelock(day, 100)
-		)
+		await truffleAssert.fails(spendingLimitsConstraintModule.addTimelock(day, 100))
 
 		// add role
-		await contracts.micoboSecurityToken.addRole(
-			Role.SPENDING_LIMITS_EDITOR,
-			accounts[0]
-		)
+		await contracts.micoboSecurityToken.addRole(Role.SPENDING_LIMITS_EDITOR, accounts[0])
 
 		// now it can add timelock
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.addTimelock(day, 100)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.addTimelock(day, 100))
 
 		// and another one
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.addTimelock(day * 2, 200)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.addTimelock(day * 2, 200))
 	})
 
-	it('can set spending limit when editor', async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(
-				Role.SPENDING_LIMITS_EDITOR,
-				accounts[0]
-			),
-			true
-		)
+	it("can set spending limit when editor", async () => {
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.SPENDING_LIMITS_EDITOR, accounts[0]), true)
 
 		// cannot update if not editor
 		await truffleAssert.fails(
@@ -106,24 +70,14 @@ contract('Test Spending Limits', async (accounts) => {
 		)
 
 		// can update the 2nd timelock
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.setTimelock(1, day * 7, 700)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.setTimelock(1, day * 7, 700))
 
 		// cannot update non-existing 3rd timelock entry
-		await truffleAssert.fails(
-			spendingLimitsConstraintModule.setTimelock(2, day * 7, 700)
-		)
+		await truffleAssert.fails(spendingLimitsConstraintModule.setTimelock(2, day * 7, 700))
 	})
 
-	it('can delete spending limit when editor', async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(
-				Role.SPENDING_LIMITS_EDITOR,
-				accounts[0]
-			),
-			true
-		)
+	it("can delete spending limit when editor", async () => {
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.SPENDING_LIMITS_EDITOR, accounts[0]), true)
 
 		// cannot delete if not editor
 		await truffleAssert.fails(
@@ -142,111 +96,83 @@ contract('Test Spending Limits', async (accounts) => {
 		await truffleAssert.passes(spendingLimitsConstraintModule.deleteTimelock(0))
 	})
 
-	it('can transfer according to limits', async () => {
+	it("can transfer according to limits", async () => {
 		// add new timelock of 10 seconds and 100
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.addTimelock(10, 100)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.addTimelock(10, 100))
 
 		// cannot transfer 110
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				110,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 110, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// can transfer 80
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				80,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 80, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// can transfer another 10
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				10,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 10, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// cannot transfer 80 again
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				80,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 80, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		await sleep(11000)
 
 		// can transfer 80 again
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				80,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 80, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// delete 1st timelock entry
 		await spendingLimitsConstraintModule.deleteTimelock(0)
 	})
 
-	it('can CANtransfer according to limits', async () => {
+	it("can CANtransfer according to limits", async () => {
 		await sleep(11000)
 
 		// add new timelock of 10 seconds and 100
-		await truffleAssert.passes(
-			spendingLimitsConstraintModule.addTimelock(10, 100)
-		)
+		await truffleAssert.passes(spendingLimitsConstraintModule.addTimelock(10, 100))
 
 		// cannot transfer 110
 		let res = await contracts.micoboSecurityToken.canTransferByPartition(
 			conf.standardPartition,
 			accounts[1],
 			110,
-			'0x0',
+			"0x0",
 			{ from: accounts[0] }
 		)
 		// console.log(res)
-		assert.deepEqual(res['0'], '0xa8')
+		assert.deepEqual(res["0"], "0xa8")
 
 		// can transfer 80
 		res = await contracts.micoboSecurityToken.canTransferByPartition(
 			conf.standardPartition,
 			accounts[1],
 			80,
-			'0x0',
+			"0x0",
 			{ from: accounts[0] }
 		)
-		assert.deepEqual(res['0'], '0xa2')
+		assert.deepEqual(res["0"], "0xa2")
 
 		//actually do transfer
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				80,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 80, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// can transfer another 10
@@ -254,20 +180,16 @@ contract('Test Spending Limits', async (accounts) => {
 			conf.standardPartition,
 			accounts[1],
 			10,
-			'0x0',
+			"0x0",
 			{ from: accounts[0] }
 		)
-		assert.deepEqual(res['0'], '0xa2')
+		assert.deepEqual(res["0"], "0xa2")
 
 		//actually do transfer
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				10,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 10, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// cannot transfer 80 again
@@ -275,22 +197,18 @@ contract('Test Spending Limits', async (accounts) => {
 			conf.standardPartition,
 			accounts[1],
 			80,
-			'0x0',
+			"0x0",
 			{ from: accounts[0] }
 		)
-		assert.deepEqual(res['0'], '0xa8')
+		assert.deepEqual(res["0"], "0xa8")
 
 		await sleep(11000)
 
 		//do transfer to update blocktime
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				10,
-				'0x0',
-				{ from: accounts[0] }
-			)
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 10, "0x0", {
+				from: accounts[0],
+			})
 		)
 
 		// can transfer 80 again
@@ -298,16 +216,13 @@ contract('Test Spending Limits', async (accounts) => {
 			conf.standardPartition,
 			accounts[1],
 			80,
-			'0x0',
+			"0x0",
 			{ from: accounts[0] }
 		)
-		assert.deepEqual(res['0'], '0xa2')
+		assert.deepEqual(res["0"], "0xa2")
 	})
 
-	it('gets correct module name', async () => {
-		assert.deepEqual(
-			await spendingLimitsConstraintModule.getModuleName(),
-			Module.SPENDING_LIMIT
-		)
+	it("gets correct module name", async () => {
+		assert.deepEqual(await spendingLimitsConstraintModule.getModuleName(), Module.SPENDING_LIMIT)
 	})
 })
