@@ -1,50 +1,60 @@
 {
-  "name": "security-token",
-  "version": "0.2.0",
-  "description": "micobo security token",
-  "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "truffle test",
-    "deploy": "truffle migrate --reset",
-    "compile-token": "solcjs --abi --hashes --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
-    "compile-vesting": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/constraints/VestingPeriodConstraintModule.sol",
-    "compile-constraints": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
-    "abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
-    "abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
-    "abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",
-    "size": "truffle compile --all && truffle exec scripts/check-size.js",
-    "solcover": "truffle run coverage --temp /build/solcover --network development"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@gitlab.com/micoboteam/security-token.git"
-  },
-  "author": "Simon Dosch",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com:micoboteam/security-token/issues"
-  },
-  "homepage": "",
-  "dependencies": {
-    "@codechecks/client": "^0.1.10",
-    "@openzeppelin/contracts": "^3.0.0",
-    "@openzeppelin/gsn-helpers": "^0.2.3",
-    "@openzeppelin/gsn-provider": "^0.1.10",
-    "@truffle/hdwallet-provider": "^1.0.21",
-    "acorn": "^7.1.1",
-    "eth-gas-reporter": "^0.2.17",
-    "erc1820": "0.0.2",
-    "solc": "0.6.6",
-    "solidity-coverage": "0.7.5",
-    "truffle-assertions": "^0.9.1",
-    "truffle-security": "^1.7.1",
-    "typescript": "^3.6.4",
-    "web3": "^1.2.7"
-  },
-  "devDependencies": {
-    "truffle": "5.1.20"
-  }
+	"name": "security-token",
+	"version": "0.2.0",
+	"description": "micobo security token",
+	"main": "truffle-config.js",
+	"directories": {
+		"test": "test"
+	},
+	"scripts": {
+		"test": "truffle test",
+		"deploy": "truffle migrate --reset",
+		"compile-token": "solcjs --abi --hashes --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
+		"compile-vesting": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/constraints/VestingPeriodConstraintModule.sol",
+		"compile-constraints": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
+		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
+		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
+		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",
+		"size": "truffle compile --all && truffle exec scripts/check-size.js",
+		"solcover": "truffle run coverage --temp /build/solcover --network development"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@gitlab.com/micoboteam/security-token.git"
+	},
+	"author": "Simon Dosch",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://gitlab.com:micoboteam/security-token/issues"
+	},
+	"prettier": {
+		"singleQuote": true,
+    "useTabs": true,
+    "tabWidth": 4,
+    "semi": false,
+    "printWidth": 80,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "arrowParens": "always"
+	},
+	"homepage": "",
+	"dependencies": {
+		"@codechecks/client": "^0.1.10",
+		"@openzeppelin/contracts": "^3.0.0",
+		"@openzeppelin/gsn-helpers": "^0.2.3",
+		"@openzeppelin/gsn-provider": "^0.1.10",
+		"@truffle/hdwallet-provider": "^1.0.21",
+		"acorn": "^7.1.1",
+		"eth-gas-reporter": "^0.2.17",
+		"erc1820": "0.0.2",
+		"solc": "0.6.6",
+		"solidity-coverage": "0.7.5",
+		"truffle-assertions": "^0.9.1",
+		"truffle-security": "^1.7.1",
+		"typescript": "^3.6.4",
+		"web3": "^1.2.7"
+	},
+	"devDependencies": {
+		"truffle": "5.1.20"
+	}
 }
