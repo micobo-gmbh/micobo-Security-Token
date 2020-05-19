@@ -113,6 +113,15 @@ contract("Test Redeeming", async (accounts) => {
 		// make redeemer
 		await contracts.micoboSecurityToken.addRole(Role.REDEEMER, accounts[3])
 
+		// should fail because of granularity
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.redeemByPartition(conf.standardPartition, value - 1, "0x0", {
+				from: accounts[3],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"A9"
+		)
+
 		//should pass now
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.redeemByPartition(conf.standardPartition, value, "0x0", { from: accounts[3] })

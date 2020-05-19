@@ -199,5 +199,16 @@ contract("Test Admin Contract", async (accounts) => {
 				from: accounts[0],
 			})
 		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.bulkIssueByPartition(
+				conf.standardPartition,
+				[accounts[0], accounts[1], accounts[2]],
+				[10, 20, 30],
+				"0x0"
+			),
+			truffleAssert.ErrorType.REVERT,
+			"A8"
+		)
 	})
 })

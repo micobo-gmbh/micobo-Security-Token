@@ -44,6 +44,15 @@ contract("Test Deployment", async (accounts) => {
 		securityTokenPartition = await SecurityTokenPartition.new(micoboSecurityToken.address, conf.standardPartition)
 
 		// add partition
+		await truffleAssert.fails(
+			micoboSecurityToken.addPartitionProxy(conf.standardPartition, securityTokenPartition.address, {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"A7"
+		)
+
+		// add partition
 		await micoboSecurityToken.addPartitionProxy(conf.standardPartition, securityTokenPartition.address)
 
 		assert.deepEqual(await securityTokenPartition.securityTokenAddress(), micoboSecurityToken.address)

@@ -108,8 +108,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @return Requested document + document hash.
 	 */
 	function getDocument(bytes32 documentName) external override view returns (string memory, bytes32) {
-		require(bytes(_documents[documentName].docURI).length != 0, "Empty document");
-		// Action Blocked - Empty document
 		return (_documents[documentName].docURI, _documents[documentName].docHash);
 	}
 
@@ -161,8 +159,9 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes32 partition,
 		address tokenHolder,
 		uint256 value,
-		bytes calldata data // onlyMinter is taken care of in _issue function
-	) external override {
+		bytes calldata data
+	) external override // onlyMinter is taken care of in _issue function
+	{
 		require(_isIssuable, "A8");
 
 		// total cap is always the sum of all partitionCaps, so it can't be violated

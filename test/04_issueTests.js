@@ -31,6 +31,24 @@ contract("Test Issuing and Cap", async (accounts) => {
 	})
 
 	it("mints tokens to test addresses if minter", async () => {
+		// should fail because of granularity
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value - 1, "0x0"),
+			truffleAssert.ErrorType.REVERT,
+			"A9"
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.issueByPartition(
+				conf.standardPartition,
+				"0x0000000000000000000000000000000000000000",
+				value,
+				"0x0"
+			),
+			truffleAssert.ErrorType.REVERT,
+			"A6"
+		)
+
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value, "0x0")
 		)

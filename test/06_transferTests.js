@@ -24,6 +24,41 @@ contract("Test Token Transfer", async (accounts) => {
 	})
 
 	it("can send tokens", async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				"0x0000000000000000000000000000000000000000",
+				value,
+				"0x0",
+				{ from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			"A6"
+		)
+
+		// never reaches ERC1400Raw.sol:318
+		//
+		// await truffleAssert.fails(
+		// 	contracts.micoboSecurityToken.transferByPartition(
+		// 		conf.standardPartition,
+		// 		accounts[0],
+		// 		100000000000000,
+		// 		'0x0',
+		// 		{ from: accounts[1] }
+		// 	),
+		// 	truffleAssert.ErrorType.REVERT,
+		// 	'A4'
+		// )
+
+		// fails granularity test
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[0], value - 1, "0x0", {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"A9"
+		)
+
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[0], value, "0x0", {
 				from: accounts[1],
@@ -360,11 +395,27 @@ contract("Test Token Transfer", async (accounts) => {
 	})
 
 	it("can ERC1400Raw transferFrom", async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.authorizeOperator(accounts[1], {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			""
+		)
+
 		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {
 			from: accounts[1],
 		})
 
 		assert.deepEqual(await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]), true)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.revokeOperator(accounts[1], {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			""
+		)
 
 		await contracts.micoboSecurityToken.revokeOperator(accounts[2], {
 			from: accounts[1],
