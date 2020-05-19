@@ -74,6 +74,26 @@ contract('Test Admin Contract', async (accounts) => {
 		)
 	})
 
+	it('cannot use 0 addresses', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.hasRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			truffleAssert.ErrorType.REVERT,
+			"zero address"
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.addRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			truffleAssert.ErrorType.REVERT,
+			"zero address"
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.removeRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			truffleAssert.ErrorType.REVERT,
+			"zero address"
+		)
+	})
+
 	it('can renounce role', async () => {
 		// constraintsEditor
 		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[1])
