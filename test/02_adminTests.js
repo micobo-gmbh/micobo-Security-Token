@@ -28,12 +28,25 @@ contract('Test Admin Contract', async (accounts) => {
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
 			true
 		)
+		
+		// account that already has the role cannot have the same role assigned again
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1]),
+			truffleAssert.ErrorType.REVERT,
+			"account already has this role"
+		)
 
 		await contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[1])
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
 			false
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.removeRole(Role.MODULE_EDITOR, accounts[1]),
+			truffleAssert.ErrorType.REVERT,
+			"account does not have this role"
 		)
 
 		// constraintsEditor
