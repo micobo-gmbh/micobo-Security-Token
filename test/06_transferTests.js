@@ -34,6 +34,45 @@ contract('Test Token Transfer', async (accounts) => {
 	})
 
 	it('can send tokens', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				'0x0000000000000000000000000000000000000000',
+				value,
+				'0x0',
+				{ from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A6'
+		)
+
+		// never reaches ERC1400Raw.sol:318
+		//
+		// await truffleAssert.fails(
+		// 	contracts.micoboSecurityToken.transferByPartition(
+		// 		conf.standardPartition,
+		// 		accounts[0],
+		// 		100000000000000,
+		// 		'0x0',
+		// 		{ from: accounts[1] }
+		// 	),
+		// 	truffleAssert.ErrorType.REVERT,
+		// 	'A4'
+		// )
+
+		// fails granularity test
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[0],
+				value - 1,
+				'0x0',
+				{ from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A9'
+		)
+
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(
 				conf.standardPartition,
@@ -168,7 +207,10 @@ contract('Test Token Transfer', async (accounts) => {
 		)
 
 		// make controller
-		await contracts.micoboSecurityToken.addRole(Role.CONTROLLER, accounts[1])
+		await contracts.micoboSecurityToken.addRole(
+			Role.CONTROLLER,
+			accounts[1]
+		)
 
 		// can force transfer when controller
 		await truffleAssert.passes(
@@ -205,7 +247,8 @@ contract('Test Token Transfer', async (accounts) => {
 	})
 
 	it('can transfer between partitions', async () => {
-		flag = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+		flag =
+			'0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 		newPartition = web3.utils.keccak256('newPartition')
 
 		data = flag + newPartition.substring(2)
@@ -227,10 +270,10 @@ contract('Test Token Transfer', async (accounts) => {
 		)
 
 		// new partition added
-		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [
-			conf.standardPartition,
-			newPartition,
-		])
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.totalPartitions(),
+			[conf.standardPartition, newPartition]
+		)
 
 		// check balance on new partition
 		assert.deepEqual(
@@ -292,9 +335,10 @@ contract('Test Token Transfer', async (accounts) => {
 		)
 
 		// newPartition doesn't exist anymore
-		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [
-			conf.standardPartition,
-		])
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.totalPartitions(),
+			[conf.standardPartition]
+		)
 
 		// check balance on new partition
 		assert.deepEqual(
@@ -432,7 +476,10 @@ contract('Test Token Transfer', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[7]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.CONTROLLER,
+				accounts[7]
+			),
 			true
 		)
 
@@ -454,7 +501,11 @@ contract('Test Token Transfer', async (accounts) => {
 
 	it('can ERC1400Raw transfer', async () => {
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transferWithData(accounts[1], value, '0x')
+			contracts.micoboSecurityToken.transferWithData(
+				accounts[1],
+				value,
+				'0x'
+			)
 		)
 
 		assert.deepEqual(
@@ -469,13 +520,32 @@ contract('Test Token Transfer', async (accounts) => {
 	})
 
 	it('can ERC1400Raw transferFrom', async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.authorizeOperator(accounts[1], {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			''
+		)
+
 		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {
 			from: accounts[1],
 		})
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]),
+			await contracts.micoboSecurityToken.isOperator(
+				accounts[2],
+				accounts[1]
+			),
 			true
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.revokeOperator(accounts[1], {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			''
 		)
 
 		await contracts.micoboSecurityToken.revokeOperator(accounts[2], {
@@ -483,7 +553,10 @@ contract('Test Token Transfer', async (accounts) => {
 		})
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]),
+			await contracts.micoboSecurityToken.isOperator(
+				accounts[2],
+				accounts[1]
+			),
 			false
 		)
 

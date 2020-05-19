@@ -21,7 +21,7 @@ contract('Test Deployment', async (accounts) => {
 				accounts[0],
 				accounts[0],
 				accounts[0],
-				accounts[0]	
+				accounts[0]
 			),
 			truffleAssert.ErrorType.REVERT,
 			'granularity >= 1'
@@ -44,6 +44,19 @@ contract('Test Deployment', async (accounts) => {
 		securityTokenPartition = await SecurityTokenPartition.new(
 			micoboSecurityToken.address,
 			conf.standardPartition
+		)
+
+		// add partition
+		await truffleAssert.fails(
+			micoboSecurityToken.addPartitionProxy(
+				conf.standardPartition,
+				securityTokenPartition.address,
+				{
+					from: accounts[1],
+				}
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A7'
 		)
 
 		// add partition
@@ -88,7 +101,10 @@ contract('Test Deployment', async (accounts) => {
 			conf.standardCap
 		)
 
-		assert.deepEqual((await micoboSecurityToken.totalSupply()).toNumber(), 0)
+		assert.deepEqual(
+			(await micoboSecurityToken.totalSupply()).toNumber(),
+			0
+		)
 	})
 
 	it('partition gives me all the correct token information', async () => {
@@ -96,13 +112,19 @@ contract('Test Deployment', async (accounts) => {
 
 		assert.deepEqual(await securityTokenPartition.symbol(), conf.symbol)
 
-		assert.deepEqual((await securityTokenPartition.decimals()).toNumber(), 18)
+		assert.deepEqual(
+			(await securityTokenPartition.decimals()).toNumber(),
+			18
+		)
 
 		assert.deepEqual(
 			(await securityTokenPartition.cap()).toNumber(),
 			conf.standardCap
 		)
 
-		assert.deepEqual((await securityTokenPartition.totalSupply()).toNumber(), 0)
+		assert.deepEqual(
+			(await securityTokenPartition.totalSupply()).toNumber(),
+			0
+		)
 	})
 })

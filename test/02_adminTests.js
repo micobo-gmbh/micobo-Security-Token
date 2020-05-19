@@ -15,7 +15,10 @@ contract('Test Admin Contract', async (accounts) => {
 
 	it('accounts[0] is admin', async () => {
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[0]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.ADMIN,
+				accounts[0]
+			),
 			true
 		)
 	})
@@ -25,32 +28,44 @@ contract('Test Admin Contract', async (accounts) => {
 		await contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1])
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.ADMIN,
+				accounts[1]
+			),
 			true
 		)
-		
+
 		// account that already has the role cannot have the same role assigned again
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1]),
 			truffleAssert.ErrorType.REVERT,
-			"account already has this role"
+			'account already has this role'
 		)
 
 		await contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[1])
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.ADMIN,
+				accounts[1]
+			),
 			false
 		)
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.removeRole(Role.MODULE_EDITOR, accounts[1]),
+			contracts.micoboSecurityToken.removeRole(
+				Role.MODULE_EDITOR,
+				accounts[1]
+			),
 			truffleAssert.ErrorType.REVERT,
-			"account does not have this role"
+			'account does not have this role'
 		)
 
 		// constraintsEditor
-		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[1])
+		await contracts.micoboSecurityToken.addRole(
+			Role.MODULE_EDITOR,
+			accounts[1]
+		)
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
@@ -76,27 +91,39 @@ contract('Test Admin Contract', async (accounts) => {
 
 	it('cannot use 0 addresses', async () => {
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.hasRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			contracts.micoboSecurityToken.hasRole(
+				Role.ADMIN,
+				'0x0000000000000000000000000000000000000000'
+			),
 			truffleAssert.ErrorType.REVERT,
-			"zero address"
+			'zero address'
 		)
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.addRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			contracts.micoboSecurityToken.addRole(
+				Role.ADMIN,
+				'0x0000000000000000000000000000000000000000'
+			),
 			truffleAssert.ErrorType.REVERT,
-			"zero address"
+			'zero address'
 		)
 
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.removeRole(Role.ADMIN, '0x0000000000000000000000000000000000000000'),
+			contracts.micoboSecurityToken.removeRole(
+				Role.ADMIN,
+				'0x0000000000000000000000000000000000000000'
+			),
 			truffleAssert.ErrorType.REVERT,
-			"zero address"
+			'zero address'
 		)
 	})
 
 	it('can renounce role', async () => {
 		// constraintsEditor
-		await contracts.micoboSecurityToken.addRole(Role.MODULE_EDITOR, accounts[1])
+		await contracts.micoboSecurityToken.addRole(
+			Role.MODULE_EDITOR,
+			accounts[1]
+		)
 
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.hasRole(
@@ -137,7 +164,10 @@ contract('Test Admin Contract', async (accounts) => {
 
 	it('non-admin cannot add nor remove roles', async () => {
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.ADMIN,
+				accounts[1]
+			),
 			false
 		)
 
@@ -204,20 +234,23 @@ contract('Test Admin Contract', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[7]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.CONTROLLER,
+				accounts[7]
+			),
 			true
 		)
 
 		// fails if not admin
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.renounceControl({
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.renounceControl({
-				from: accounts[0]
+				from: accounts[0],
 			})
 		)
 
@@ -225,7 +258,6 @@ contract('Test Admin Contract', async (accounts) => {
 			await contracts.micoboSecurityToken.isControllable(),
 			false
 		)
-		
 
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(
@@ -243,32 +275,32 @@ contract('Test Admin Contract', async (accounts) => {
 				100,
 				'0x',
 				'0x',
-				{from: accounts[7]}
+				{ from: accounts[7] }
 			)
 		)
 	})
 
 	it('can renounce issuance', async () => {
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.isIssuable(),
-			true
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.isIssuable(), true)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.ISSUER, accounts[0]),
+			await contracts.micoboSecurityToken.hasRole(
+				Role.ISSUER,
+				accounts[0]
+			),
 			true
 		)
 
 		// fails if not admin
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.renounceIssuance({
-				from: accounts[1]
+				from: accounts[1],
 			})
 		)
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.renounceIssuance({
-				from: accounts[0]
+				from: accounts[0],
 			})
 		)
 
@@ -279,9 +311,26 @@ contract('Test Admin Contract', async (accounts) => {
 
 		// not able to mint anymore
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], 100, '', {
-				from: accounts[0]
-			})
+			contracts.micoboSecurityToken.issueByPartition(
+				conf.standardPartition,
+				accounts[0],
+				100,
+				'',
+				{
+					from: accounts[0],
+				}
+			)
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.bulkIssueByPartition(
+				conf.standardPartition,
+				[accounts[0], accounts[1], accounts[2]],
+				[10, 20, 30],
+				'0x0'
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A8'
 		)
 	})
 })

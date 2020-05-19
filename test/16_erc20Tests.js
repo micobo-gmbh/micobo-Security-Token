@@ -25,7 +25,9 @@ contract('Test Document Management', async (accounts) => {
 
 	it('can get user balance', async () => {
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOf(accounts[0])).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOf(accounts[0])
+			).toNumber(),
 			value * 2
 		)
 	})
@@ -37,18 +39,21 @@ contract('Test Document Management', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOf(accounts[0])).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOf(accounts[0])
+			).toNumber(),
 			value
 		)
 
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOf(accounts[1])).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOf(accounts[1])
+			).toNumber(),
 			value
 		)
 	})
 
 	it('can approve and transferFrom', async () => {
-
 		// cannot approve 0 address
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.approve(
@@ -63,7 +68,10 @@ contract('Test Document Management', async (accounts) => {
 
 		assert.deepEqual(
 			(
-				await contracts.micoboSecurityToken.allowance(accounts[0], accounts[1])
+				await contracts.micoboSecurityToken.allowance(
+					accounts[0],
+					accounts[1]
+				)
 			).toNumber(),
 			value
 		)
@@ -88,12 +96,16 @@ contract('Test Document Management', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOf(accounts[0])).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOf(accounts[0])
+			).toNumber(),
 			0
 		)
 
 		assert.deepEqual(
-			(await contracts.micoboSecurityToken.balanceOf(accounts[1])).toNumber(),
+			(
+				await contracts.micoboSecurityToken.balanceOf(accounts[1])
+			).toNumber(),
 			value * 2
 		)
 	})
@@ -116,41 +128,60 @@ contract('Test Document Management', async (accounts) => {
 			'0x0'
 		)
 
-        // cannot transfer from second and third, since default partitions has not been updated
-        await truffleAssert.fails(
-            contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
-                from: accounts[1],
-            })
-        )
+		// cannot transfer from second and third, since default partitions has not been updated
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
+				from: accounts[1],
+			})
+		)
 
-        
-        // update default partitions
-        await contracts.micoboSecurityToken.addRole(Role.DEFAULT_PARTITIONS_EDITOR, accounts[0])
+		// update default partitions
+		await contracts.micoboSecurityToken.addRole(
+			Role.DEFAULT_PARTITIONS_EDITOR,
+			accounts[0]
+		)
 
-        await contracts.micoboSecurityToken.setDefaultPartitions(
-            [Partitions.BASE, Partitions.SECOND, Partitions.THIRD]
-        )
-        
-        //not the transfer works
-        await truffleAssert.passes(
-            contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
-                from: accounts[1],
-            })
-        )
+		await contracts.micoboSecurityToken.setDefaultPartitions([
+			Partitions.BASE,
+			Partitions.SECOND,
+			Partitions.THIRD,
+		])
 
-        assert.deepEqual(
-            (await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.BASE, accounts[1])).toNumber(),
-            0
-        )
+		//not the transfer works
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
+				from: accounts[1],
+			})
+		)
 
-        assert.deepEqual(
-            (await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.SECOND, accounts[1])).toNumber(),
-            value
-        )
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					Partitions.BASE,
+					accounts[1]
+				)
+			).toNumber(),
+			0
+		)
 
-        assert.deepEqual(
-            (await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.THIRD, accounts[1])).toNumber(),
-            value * 2
-        )
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					Partitions.SECOND,
+					accounts[1]
+				)
+			).toNumber(),
+			value
+		)
+
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					Partitions.THIRD,
+					accounts[1]
+				)
+			).toNumber(),
+			value * 2
+		)
 	})
 })
