@@ -315,7 +315,7 @@ ERC1820Client
         // Transfer Blocked - Token granularity
         require(to != address(0), "A6");
         // Transfer Blocked - Receiver not eligible
-        require(_balances[from] >= value, "A4");
+        // require(_balances[from] >= value, "A4"); // already checked in ERC1400Partition
         // Transfer Blocked - Sender balance insufficient
 
         // CONTROLLER bypasses constraint modules

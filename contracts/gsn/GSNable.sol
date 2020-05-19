@@ -7,6 +7,7 @@ import "./GSNRecipient.sol";
 contract GSNable is GSNRecipient {
 
     // override this function to add access control
+
     function _isGSNController() internal view virtual returns (bool) {
         this;
         return true;
