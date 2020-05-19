@@ -1,3 +1,4 @@
+const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
 
@@ -9,6 +10,23 @@ contract('Test Deployment', async (accounts) => {
 	// deepEqual compares with '==='
 
 	it('deploys micobo security token', async () => {
+		// granularity should be at least 1
+		await truffleAssert.fails(
+			MicoboSecurityToken.new(
+				conf.name,
+				conf.symbol,
+				0,
+				conf.standardCap,
+				accounts[0],
+				accounts[0],
+				accounts[0],
+				accounts[0],
+				accounts[0]	
+			),
+			truffleAssert.ErrorType.REVERT,
+			'granularity >= 1'
+		)
+
 		micoboSecurityToken = await MicoboSecurityToken.new(
 			conf.name,
 			conf.symbol,

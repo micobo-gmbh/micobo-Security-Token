@@ -48,6 +48,17 @@ contract('Test Document Management', async (accounts) => {
 	})
 
 	it('can approve and transferFrom', async () => {
+
+		// cannot approve 0 address
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.approve(
+				'0x0000000000000000000000000000000000000000',
+				value
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A5'
+		)
+
 		await contracts.micoboSecurityToken.approve(accounts[1], value)
 
 		assert.deepEqual(
@@ -62,6 +73,18 @@ contract('Test Document Management', async (accounts) => {
 			accounts[1],
 			value,
 			{ from: accounts[1] }
+		)
+
+		// does not have enough allowance
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferFrom(
+				'0x0000000000000000000000000000000000000000',
+				accounts[1],
+				value,
+				{ from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A7'
 		)
 
 		assert.deepEqual(
