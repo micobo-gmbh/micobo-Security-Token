@@ -46,12 +46,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
         _cap = cap;
 
-        // TODO activate when live
-        // setInterfaceImplementation("ERC1400Token", address(this));
+        setInterfaceImplementation("ERC1400Token", address(this));
 
         _isIssuable = true;
         _isControllable = true;
-
 
     }
 
@@ -177,7 +175,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @param partition Name of the partition.
      * @param tokenHolder Address for which we want to issue tokens.
      * @param value Number of tokens issued.
-     * @param data Information attached to the issuance, by the issuer. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the issuance, by the issuer.
      */
     function issueByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data)
     external override
@@ -200,7 +198,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @dev Redeem tokens of a specific partition.
      * @param partition Name of the partition.
      * @param value Number of tokens redeemed.
-     * @param data Information attached to the redemption, by the redeemer. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the redemption, by the redeemer.
      */
     // only controllers can redeem
     function redeemByPartition(bytes32 partition, uint256 value, bytes calldata data)
@@ -218,7 +216,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @param tokenHolder Address for which we want to redeem tokens.
      * @param value Number of tokens redeemed.
      * @param data Information attached to the redemption.
-     * @param operatorData Information attached to the redemption, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param operatorData Information attached to the redemption, by the operator.
      */
 
     function operatorRedeemByPartition(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data, bytes calldata operatorData)
@@ -226,7 +224,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     {
         // only REDEEMER can burn tokens (checked in _redeem())
 
-        require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
+        require(_isOperatorForPartition(partition, _msgSender(), tokenHolder),  "A7");
         // Transfer Blocked - Identity restriction
 
         _redeemByPartition(partition, _msgSender(), tokenHolder, value, data, operatorData);
@@ -266,7 +264,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer. [CAN CONTAIN THE DESTINATION PARTITION]
-     * @param operatorData Information attached to the transfer, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param operatorData Information attached to the transfer, by the operator.
      * @return ESC (Ethereum Status Code) following the EIP-1066 standard.
      * @return Additional bytes32 parameter that can be used to define
      * application specific reason codes with additional details (for example the
@@ -287,6 +285,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
     override
     returns (byte, bytes32, bytes32)
     {
+        // controller bypasses constraints
+        if(_isControllable && hasRole(bytes32("CONTROLLER"), _msgSender())) {
+            return (hex"A2", "", partition);
+        }
         if (!_isOperatorForPartition(partition, _msgSender(), from))
             return (hex"A7", "", partition);
         // "Transfer Blocked - Identity restriction"
@@ -440,7 +442,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @dev Definitely renounce the possibility to control tokens on behalf of tokenHolders.
      * Once set to false, '_isControllable' can never be set to 'true' again.
      */
-     // TODO right now this would disable ERC20 proxyx contracts
+     // INFO this disables ERC20 proxyx contracts
     function renounceControl()
     external override
     {
@@ -482,6 +484,9 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
      * @param operators Controller addresses.
      */
 
+    // We don't allow this function publicly. Only proxies use it
+    // and have to continue to use it even after _isControllable is false
+    // this is why partitionControllers are only set in addPartition()
     function setPartitionControllers(bytes32 partition, address[] calldata operators)
     external override
     {

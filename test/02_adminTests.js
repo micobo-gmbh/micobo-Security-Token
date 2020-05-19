@@ -171,7 +171,7 @@ contract('Test Admin Contract', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[0]),
+			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[7]),
 			true
 		)
 
@@ -209,12 +209,13 @@ contract('Test Admin Contract', async (accounts) => {
 				accounts[1],
 				100,
 				'0x',
-				'0x'
+				'0x',
+				{from: accounts[7]}
 			)
 		)
 	})
 
-	it('can renounce issuance control', async () => {
+	it('can renounce issuance', async () => {
 		assert.deepEqual(
 			await contracts.micoboSecurityToken.isIssuable(),
 			true

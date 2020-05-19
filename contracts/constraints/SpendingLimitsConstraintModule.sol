@@ -44,9 +44,6 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
     }
 
 
-    // TODO find a way to easily get all timelock entries
-
-
     modifier onlySpendingLimitsEditor {
         require(_securityToken.hasRole(bytes32('SPENDING_LIMITS_EDITOR'), msg.sender), 'A7');
         _;

@@ -18,8 +18,6 @@ const GSNMode = {
 	NONE: 2,
 }
 
-// TODO add tests with GSN Module
-
 contract('Test GSN functionality', async (accounts) => {
 	let contracts
 

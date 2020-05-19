@@ -16,7 +16,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
      *
      * --main roles--
      * ADMIN   (can add and remove roles)
-     * CONTROLLER (ERC1400, can force-transfer tokens if contract _isControllable), TODO
+     * CONTROLLER (ERC1400, can force-transfer tokens if contract _isControllable)
      * ISSUER (ISSUER)
      * REDEEMER (BURNER, can redeem tokens, their own OR others IF _isOperatorForPartition())
      * MODULE_EDITOR (can edit constraint modules),
@@ -38,7 +38,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
     mapping(bytes32 => mapping(address => bool)) internal _roles;
 
     // Array of controllers. [GLOBAL - NOT TOKEN-HOLDER-SPECIFIC]
-    // INFO we use CONTROLLER roles for global controllers instead
+    // INFO we use CONTROLLER role for global controller instead
     // address[] internal _controllers;
 
     // EVENTS in IAdmin.sol

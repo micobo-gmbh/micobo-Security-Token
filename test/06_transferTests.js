@@ -1,10 +1,12 @@
 const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
+const PauseConstraintModule = artifacts.require('PauseConstraintModule')
+
 
 const { conf } = require('../token-config')
 const { Role } = require('./Constants')
 
-contract('Test Security Token', async (accounts) => {
+contract('Test Token Transfer', async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -220,15 +222,16 @@ contract('Test Security Token', async (accounts) => {
 				value,
 				data,
 				// operator data length > 0
-				'0x0'
+				'0x0',
+				{ from: accounts[7] }
 			)
 		)
 
 		// new partition added
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.totalPartitions(),
-			[conf.standardPartition, newPartition]
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [
+			conf.standardPartition,
+			newPartition,
+		])
 
 		// check balance on new partition
 		assert.deepEqual(
@@ -264,7 +267,8 @@ contract('Test Security Token', async (accounts) => {
 			value,
 			data,
 			// operator data length > 0
-			'0x0'
+			'0x0',
+			{ from: accounts[7] }
 		)
 
 		// check balance on base partition
@@ -289,10 +293,9 @@ contract('Test Security Token', async (accounts) => {
 		)
 
 		// newPartition doesn't exist anymore
-		assert.deepEqual(
-			await contracts.micoboSecurityToken.totalPartitions(),
-			[conf.standardPartition]
-		)
+		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [
+			conf.standardPartition,
+		])
 
 		// check balance on new partition
 		assert.deepEqual(
@@ -319,29 +322,53 @@ contract('Test Security Token', async (accounts) => {
 
 	it('can CAN operatorTransfer', async () => {
 		// not if not controller
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.canOperatorTransferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				accounts[0],
-				value,
-				'0x',
-				'0x',
-				{ from: accounts[3] }
-			)
+
+		let res = await contracts.micoboSecurityToken.canOperatorTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			accounts[0],
+			value,
+			'0x',
+			'0x',
+			{ from: accounts[3] }
 		)
 
+		assert.deepEqual(res['0'], '0xa7')
+
 		// passes when controller
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.canOperatorTransferByPartition(
-				conf.standardPartition,
-				accounts[1],
-				accounts[0],
-				value,
-				'0x',
-				'0x'
-			)
+		let res2 = await contracts.micoboSecurityToken.canOperatorTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			accounts[0],
+			value,
+			'0x',
+			'0x',
+			{ from: accounts[7] }
 		)
+
+		assert.deepEqual(res2['0'], '0xa2')
+
+		// using authorizeOperatorByPartition
+		await contracts.micoboSecurityToken.authorizeOperatorByPartition(
+			conf.standardPartition,
+			accounts[6],
+			{
+				from: accounts[1],
+			}
+		)
+
+		// passes when operator
+		let res3 = await contracts.micoboSecurityToken.canOperatorTransferByPartition(
+			conf.standardPartition,
+			accounts[1],
+			accounts[0],
+			value,
+			'0x',
+			'0x',
+			{ from: accounts[6] }
+		)
+
+		assert.deepEqual(res3['0'], '0xa2')
 	})
 
 	it('can CAN transfer', async () => {
@@ -376,5 +403,61 @@ contract('Test Security Token', async (accounts) => {
 		)
 
 		assert.deepEqual(res3['0'], '0xa9')
+	})
+
+	it('controller bypasses constraints modules', async () => {
+		
+		pauseConstraintModule = await PauseConstraintModule.new(
+			contracts.micoboSecurityToken.address
+		)
+
+		await contracts.micoboSecurityToken.setModulesByPartition(
+			conf.standardPartition,
+			[pauseConstraintModule.address]
+		)
+
+		// pause it
+		await contracts.micoboSecurityToken.addRole(Role.PAUSER, accounts[0])
+		await pauseConstraintModule.pause()
+
+		assert.deepEqual(await pauseConstraintModule.paused(), true)
+
+		// fails if not controller
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				value,
+				'0x0',
+				{ from: accounts[0] }
+			)
+		)
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.hasRole(
+				Role.CONTROLLER,
+				accounts[7]
+			),
+			true
+		)
+
+		// controller bypasses constraints
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.operatorTransferByPartition(
+				conf.standardPartition,
+				accounts[1],
+				accounts[0],
+				value,
+				'0x',
+				'0x',
+				{ from: accounts[7] }
+			)
+		)
+	})
+
+	it('can use ERC1400Raw transfers', async () => {
+		// TODO
+
+		
 	})
 })

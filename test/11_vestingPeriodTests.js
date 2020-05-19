@@ -9,7 +9,6 @@ const VestingPeriodConstraintModule = artifacts.require(
 )
 
 contract('Test Vesting Period', async (accounts) => {
-	let day = 86400
 
 	let value = 1000
 

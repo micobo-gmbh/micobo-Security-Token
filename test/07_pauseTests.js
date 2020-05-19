@@ -9,9 +9,6 @@ const { Role, Module } = require('./Constants')
 contract('Test Pausing', async (accounts) => {
 	let contracts, pauseConstraintModule
 
-	let pauser = accounts[2]
-	let constraintsEditor = accounts[1]
-
 	let value = 1000
 
 	// deepEqual compares with '==='

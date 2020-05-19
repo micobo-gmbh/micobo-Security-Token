@@ -1,9 +1,16 @@
 const SecurityToken = artifacts.require('SecurityToken')
 const SecurityTokenPartition = artifacts.require('SecurityTokenPartition')
+const SecurityTokenPartitionFactory = artifacts.require('SecurityTokenPartitionFactory')
 
 const { conf } = require('../token-config')
 
+const ERC1820 = require('erc1820');
+
+
 module.exports = async (deployer, network, accounts) => {
+
+	await ERC1820.deploy(web3, accounts[0]);
+
 	try {
 		await deployer.deploy(
 			SecurityToken,
@@ -12,7 +19,7 @@ module.exports = async (deployer, network, accounts) => {
 			conf.granularity,
 			conf.standardCap,
 			accounts[0],
-			accounts[0],
+			accounts[7],
 			accounts[0],
 			accounts[0],
 			accounts[0]

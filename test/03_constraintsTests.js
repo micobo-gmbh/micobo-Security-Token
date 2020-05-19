@@ -45,6 +45,4 @@ contract('Test Constraint Contract', async (accounts) => {
 			moduleAddresses
 		)
 	})
-
-	// TODO test out some real modules and their effects
 })

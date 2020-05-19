@@ -36,6 +36,7 @@
     "@truffle/hdwallet-provider": "^1.0.21",
     "acorn": "^7.1.1",
     "eth-gas-reporter": "^0.2.17",
+    "erc1820": "0.0.2",
     "solc": "0.6.6",
     "solidity-coverage": "0.7.5",
     "truffle-assertions": "^0.9.1",

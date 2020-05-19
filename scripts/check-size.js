@@ -32,6 +32,7 @@ module.exports = async () => {
 		}
 		if (sz.deployedSize >= MAX) {
 			max_reached = true
+			console.log('OVER MAX: ' + name + ': '  + sz)
 		}
 	}) ;
 

@@ -5,8 +5,10 @@ import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ISecurityToken.sol";
 import "../gsn/GSNable.sol";
+import "../erc1820/ERC1820Client.sol";
 
-contract SecurityTokenPartition is IERC20, GSNable {
+
+contract SecurityTokenPartition is IERC20, ERC1820Client, GSNable {
 
     using SafeMath for uint256;
 
@@ -17,7 +19,7 @@ contract SecurityTokenPartition is IERC20, GSNable {
 
     constructor(address securityTokenAddress, bytes32 partition) public {
 
-        // TODO maybe set interface implementation 1820 for ERC20 here?
+        setInterfaceImplementation("ERC20Token", address(this));
 
         _securityToken = ISecurityToken(securityTokenAddress);
         _partitionId = partition;

@@ -129,7 +129,7 @@ ERC1820Client
      * @dev Get the list of controllers as defined by the Administrable contract.
      * @return List of addresses of all the controllers.
      */
-    // has been moved to Admin
+    // TODO implement in Administrable?
     /*
     function controllers() external view returns (address[] memory) {
         address[] memory activeControllers = _controllers;
@@ -141,7 +141,7 @@ ERC1820Client
             }
         }
         return activeControllers;
-    }
+    }*/
 
     /**
      * [ERC1400Raw INTERFACE (7/13)]
@@ -150,11 +150,11 @@ ERC1820Client
      * @param operator Address to set as an operator for 'msg.sender'.
      */
     // we only use authorizeOperatorByPartition()
-    /*function authorizeOperator(address operator) external {
-        require(operator != _msgSender());
+    function authorizeOperator(address operator) external override {
+        require(operator != _msgSender(), "");
         _authorizedOperator[operator][_msgSender()] = true;
         emit AuthorizedOperator(operator, _msgSender());
-    }*/
+    }
 
     /**
      * [ERC1400Raw INTERFACE (8/13)]
@@ -163,11 +163,11 @@ ERC1820Client
      * @param operator Address to rescind as an operator for 'msg.sender'.
      */
     // we only use revokeOperatorByPartition()
-    /*function revokeOperator(address operator) external {
-        require(operator != _msgSender());
+    function revokeOperator(address operator) external override {
+        require(operator != _msgSender(), "");
         _authorizedOperator[operator][_msgSender()] = false;
         emit RevokedOperator(operator, _msgSender());
-    }*/
+    }
 
     /**
      * [ERC1400Raw INTERFACE (9/13)]
@@ -177,23 +177,23 @@ ERC1820Client
      * @return 'true' if operator is an operator of 'tokenHolder' and 'false' otherwise.
      */
     // we only use isOperatorForPartition()
-    /*function isOperator(address operator, address tokenHolder) external view returns (bool) {
+    function isOperator(address operator, address tokenHolder) external view override returns (bool) {
         return _isOperator(operator, tokenHolder);
-    }*/
+    }
 
     /**
      * [ERC1400Raw INTERFACE (10/13)]
      * @dev Transfer the amount of tokens from the address 'msg.sender' to the address 'to'.
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
-     * @param data Information attached to the transfer, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the transfer, by the token holder.
      */
     // is overridden in ERC1400Partition
-    /*
+
     function transferWithData(address to, uint256 value, bytes calldata data)
-    external
+    external override
     {
-        _transferWithData("", _msgSender(), _msgSender(), to, value, data, "", true);
+        _transferWithData("", _msgSender(), _msgSender(), to, value, data, "");
     }
 
     /**
@@ -203,27 +203,26 @@ ERC1820Client
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer, and intended for the token holder ('from').
-     * @param operatorData Information attached to the transfer by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param operatorData Information attached to the transfer by the operator.
      */
     // is overridden in ERC1400Partition
-    /*
     function transferFromWithData(
         address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
-    external
+    external override
     {
         require(_isOperator(_msgSender(), from), "A7");
         // Transfer Blocked - Identity restriction
 
-        _transferWithData("", _msgSender(), from, to, value, data, operatorData, true);
+        _transferWithData("", _msgSender(), from, to, value, data, operatorData);
     }
 
     /**
      * [ERC1400Raw INTERFACE (12/13)]
      * @dev Redeem the amount of tokens from the address 'msg.sender'.
      * @param value Number of tokens to redeem.
-     * @param data Information attached to the redemption, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the redemption, by the token holder.
      */
-    // is overridden in ERC1400Partition
+    // is deleted in ERC1400Partition
     /*
     function redeem(uint256 value, bytes calldata data)
     external
@@ -237,9 +236,9 @@ ERC1820Client
      * @param from Token holder whose tokens will be redeemed (or address(0) to set from to msg.sender).
      * @param value Number of tokens to redeem.
      * @param data Information attached to the redemption.
-     * @param operatorData Information attached to the redemption, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param operatorData Information attached to the redemption, by the operator.
      */
-    // is overridden in ERC1400Partition
+    // is deleted in ERC1400Partition
     /*
     function redeemFrom(address from, uint256 value, bytes calldata data, bytes calldata operatorData)
     external
@@ -283,13 +282,12 @@ ERC1820Client
      * @param tokenHolder Address of a token holder which may have the 'operator' address as an operator.
      * @return 'true' if 'operator' is an operator of 'tokenHolder' and 'false' otherwise.
      */
-    /*function _isOperator(address operator, address tokenHolder) internal view returns (bool) {
-        return (operator == tokenHolder
-        || _authorizedOperator[operator][tokenHolder]
-        // contract is controllable and operator is a controller
-        || (_isControllable && hasRole(bytes32("CONTROLLER"), operator))
+    function _isOperator(address operator, address tokenHolder) internal view returns (bool) {
+        return (operator == tokenHolder ||
+            _authorizedOperator[operator][tokenHolder] ||
+            (_isControllable && hasRole(bytes32("CONTROLLER"), operator))
         );
-    }*/
+    }
 
     /**
      * [INTERNAL]
@@ -322,7 +320,10 @@ ERC1820Client
         require(_balances[from] >= value, "A4");
         // Transfer Blocked - Sender balance insufficient
 
-        _executeTransfer(_msgSender(), partition, operator, from, to, value, data, operatorData);
+        // CONTROLLER bypasses constraint modules
+        if(!(_isControllable && hasRole(bytes32("CONTROLLER"), _msgSender()))) {
+            _executeTransfer(_msgSender(), partition, operator, from, to, value, data, operatorData);
+        }
 
         // _callSender(partition, operator, from, to, value, data, operatorData);
 

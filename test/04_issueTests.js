@@ -7,8 +7,6 @@ const { conf } = require('../token-config')
 contract('Test Issuing and Cap', async (accounts) => {
 	let contracts
 
-	let minter = accounts[1]
-
 	let value = 1000
 
 	// deepEqual compares with '==='

@@ -107,7 +107,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param partition Name of the partition.
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
-     * @param data Information attached to the transfer, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param data Information attached to the transfer, by the token holder.
      * @return Destination partition.
      */
     function transferByPartition(
@@ -130,7 +130,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
      * @param to Token recipient.
      * @param value Number of tokens to transfer.
      * @param data Information attached to the transfer. [CAN CONTAIN THE DESTINATION PARTITION]
-     * @param operatorData Information attached to the transfer, by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
+     * @param operatorData Information attached to the transfer, by the operator.
      * @return Destination partition.
      */
     function operatorTransferByPartition(
@@ -241,8 +241,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     view
     returns (bool)
     {
-        // TODO renouncing control kills erc20 proxy contracts atm
-        // TODO allow CONTROLLER to transfer without validation
         return (_authorizedOperatorByPartition[tokenHolder][partition][operator] ||
         (
             _isControllable &&
@@ -251,7 +249,8 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
                 hasRole(bytes32("CONTROLLER"), operator))
             )
         );
-        // we use _isControllerByPartition only for partitionProxy at this point
+        // INFO we use _isControllerByPartition only for partitionProxy
+        // renouncing control kills erc20 proxy contracts
     }
 
     /**
@@ -428,44 +427,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 
     /************** ERC1400Raw BACKWARDS RETROCOMPATIBILITY *************************/
 
-    // INFO we don't use these as they make use of the defaultPartition
-    // we don't have a default partition, either you call operatorTransferByPartition
-    // or use the SecurityTokenPartition ERC20 Proxy contract that still implements
-    // transferWithData and transferFromWithData
-
     /**
-     * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
-     * @dev Transfer the value of tokens from the address 'msg.sender' to the address 'to'.
-     * @param to Token recipient.
-     * @param value Number of tokens to transfer.
-     * @param data Information attached to the transfer, by the token holder. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
-     *//*
-    function transferWithData(address to, uint256 value, bytes calldata data)
-    external
-    isValidCertificate(data)
-    {
-        _transferByDefaultPartitions(msg.sender, msg.sender, to, value, data, "", true);
-    }
-
-    *//**
-     * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
-     * @dev Transfer the value of tokens on behalf of the address from to the address to.
-     * @param from Token holder (or 'address(0)'' to set from to 'msg.sender').
-     * @param to Token recipient.
-     * @param value Number of tokens to transfer.
-     * @param data Information attached to the transfer, and intended for the token holder ('from'). [CAN CONTAIN THE DESTINATION PARTITION]
-     * @param operatorData Information attached to the transfer by the operator. [CONTAINS THE CONDITIONAL OWNERSHIP CERTIFICATE]
-     *//*
-    function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
-    external
-    isValidCertificate(operatorData)
-    {
-        require(_isOperator(msg.sender, from), "A7"); // Transfer Blocked - Identity restriction
-
-        _transferByDefaultPartitions(msg.sender, from, to, value, data, operatorData, true);
-    }
-
-    *//**
      * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
      * @dev Empty function to erase ERC1400Raw redeem() function since it doesn't handle partitions.
      *//*
