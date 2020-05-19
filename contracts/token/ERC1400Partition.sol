@@ -428,6 +428,28 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
     /************** ERC1400Raw BACKWARDS RETROCOMPATIBILITY *************************/
 
     /**
+    * @dev Transfer the amount of tokens from the address 'msg.sender' to the address 'to'.
+    * @param to Token recipient.
+    * @param value Number of tokens to transfer.
+    * @param data Information attached to the transfer, by the token holder.
+    */
+    function transferWithData(address to, uint256 value, bytes calldata data) external {
+        _transferByDefaultPartitions(msg.sender, msg.sender, to, value, data, '');
+    }
+    /**
+    * @dev Transfer the amount of tokens on behalf of the address 'from' to the address 'to'.
+    * @param from Token holder (or 'address(0)' to set from to 'msg.sender').
+    * @param to Token recipient.
+    * @param value Number of tokens to transfer.
+    * @param data Information attached to the transfer, and intended for the token holder ('from').
+    */
+    function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData) external {
+        require(_isOperator(msg.sender, from), "58"); // 0x58	invalid operator (transfer agent)
+
+        _transferByDefaultPartitions(msg.sender, from, to, value, data, operatorData);
+    }
+
+    /**
      * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
      * @dev Empty function to erase ERC1400Raw redeem() function since it doesn't handle partitions.
      *//*

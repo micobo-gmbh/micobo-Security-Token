@@ -14,7 +14,6 @@ import "../interfaces/IERC1400Raw.sol";
 // INFO got rid of sender recipient check
 
 contract ERC1400Raw is
-
 IERC1400Raw,
 Constrainable,
 ERC1820Client
@@ -189,12 +188,11 @@ ERC1820Client
      * @param data Information attached to the transfer, by the token holder.
      */
     // is overridden in ERC1400Partition
-
-    function transferWithData(address to, uint256 value, bytes calldata data)
+    /* function transferWithData(address to, uint256 value, bytes calldata data)
     external override
     {
         _transferWithData("", _msgSender(), _msgSender(), to, value, data, "");
-    }
+    } */
 
     /**
      * [ERC1400Raw INTERFACE (11/13)]
@@ -206,7 +204,7 @@ ERC1820Client
      * @param operatorData Information attached to the transfer by the operator.
      */
     // is overridden in ERC1400Partition
-    function transferFromWithData(
+    /* function transferFromWithData(
         address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData)
     external override
     {
@@ -214,7 +212,7 @@ ERC1820Client
         // Transfer Blocked - Identity restriction
 
         _transferWithData("", _msgSender(), from, to, value, data, operatorData);
-    }
+    } */
 
     /**
      * [ERC1400Raw INTERFACE (12/13)]

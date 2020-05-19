@@ -2,7 +2,6 @@ const truffleAssert = require('truffle-assertions')
 const MicoboSecurityToken = artifacts.require('SecurityToken')
 const PauseConstraintModule = artifacts.require('PauseConstraintModule')
 
-
 const { conf } = require('../token-config')
 const { Role } = require('./Constants')
 
@@ -406,7 +405,6 @@ contract('Test Token Transfer', async (accounts) => {
 	})
 
 	it('controller bypasses constraints modules', async () => {
-		
 		pauseConstraintModule = await PauseConstraintModule.new(
 			contracts.micoboSecurityToken.address
 		)
@@ -434,10 +432,7 @@ contract('Test Token Transfer', async (accounts) => {
 		)
 
 		assert.deepEqual(
-			await contracts.micoboSecurityToken.hasRole(
-				Role.CONTROLLER,
-				accounts[7]
-			),
+			await contracts.micoboSecurityToken.hasRole(Role.CONTROLLER, accounts[7]),
 			true
 		)
 
@@ -453,11 +448,58 @@ contract('Test Token Transfer', async (accounts) => {
 				{ from: accounts[7] }
 			)
 		)
+
+		await pauseConstraintModule.unpause()
 	})
 
-	it('can use ERC1400Raw transfers', async () => {
-		// TODO
+	it('can ERC1400Raw transfer', async () => {
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferWithData(accounts[1], value, '0x')
+		)
 
-		
+		assert.deepEqual(
+			(
+				await contracts.micoboSecurityToken.balanceOfByPartition(
+					conf.standardPartition,
+					accounts[1]
+				)
+			).toNumber(),
+			value
+		)
+	})
+
+	it('can ERC1400Raw transferFrom', async () => {
+		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {
+			from: accounts[1],
+		})
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]),
+			true
+		)
+
+		await contracts.micoboSecurityToken.revokeOperator(accounts[2], {
+			from: accounts[1],
+		})
+
+		assert.deepEqual(
+			await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]),
+			false
+		)
+
+		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {
+			from: accounts[1],
+		})
+
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferFromWithData(
+				accounts[1],
+				accounts[2],
+				value,
+				'0x',
+				'0x',
+				{ from: accounts[2] }
+			)
+		)
 	})
 })
