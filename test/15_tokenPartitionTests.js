@@ -104,6 +104,16 @@ contract('Test Token Partition ERC20 Proxy', async (accounts) => {
 			)
 		)
 
+		// cannot approve 0 address
+		await truffleAssert.fails(
+			contracts.securityTokenPartition.approve(
+				'0x0000000000000000000000000000000000000000',
+				value, { from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			'A5'
+		)
+
 		// 1 approves 0 to transfer value
 		await truffleAssert.passes(
 			contracts.securityTokenPartition.approve(accounts[0], value, {
