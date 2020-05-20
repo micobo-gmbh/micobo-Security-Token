@@ -50,6 +50,21 @@ interface IERC1400Partition {
 	// Optional functions
 	function totalPartitions() external view returns (bytes32[] memory);
 
+	// ERC1400Raw compatibility
+	function transferWithData(
+		address to,
+		uint256 value,
+		bytes calldata data
+	) external;
+
+	function transferFromWithData(
+		address from,
+		address to,
+		uint256 value,
+		bytes calldata data,
+		bytes calldata operatorData
+	) external;
+
 	// Transfer Events
 	event TransferByPartition(
 		bytes32 indexed fromPartition,

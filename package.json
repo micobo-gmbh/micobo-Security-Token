@@ -9,9 +9,9 @@
 	"scripts": {
 		"test": "truffle test",
 		"deploy": "truffle migrate --reset",
-		"compile-token": "solcjs --abi --hashes --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
-		"compile-vesting": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/constraints/VestingPeriodConstraintModule.sol",
-		"compile-constraints": "solc --abi --bin --optimize --optimize-runs 32768 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
+		"compile-token": "solc --abi --hashes --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
+		"compile-vesting": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/constraints/VestingPeriodConstraintModule.sol",
+		"compile-constraints": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
 		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
 		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
 		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",

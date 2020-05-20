@@ -2,9 +2,10 @@ pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
 import "./GSNRecipient.sol";
+import "../interfaces/IGSNable.sol";
 
 
-contract GSNable is GSNRecipient {
+contract GSNable is IGSNable, GSNRecipient {
 	// override this function to add access control
 
 	function _isGSNController() internal virtual view returns (bool) {
@@ -12,8 +13,7 @@ contract GSNable is GSNRecipient {
 		return true;
 	}
 
-	gsnMode _gsnMode = gsnMode.ALL;
-	enum gsnMode { ALL, MODULE, NONE }
+	gsnMode private _gsnMode = gsnMode.ALL;
 
 	IRelayRecipient private _gsnModule = IRelayRecipient(address(0));
 
@@ -70,19 +70,25 @@ contract GSNable is GSNRecipient {
 		}
 	}
 
-	function setGSNMode(gsnMode m) public onlyGSNController {
+	function setGSNMode(gsnMode m) public override onlyGSNController {
 		_gsnMode = gsnMode(m);
+		emit GSNModeSet(m);
 	}
 
-	function setGSNModule(IRelayRecipient newGSNModule) public onlyGSNController {
+	function getGSNMode() public override view onlyGSNController returns (gsnMode) {
+		return _gsnMode;
+	}
+
+	function setGSNModule(IRelayRecipient newGSNModule) public override onlyGSNController {
 		_gsnModule = newGSNModule;
+		emit GSNModuleSet(newGSNModule);
 	}
 
-	function upgradeRelayHub(address newRelayHub) public onlyGSNController {
+	function upgradeRelayHub(address newRelayHub) public override onlyGSNController {
 		_upgradeRelayHub(newRelayHub);
 	}
 
-	function withdrawDeposits(uint256 amount, address payable payee) public onlyGSNController {
+	function withdrawDeposits(uint256 amount, address payable payee) public override onlyGSNController {
 		_withdrawDeposits(amount, payee);
 	}
 }

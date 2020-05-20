@@ -2,9 +2,10 @@ pragma solidity 0.6.6;
 
 import "./Administrable.sol";
 import "../interfaces/IConstraintModule.sol";
+import "../interfaces/IConstrainable.sol";
 
 
-contract Constrainable is Administrable {
+contract Constrainable is IConstrainable, Administrable {
 	mapping(bytes32 => IConstraintModule[]) private _modulesByPartition;
 
 	function _executeTransfer(
@@ -71,11 +72,11 @@ contract Constrainable is Administrable {
 		return (true, "", "", "");
 	}
 
-	function getModulesByPartition(bytes32 partition) external view returns (IConstraintModule[] memory) {
+	function getModulesByPartition(bytes32 partition) external override view returns (IConstraintModule[] memory) {
 		return _modulesByPartition[partition];
 	}
 
-	function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external {
+	function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external override {
 		require(hasRole(bytes32("MODULE_EDITOR"), msg.sender), "A7");
 		_modulesByPartition[partition] = newModules;
 	}

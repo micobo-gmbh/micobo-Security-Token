@@ -238,8 +238,35 @@ interface ISecurityToken {
 	);
 
 	// Transfer Validity
-	// function canTransferByPartition(bytes32 partition, address to, uint256 value, bytes calldata data) external view returns (byte, bytes32, bytes32); // 8/9
-	// function canOperatorTransferByPartition(bytes32 partition, address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData) external view returns (byte, bytes32, bytes32); // 9/9
+	function canTransferByPartition(
+		bytes32 partition,
+		address to,
+		uint256 value,
+		bytes calldata data
+	)
+		external
+		view
+		returns (
+			bytes1,
+			bytes32,
+			bytes32
+		); // 8/9
+
+	function canOperatorTransferByPartition(
+		bytes32 partition,
+		address from,
+		address to,
+		uint256 value,
+		bytes calldata data,
+		bytes calldata operatorData
+	)
+		external
+		view
+		returns (
+			bytes1,
+			bytes32,
+			bytes32
+		); // 9/9
 
 	// Optional functions
 	function renounceControl() external;

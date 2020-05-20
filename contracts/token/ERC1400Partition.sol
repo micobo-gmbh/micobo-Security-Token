@@ -427,7 +427,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		address to,
 		uint256 value,
 		bytes calldata data
-	) external {
+	) external override {
 		_transferByDefaultPartitions(msg.sender, msg.sender, to, value, data, "");
 	}
 
@@ -444,21 +444,11 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		uint256 value,
 		bytes calldata data,
 		bytes calldata operatorData
-	) external {
+	) external override {
 		require(_isOperator(msg.sender, from), "58"); // 0x58	invalid operator (transfer agent)
 
 		_transferByDefaultPartitions(msg.sender, from, to, value, data, operatorData);
-	} /*, bytes calldata */ /*operatorData*/ /*) external { // Comments to avoid compilation warnings for unused variables.
-        revert("A8: Transfer Blocked - Token restriction");
-    }
-
-    */ /*) external { // Comments to avoid compilation warnings for unused variables.
-        revert("A8: Transfer Blocked - Token restriction");
-    }
-
-    */ /*
-    function redeem(uint256 */ /*value*/ /*, bytes calldata */ /*data*/ /*
-    function redeemFrom(address */ /*from*/ /*, uint256 */ /*value*/ /*, bytes calldata */ /*data*/
+	}
 
 	/**
 	 * [NOT MANDATORY FOR ERC1400Partition STANDARD]
