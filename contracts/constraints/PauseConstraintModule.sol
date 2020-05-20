@@ -7,7 +7,7 @@ import "../interfaces/ISecurityToken.sol";
 contract PauseConstraintModule is IConstraintModule {
 	ISecurityToken _securityToken;
 
-	bytes32 private _module_name = keccak256("PAUSE");
+	bytes32 private _module_name = bytes32("PAUSE");
 
 	/**
 	 * @dev Emitted when the pause is triggered by a pauser (`account`).

@@ -14,7 +14,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 
 	ISecurityToken _securityToken;
 
-	bytes32 private _module_name = keccak256("SPENDING_LIMIT");
+	bytes32 private _module_name = bytes32("SPENDING_LIMIT");
 
 	// module data
 

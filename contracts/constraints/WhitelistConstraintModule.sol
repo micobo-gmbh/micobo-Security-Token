@@ -7,7 +7,7 @@ import "../interfaces/ISecurityToken.sol";
 contract WhitelistConstraintModule is IConstraintModule {
 	ISecurityToken _securityToken;
 
-	bytes32 private _module_name = keccak256("WHITELIST");
+	bytes32 private _module_name = bytes32("WHITELIST");
 
 	// module data
 	mapping(address => bool) private _whitelist;

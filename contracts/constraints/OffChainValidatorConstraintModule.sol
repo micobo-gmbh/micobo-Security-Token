@@ -13,7 +13,7 @@ contract OffChainValidator is IConstraintModule {
 
     address _signer;
 
-    bytes32 private _module_name = keccak256('OFF_CHAIN');
+    bytes32 private _module_name = bytes32('OFF_CHAIN');
 
     // module data
     address _signer;

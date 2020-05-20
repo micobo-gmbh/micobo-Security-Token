@@ -13,7 +13,7 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
 	ISecurityToken _securityToken;
 
-	bytes32 private _module_name = keccak256("VESTING");
+	bytes32 private _module_name = bytes32("VESTING");
 
 	// time until vesting starts
 	uint256 _vestingStart;

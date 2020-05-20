@@ -17,12 +17,12 @@ module.exports = {
 	},
 
 	Module: {
-		TIME_LOCK: web3.utils.keccak256("TIME_LOCK"),
-		PAUSE: web3.utils.keccak256("PAUSE"),
-		SPENDING_LIMIT: web3.utils.keccak256("SPENDING_LIMIT"),
-		VESTING: web3.utils.keccak256("VESTING"),
-		WHITELIST: web3.utils.keccak256("WHITELIST"),
-		OFF_CHAIN: web3.utils.keccak256("OFF_CHAIN"),
+		TIME_LOCK: web3.utils.padRight(web3.utils.fromAscii("TIME_LOCK"), 64),
+		PAUSE: web3.utils.padRight(web3.utils.fromAscii("PAUSE"), 64),
+		SPENDING_LIMIT: web3.utils.padRight(web3.utils.fromAscii("SPENDING_LIMIT"), 64),
+		VESTING: web3.utils.padRight(web3.utils.fromAscii("VESTING"), 64),
+		WHITELIST: web3.utils.padRight(web3.utils.fromAscii("WHITELIST"), 64),
+		OFF_CHAIN: web3.utils.padRight(web3.utils.fromAscii("OFF_CHAIN"), 64),
 	},
 
 	Partitions: {

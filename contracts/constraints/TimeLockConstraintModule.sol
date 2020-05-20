@@ -7,7 +7,7 @@ import "../interfaces/ISecurityToken.sol";
 contract TimeLockConstraintModule is IConstraintModule {
 	ISecurityToken _securityToken;
 
-	bytes32 private _module_name = keccak256("TIME_LOCK");
+	bytes32 private _module_name = bytes32("TIME_LOCK");
 
 	// module data
 	mapping(address => uint256) private _accountTimeLock;
