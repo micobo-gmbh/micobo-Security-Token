@@ -1,6 +1,5 @@
 const SecurityToken = artifacts.require("SecurityToken")
 const SecurityTokenPartition = artifacts.require("SecurityTokenPartition")
-const SecurityTokenPartitionFactory = artifacts.require("SecurityTokenPartitionFactory")
 
 const { conf } = require("../token-config")
 

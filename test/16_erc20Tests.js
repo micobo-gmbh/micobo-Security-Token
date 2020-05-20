@@ -4,7 +4,7 @@ const MicoboSecurityToken = artifacts.require("SecurityToken")
 const { conf } = require("../token-config")
 const { Role, Partitions } = require("./Constants")
 
-contract("Test Document Management", async (accounts) => {
+contract("Test ERC20 Functionality", async (accounts) => {
 	let contracts
 
 	let value = 1000
@@ -99,21 +99,9 @@ contract("Test Document Management", async (accounts) => {
 			value
 		)
 
-		// cannot transfer from second and third, since default partitions has not been updated
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
-				from: accounts[1],
-			})
-		)
-
-		// update default partitions
-		await contracts.micoboSecurityToken.addRole(Role.DEFAULT_PARTITIONS_EDITOR, accounts[0])
-
-		await contracts.micoboSecurityToken.setDefaultPartitions([Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
-
-		//not the transfer works
+		// transfer more
 		await truffleAssert.passes(
-			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
+			contracts.micoboSecurityToken.transfer(accounts[0], value * 2, {
 				from: accounts[1],
 			})
 		)
@@ -125,12 +113,12 @@ contract("Test Document Management", async (accounts) => {
 
 		assert.deepEqual(
 			(await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.SECOND, accounts[1])).toNumber(),
-			value
+			0
 		)
 
 		assert.deepEqual(
 			(await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.THIRD, accounts[1])).toNumber(),
-			value * 2
+			value
 		)
 	})
 })
