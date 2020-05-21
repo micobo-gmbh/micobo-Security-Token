@@ -195,9 +195,11 @@ contract("Test Admin Contract", async (accounts) => {
 
 		// not able to mint anymore
 		await truffleAssert.fails(
-			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], 100, "", {
+			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], 100, "0x", {
 				from: accounts[0],
-			})
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"A8"
 		)
 
 		await truffleAssert.fails(

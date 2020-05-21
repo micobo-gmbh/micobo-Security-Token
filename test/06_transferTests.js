@@ -37,18 +37,18 @@ contract("Test Token Transfer", async (accounts) => {
 		)
 
 		// never reaches ERC1400Raw.sol:318
-		//
-		// await truffleAssert.fails(
-		// 	contracts.micoboSecurityToken.transferByPartition(
-		// 		conf.standardPartition,
-		// 		accounts[0],
-		// 		100000000000000,
-		// 		'0x0',
-		// 		{ from: accounts[1] }
-		// 	),
-		// 	truffleAssert.ErrorType.REVERT,
-		// 	'A4'
-		// )
+		// reaches ERC1400Partition.sol:260
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(
+				conf.standardPartition,
+				accounts[0],
+				100000000000000,
+				"0x0",
+				{ from: accounts[1] }
+			),
+			truffleAssert.ErrorType.REVERT,
+			"A4"
+		)
 
 		// fails granularity test
 		await truffleAssert.fails(
@@ -422,6 +422,14 @@ contract("Test Token Transfer", async (accounts) => {
 		})
 
 		assert.deepEqual(await contracts.micoboSecurityToken.isOperator(accounts[2], accounts[1]), false)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferFromWithData(accounts[1], accounts[2], value, "0x", "0x", {
+				from: accounts[2],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"58"
+		)
 
 		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {
 			from: accounts[1],

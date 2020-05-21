@@ -25,6 +25,12 @@ contract("Test Issuing and Cap", async (accounts) => {
 
 		await contracts.micoboSecurityToken.addRole(Role.CAP_EDITOR, accounts[0])
 
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.setCap(conf.standardCap - 100),
+			truffleAssert.ErrorType.REVERT,
+			"cap must be greater than old one"
+		)
+
 		await truffleAssert.passes(contracts.micoboSecurityToken.setCap(conf.standardCap - -100))
 
 		assert.deepEqual((await contracts.micoboSecurityToken.cap()).toNumber(), conf.standardCap - -100)
