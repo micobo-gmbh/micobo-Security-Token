@@ -48,4 +48,14 @@ contract("Test default partition behaviour", async (accounts) => {
 
 		assert.deepEqual(res, [Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
 	})
+
+	it("cannot transfer by default partition if no default partition is set", async () => {
+		await contracts.micoboSecurityToken.setDefaultPartitions([])
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferWithData(accounts[1], value, "0x"),
+			truffleAssert.ErrorType.REVERT,
+			"A8"
+		)
+	})
 })

@@ -131,6 +131,8 @@ contract("Test GSN functionality", async (accounts) => {
 				from: accounts[0],
 			})
 		)
+
+		assert.deepEqual((await contracts.micoboSecurityToken.getGSNMode()).toNumber(), GSNMode.NONE)
 	})
 
 	it("can deactivate GSN if GSN_CONTROLLER in PartitionProxy", async () => {
@@ -173,9 +175,23 @@ contract("Test GSN functionality", async (accounts) => {
 
 	it("can upgrade relay hub", async () => {
 		const newHub = "0x09226Fc4a70ff15Ed2E6aaa8eb37702122633d6A" //random address
+		const zeroHub = "0x0000000000000000000000000000000000000000"
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.upgradeRelayHub(zeroHub),
+			truffleAssert.ErrorType.REVERT,
+			"GSNRecipient: new RelayHub is the zero address"
+		)
+
 		await contracts.micoboSecurityToken.upgradeRelayHub(newHub)
 
 		assert.deepEqual(await contracts.micoboSecurityToken.getHubAddr(), newHub)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.upgradeRelayHub(newHub),
+			truffleAssert.ErrorType.REVERT,
+			"GSNRecipient: new RelayHub is the current one"
+		)
 
 		await contracts.micoboSecurityToken.upgradeRelayHub(relayHub)
 	})
@@ -195,6 +211,20 @@ contract("Test GSN functionality", async (accounts) => {
 		assert.deepEqual(
 			(await web3.eth.getBalance(accounts[0])) - 0, // convert to number
 			balance - -1000
+		)
+	})
+
+	it("cannot call preRelayedCall or postRelayedCall from non RelayHub", async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.preRelayedCall("0x"),
+			truffleAssert.ErrorType.REVERT,
+			"GSNRecipient: caller is not RelayHub"
+		)
+
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.postRelayedCall("0x", false, 0, "0x00000000000000000000000000000000"),
+			truffleAssert.ErrorType.REVERT,
+			"GSNRecipient: caller is not RelayHub"
 		)
 	})
 
