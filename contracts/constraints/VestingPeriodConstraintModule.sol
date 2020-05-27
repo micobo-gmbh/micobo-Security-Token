@@ -6,42 +6,109 @@ import "../interfaces/IConstraintModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
+/**
+ * @author Simon Dosch
+ * @title VestingPeriodConstraintModule
+ * @dev ConstraintModule
+ * Define a vesting function including a locked period
+ * Accounts can only transfer tokens when they are vested
+ */
 contract VestingPeriodConstraintModule is IConstraintModule {
-	// accounts can only transfer tokens when they are vested
-
 	using SafeMath for uint256;
 
+	/**
+	 * @dev Address of securityToken this ConstraintModule is used by
+	 */
 	ISecurityToken _securityToken;
 
+	/**
+	 * @dev Standard module name
+	 */
 	bytes32 private _module_name = bytes32("VESTING");
 
-	// time until vesting starts
+	// EVENTS
+	/**
+	 * @dev Emitted when vesting options are set
+	 */
+	event VestingOptionsSet(
+		uint256 vestingStart,
+		uint256 vestedFractionAfterStart,
+		uint256 vestingRatio
+	);
+
+	// MODULE DATA
+	/**
+	 * @dev Time until vesting starts
+	 */
 	uint256 _vestingStart;
 
-	// fraction vested after starting
+	/**
+	 * @dev Fraction vested after starting
+	 */
 	uint256 _vestedFraction;
 
-	// fraction of tokens vested in 1 month
+	/**
+	 * @dev Fraction of tokens vested in 1 month
+	 */
 	uint256 _vestingRatio;
 
+	/**
+	 * @dev Tracks amount already spent by users
+	 */
 	mapping(address => uint256) _amountSpentByUser;
 
+	/**
+	 * [VestingPeriodConstraintModule CONSTRUCTOR]
+	 * @dev Initialize VestingPeriodConstraintModule with security token address
+	 * @param tokenAddress Address of securityToken this ConstraintModule is used by
+	 */
 	constructor(address tokenAddress) public {
 		_securityToken = ISecurityToken(tokenAddress);
 	}
 
+	// MODULE FUNCTIONS
+	/**
+	 * @dev Sets vesting options
+	 * @param vestingStart Timestamp in seconds when vesting should start
+	 * @param vestedFractionAfterStart i.e. 4  => 1/4
+	 * @param vestingRatio i.e. 48 => 1/48
+	 */
 	function setVestingOptions(
-		uint256 vestingStart, // timestamp in seconds when vesting should start
-		uint256 vestedFractionAfterStart, // i.e. 4  => 1/4
-		uint256 vestingRatio // i.e. 48 => 1/48
+		uint256 vestingStart,
+		uint256 vestedFractionAfterStart,
+		uint256 vestingRatio
 	) public {
-		require(_securityToken.hasRole(bytes32("VESTING_PERIOD_EDITOR"), msg.sender), "A8");
+		require(
+			_securityToken.hasRole(
+				bytes32("VESTING_PERIOD_EDITOR"),
+				msg.sender
+			),
+			"A8"
+		);
 
 		_vestingStart = vestingStart;
 		_vestedFraction = vestedFractionAfterStart;
 		_vestingRatio = vestingRatio;
+
+		emit VestingOptionsSet(
+			vestingStart,
+			vestedFractionAfterStart,
+			vestingRatio
+		);
 	}
 
+	/**
+	 * @dev Validates live transfer. Can modify state
+	 * @param msg_sender Sender of this function call
+	 * @param partition Partition the tokens are being transferred from
+	 * @param from Token holder.
+	 * @param to Token recipient.
+	 * @param value Number of tokens to transfer.
+	 * @param data Information attached to the transfer.
+	 * @param operatorData Information attached to the transfer, by the operator.
+	 * @return valid transfer is valid
+	 * @return reason Why the transfer failed (intended for require statement)
+	 */
 	function executeTransfer(
 		address msg_sender,
 		bytes32 partition,
@@ -70,6 +137,18 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 		return (valid, reason);
 	}
 
+	/**
+	 * @dev Validates transfer. Cannot modify state
+	 * @param partition Partition the tokens are being transferred from
+	 * @param from Token holder.
+	 * @param value Number of tokens to transfer.
+	 * @return invalid transfer is valid
+	 * @return code ERC1066 error code
+	 * @return extradata Additional bytes32 parameter that can be used to define
+	 * application specific reason codes with additional details (for example the
+	 * transfer restriction rule responsible for making the transfer operation invalid).
+	 * @return reason Why the transfer failed (intended for require statement)
+	 */
 	function validateTransfer(
 		address, /* msg_sender */
 		bytes32 partition,
@@ -107,6 +186,13 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 		return (true, code, extradata, reason);
 	}
 
+	/**
+	 * @dev Returns allowed amount at this point in time for a specific account
+	 * @param partition Partition the transfer originates from
+	 * @param from Account tokens are being transferred from
+	 * @param value Amount that is being transferred
+	 * @return uint256 Allowed amount to be transferred at the moment
+	 */
 	function getAmountAllowed(
 		bytes32 partition,
 		address from,
@@ -144,24 +230,43 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 		// we get the total amountAllowed at this point in time
 	}
 
-	// VIEW
-
+	/**
+	 * @dev Returns _vestingStart
+	 * @return uint256 _vestingStart
+	 */
 	function getVestingStart() public view returns (uint256) {
 		return _vestingStart;
 	}
 
+	/**
+	 * @dev Returns _vestedFraction
+	 * @return uint256 _vestedFraction
+	 */
 	function getVestedFractionAfterStart() public view returns (uint256) {
 		return _vestedFraction;
 	}
 
+	/**
+	 * @dev Returns _vestingRatio
+	 * @return uint256 _vestingRatio
+	 */
 	function getVestingRatio() public view returns (uint256) {
 		return _vestingRatio;
 	}
 
+	/**
+	 * @dev Returns _amountSpentByUser
+	 * @param user Account to get amountSpent for
+	 * @return uint256 _amountSpentByUser
+	 */
 	function getAmountSpentByUser(address user) public view returns (uint256) {
 		return _amountSpentByUser[user];
 	}
 
+	/**
+	 * @dev Returns module name
+	 * @return bytes32 name of the constraint module
+	 */
 	function getModuleName() public override view returns (bytes32) {
 		return _module_name;
 	}

@@ -61,7 +61,8 @@ It can be configured here:
             },
         },
     }
-
+#
+![gsn](resources/gas_consumption.png "GSN")
 #
 
 ## Code Coverage
@@ -137,13 +138,6 @@ When using `issueByPartition` or `bulkIssueByPartition`,
 the issued value must not exceed `_cap`
 
 #
-
-## Gas Consumption
-
-TODO
-
-#
-
 ## Free Transactions
 
 **Gas Station Network (GSN)**

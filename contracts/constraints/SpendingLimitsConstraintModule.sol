@@ -6,47 +6,116 @@ import "../interfaces/IConstraintModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
 
+/**
+ * @author Simon Dosch
+ * @title SpendingLimitsConstraintModule
+ * @dev ConstraintModule
+ * Set spending limits like:
+ * Not more than 2000/500/100 tokens every 24h/12h/6h etc
+ */
 contract SpendingLimitsConstraintModule is IConstraintModule {
 	using SafeMath for uint256;
 
-	// Set spending limits like:
-	// Not more than 2000/500/100 tokens every 24h/12h/6h etc
-
+	/**
+	 * @dev Address of securityToken this ConstraintModule is used by
+	 */
 	ISecurityToken _securityToken;
 
+	/**
+	 * @dev Standard module name
+	 */
 	bytes32 private _module_name = bytes32("SPENDING_LIMIT");
 
-	// module data
+	// EVENTS
+	/**
+	 * @dev Emitted when a timelock entry was added
+	 */
+	event TimelockAdded(uint256 periodLength, uint256 amountAllowed);
 
-	// tracks limits for different time periods
-	SpendingLimit[] private _spendinglimits;
+	/**
+	 * @dev Emitted when a timelock entry was set to a new value
+	 */
+	event TimelockSet(
+		uint256 index,
+		uint256 periodLength,
+		uint256 amountAllowed
+	);
 
+	/**
+	 * @dev Emitted when a timelock entry was deleted
+	 */
+	event TimelockDeleted(uint256 index);
+
+	// MODULE DATA
+	/**
+	 * @dev Describes a spending limit with periodLength and amountAllowed
+	 */
 	struct SpendingLimit {
 		uint256 periodLength;
 		uint256 amountAllowed;
 	}
 
-	// tracks the current spending of accounts in a period, Account - TimelockIndex - User
-	mapping(address => mapping(uint256 => User)) private _ATU;
-
+	/**
+	 * @dev Describes user specific data for saving amounts already spent
+	 */
 	struct User {
 		uint256 amount;
 		uint256 periodEnd;
 	}
 
+	/**
+	 * @dev Contains limits for different time periods
+	 */
+	SpendingLimit[] private _spendinglimits;
+
+	/**
+	 * @dev Tracks the current spending of accounts in a period, Account - TimelockIndex - User
+	 */
+	mapping(address => mapping(uint256 => User)) private _ATU;
+
+	/**
+	 * [SpendingLimitsConstraintModule CONSTRUCTOR]
+	 * @dev Initialize SpendingLimitsConstraintModule with security token address
+	 * @param tokenAddress Address of securityToken this ConstraintModule is used by
+	 */
 	constructor(address tokenAddress) public {
 		_securityToken = ISecurityToken(tokenAddress);
 	}
 
+	// MODULE FUNCTIONS
+	/**
+	 * @dev Modifier to make a function callable only when the caller is SPENDING_LIMITS_EDITOR
+	 */
 	modifier onlySpendingLimitsEditor {
-		require(_securityToken.hasRole(bytes32("SPENDING_LIMITS_EDITOR"), msg.sender), "A7");
+		require(
+			_securityToken.hasRole(
+				bytes32("SPENDING_LIMITS_EDITOR"),
+				msg.sender
+			),
+			"A7"
+		);
 		_;
 	}
 
-	function addTimelock(uint256 periodLength, uint256 amountAllowed) public onlySpendingLimitsEditor {
+	/**
+	 * @dev Adds a new timelock entry
+	 * @param periodLength Length of limiting time period
+	 * @param amountAllowed Amount that can be spent in this period
+	 */
+	function addTimelock(uint256 periodLength, uint256 amountAllowed)
+		public
+		onlySpendingLimitsEditor
+	{
 		_spendinglimits.push(SpendingLimit(periodLength, amountAllowed));
+		emit TimelockAdded(periodLength, amountAllowed);
 	}
 
+	/**
+	 * @dev Edits an existing timelock entry
+	 * @param index Index of timelock entry
+	 * @param periodLength Length of limiting time period
+	 * @param amountAllowed Amount that can be spent in this period
+	 */
 	function setTimelock(
 		uint256 index,
 		uint256 periodLength,
@@ -54,14 +123,27 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 	) public onlySpendingLimitsEditor {
 		require(_spendinglimits.length > index, "out of bounds");
 		_spendinglimits[index] = SpendingLimit(periodLength, amountAllowed);
+		emit TimelockSet(index, periodLength, amountAllowed);
 	}
 
+	/**
+	 * @dev Deletes an existing timelock entry
+	 * @param index Index of timelock entry
+	 */
 	function deleteTimelock(uint256 index) public onlySpendingLimitsEditor {
 		require(_spendinglimits.length > index, "out of bounds");
 		_spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
 		_spendinglimits.pop();
+		emit TimelockDeleted(index);
 	}
 
+	/**
+	 * @dev Validates live transfer. Can modify state
+	 * @param from Token holder.
+	 * @param value Number of tokens to transfer.
+	 * @return invalid transfer is valid
+	 * @return reason Why the transfer failed (intended for require statement)
+	 */
 	function executeTransfer(
 		address, /* msg_sender */
 		bytes32, /* partition */
@@ -110,8 +192,17 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 		return (!invalid, reason);
 	}
 
-	// VIEW
-
+	/**
+	 * @dev Validates transfer. Cannot modify state
+	 * @param from Token holder.
+	 * @param value Number of tokens to transfer.
+	 * @return invalid transfer is valid
+	 * @return code ERC1066 error code
+	 * @return extradata Additional bytes32 parameter that can be used to define
+	 * application specific reason codes with additional details (for example the
+	 * transfer restriction rule responsible for making the transfer operation invalid).
+	 * @return reason Why the transfer failed (intended for require statement)
+	 */
 	function validateTransfer(
 		address, /* msg_sender */
 		bytes32, /* partition */
@@ -170,6 +261,10 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 		return (!invalid, code, extradata, reason);
 	}
 
+	/**
+	 * @dev Returns module name
+	 * @return bytes32 name of the constraint module
+	 */
 	function getModuleName() public override view returns (bytes32) {
 		return _module_name;
 	}
