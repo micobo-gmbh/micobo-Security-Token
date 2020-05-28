@@ -1,7 +1,9 @@
-pragma solidity ^0.6.6;
+pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
 
+
+// copied here to be included in coverage
 
 /**
  * @dev Base GSN recipient contract: includes the {IRelayRecipient} interface
@@ -78,7 +80,11 @@ contract GSNModule is IRelayRecipient {
 	 * @dev Return this in acceptRelayedCall to proceed with the execution of a relayed call. Note that this contract
 	 * will be charged a fee by RelayHub
 	 */
-	function _approveRelayedCall() internal pure returns (uint256, bytes memory) {
+	function _approveRelayedCall()
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return _approveRelayedCall("");
 	}
 
@@ -87,14 +93,22 @@ contract GSNModule is IRelayRecipient {
 	 *
 	 * This overload forwards `context` to _preRelayedCall and _postRelayedCall.
 	 */
-	function _approveRelayedCall(bytes memory context) internal pure returns (uint256, bytes memory) {
+	function _approveRelayedCall(bytes memory context)
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return (_RELAYED_CALL_ACCEPTED, context);
 	}
 
 	/**
 	 * @dev Return this in acceptRelayedCall to impede execution of a relayed call. No fees will be charged.
 	 */
-	function _rejectRelayedCall(uint256 errorCode) internal pure returns (uint256, bytes memory) {
+	function _rejectRelayedCall(uint256 errorCode)
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return (_RELAYED_CALL_REJECTED + errorCode, "");
 	}
 }

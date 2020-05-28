@@ -65,11 +65,24 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes memory data
 	) public {
 		require(_isIssuable, "A8");
-		require(tokenHolders.length == values.length, "tokenHolders and values must be same length");
+		require(
+			tokenHolders.length == values.length,
+			"tokenHolders and values must be same length"
+		);
 
 		for (uint256 i = 0; i < tokenHolders.length; i++) {
-			require(_totalSupply.add(values[i]) <= _cap, "totalSupply would exceed cap");
-			_issueByPartition(partition, _msgSender(), tokenHolders[i], values[i], data, "");
+			require(
+				_totalSupply.add(values[i]) <= _cap,
+				"totalSupply would exceed cap"
+			);
+			_issueByPartition(
+				partition,
+				_msgSender(),
+				tokenHolders[i],
+				values[i],
+				data,
+				""
+			);
 		}
 	}
 
@@ -107,8 +120,16 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @param documentName Short name (represented as a bytes32) associated to the document.
 	 * @return Requested document + document hash.
 	 */
-	function getDocument(bytes32 documentName) external override view returns (string memory, bytes32) {
-		return (_documents[documentName].docURI, _documents[documentName].docHash);
+	function getDocument(bytes32 documentName)
+		external
+		override
+		view
+		returns (string memory, bytes32)
+	{
+		return (
+			_documents[documentName].docURI,
+			_documents[documentName].docHash
+		);
 	}
 
 	/**
@@ -159,16 +180,25 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes32 partition,
 		address tokenHolder,
 		uint256 value,
-		bytes calldata data
-	) external override // onlyMinter is taken care of in _issue function
-	{
+		bytes calldata data // onlyMinter is taken care of in _issue function
+	) external override {
 		require(_isIssuable, "A8");
 
 		// total cap is always the sum of all partitionCaps, so it can't be violated
 
-		require(_totalSupply.add(value) <= _cap, "totalSupply would exceed cap");
+		require(
+			_totalSupply.add(value) <= _cap,
+			"totalSupply would exceed cap"
+		);
 
-		_issueByPartition(partition, _msgSender(), tokenHolder, value, data, "");
+		_issueByPartition(
+			partition,
+			_msgSender(),
+			tokenHolder,
+			value,
+			data,
+			""
+		);
 	}
 
 	/**
@@ -186,7 +216,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	) external override {
 		// only REDEEMER can burn tokens (checked in _redeem())
 
-		_redeemByPartition(partition, _msgSender(), _msgSender(), value, data, "");
+		_redeemByPartition(
+			partition,
+			_msgSender(),
+			_msgSender(),
+			value,
+			data,
+			""
+		);
 	}
 
 	/**
@@ -208,10 +245,20 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	) external override {
 		// only REDEEMER can burn tokens (checked in _redeem())
 
-		require(_isOperatorForPartition(partition, _msgSender(), tokenHolder), "A7");
+		require(
+			_isOperatorForPartition(partition, _msgSender(), tokenHolder),
+			"A7"
+		);
 		// Transfer Blocked - Identity restriction
 
-		_redeemByPartition(partition, _msgSender(), tokenHolder, value, data, operatorData);
+		_redeemByPartition(
+			partition,
+			_msgSender(),
+			tokenHolder,
+			value,
+			data,
+			operatorData
+		);
 	}
 
 	// only used for standardized use of the off-chain validator?
@@ -245,7 +292,16 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 			bytes32
 		)
 	{
-		return _canTransfer(partition, _msgSender(), _msgSender(), to, value, data, "");
+		return
+			_canTransfer(
+				partition,
+				_msgSender(),
+				_msgSender(),
+				to,
+				value,
+				data,
+				""
+			);
 	}
 
 	/**
@@ -285,10 +341,20 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		if (_isControllable && hasRole(bytes32("CONTROLLER"), _msgSender())) {
 			return (hex"A2", "", partition);
 		}
-		if (!_isOperatorForPartition(partition, _msgSender(), from)) return (hex"A7", "", partition);
+		if (!_isOperatorForPartition(partition, _msgSender(), from))
+			return (hex"A7", "", partition);
 		// "Transfer Blocked - Identity restriction"
 
-		return _canTransfer(partition, _msgSender(), from, to, value, data, operatorData);
+		return
+			_canTransfer(
+				partition,
+				_msgSender(),
+				from,
+				to,
+				value,
+				data,
+				operatorData
+			);
 	}
 
 	/********************** ERC1400 INTERNAL FUNCTIONS **************************/
@@ -327,8 +393,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 			bytes32
 		)
 	{
-		if ((_balances[from] < value) || (_balanceOfByPartition[from][partition] < value))
-			return (hex"A4", "", partition);
+		if (
+			(_balances[from] < value) ||
+			(_balanceOfByPartition[from][partition] < value)
+		) return (hex"A4", "", partition);
 		// Transfer Blocked - Sender balance insufficient
 
 		if (to == address(0)) return (hex"A6", "", partition);
@@ -395,7 +463,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		_issue(operator, to, value, data, operatorData);
 		_addTokenToPartition(to, toPartition, value);
 
-		emit IssuedByPartition(toPartition, operator, to, value, data, operatorData);
+		emit IssuedByPartition(
+			toPartition,
+			operator,
+			to,
+			value,
+			data,
+			operatorData
+		);
 	}
 
 	/**
@@ -423,7 +498,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		_removeTokenFromPartition(from, fromPartition, value);
 		_redeem(operator, from, value, data, operatorData);
 
-		emit RedeemedByPartition(fromPartition, operator, from, value, data, operatorData);
+		emit RedeemedByPartition(
+			fromPartition,
+			operator,
+			from,
+			value,
+			data,
+			operatorData
+		);
 	}
 
 	/********************** ERC1400 OPTIONAL FUNCTIONS **************************/
@@ -471,15 +553,13 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @param operators Controller addresses.
 	 */
 
-	// We don't allow this function publicly. Only proxies use it
-	// and have to continue to use it even after _isControllable is false
-	// this is why partitionControllers are only set in addPartition()
-	function setPartitionControllers(bytes32 partition, address[] calldata operators) external override {
+	function setPartitionControllers(
+		bytes32 partition,
+		address[] calldata operators
+	) external override {
 		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
 		_setPartitionControllers(partition, operators);
 	}
-
-	// INFO no setCertificateSigner function, offline valdation works through modules
 
 	//**************CAPPED*******************
 
@@ -491,7 +571,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	}
 
 	function setCap(uint256 newCap) public override {
-		require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), "A7, not allowed to set cap");
+		require(
+			hasRole(bytes32("CAP_EDITOR"), _msgSender()),
+			"A7, not allowed to set cap"
+		);
 		require((newCap > _cap), "cap must be greater than old one");
 
 		// set new cap

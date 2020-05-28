@@ -5,23 +5,44 @@ import "./GSNRecipient.sol";
 import "../interfaces/IGSNable.sol";
 
 
+/**
+ * @author Simon Dosch
+ * @title GSNable
+ * @dev enables GSN capability by implementing GSNRecipient
+ * Can be set to accept ALL, NONE or add a MODULE implementing restrictions
+ */
 contract GSNable is IGSNable, GSNRecipient {
-	// override this function to add access control
-
+	/**
+	 * @dev Add access control by overriding this function!
+	 * should return true if sender is authorized
+	 */
 	function _isGSNController() internal virtual view returns (bool) {
 		this;
 		return true;
 	}
 
+	/**
+	 * @dev Can be set to accept ALL, NONE or MODULE mode
+	 * Initialized with ALL
+	 */
 	gsnMode private _gsnMode = gsnMode.ALL;
 
+	/**
+	 * @dev Address of the GSN MODULE implementing IRelayRecipient
+	 */
 	IRelayRecipient private _gsnModule = IRelayRecipient(address(0));
 
+	/**
+	 * @dev Modifier to make a function callable only when _isGSNController returns true
+	 */
 	modifier onlyGSNController() {
 		require(_isGSNController(), "only GSN controller");
 		_;
 	}
 
+	/**
+	 * @dev doc in IRelayRecipient
+	 */
 	function acceptRelayedCall(
 		address relay,
 		address from,
@@ -53,12 +74,22 @@ contract GSNable is IGSNable, GSNRecipient {
 		}
 	}
 
-	function _preRelayedCall(bytes memory context) internal override returns (bytes32) {
+	/**
+	 * @dev doc in IRelayRecipient
+	 */
+	function _preRelayedCall(bytes memory context)
+		internal
+		override
+		returns (bytes32)
+	{
 		if (_gsnMode == gsnMode.MODULE) {
 			return _gsnModule.preRelayedCall(context);
 		}
 	}
 
+	/**
+	 * @dev doc in IRelayRecipient
+	 */
 	function _postRelayedCall(
 		bytes memory context,
 		bool success,
@@ -66,29 +97,74 @@ contract GSNable is IGSNable, GSNRecipient {
 		bytes32 preRetVal
 	) internal override {
 		if (_gsnMode == gsnMode.MODULE) {
-			return _gsnModule.postRelayedCall(context, success, actualCharge, preRetVal);
+			return
+				_gsnModule.postRelayedCall(
+					context,
+					success,
+					actualCharge,
+					preRetVal
+				);
 		}
 	}
 
-	function setGSNMode(gsnMode m) public override onlyGSNController {
-		_gsnMode = gsnMode(m);
-		emit GSNModeSet(m);
+	/**
+	 * @dev Sets GSN mode to either ALL, NONE or MODULE
+	 * @param mode ALL, NONE or MODULE
+	 */
+	function setGSNMode(gsnMode mode) public override onlyGSNController {
+		_gsnMode = gsnMode(mode);
+		emit GSNModeSet(mode);
 	}
 
-	function getGSNMode() public override view onlyGSNController returns (gsnMode) {
+	/**
+	 * @dev Gets GSN mode
+	 * @return gsnMode ALL, NONE or MODULE
+	 */
+	function getGSNMode()
+		public
+		override
+		view
+		onlyGSNController
+		returns (gsnMode)
+	{
 		return _gsnMode;
 	}
 
-	function setGSNModule(IRelayRecipient newGSNModule) public override onlyGSNController {
+	/**
+	 * @dev Sets Module address for MODULE mode
+	 * @param newGSNModule Address of new GSN module
+	 */
+	function setGSNModule(IRelayRecipient newGSNModule)
+		public
+		override
+		onlyGSNController
+	{
 		_gsnModule = newGSNModule;
 		emit GSNModuleSet(newGSNModule);
 	}
 
-	function upgradeRelayHub(address newRelayHub) public override onlyGSNController {
+	/**
+	 * @dev Upgrades the relay hub address
+	 * @param newRelayHub Address of new relay hub
+	 */
+	function upgradeRelayHub(address newRelayHub)
+		public
+		override
+		onlyGSNController
+	{
 		_upgradeRelayHub(newRelayHub);
 	}
 
-	function withdrawDeposits(uint256 amount, address payable payee) public override onlyGSNController {
+	/**
+	 * @dev Withdraws GSN deposits for this contract
+	 * @param amount Amount to be withdrawn
+	 * @param payee Address to sned the funds to
+	 */
+	function withdrawDeposits(uint256 amount, address payable payee)
+		public
+		override
+		onlyGSNController
+	{
 		_withdrawDeposits(amount, payee);
 	}
 }

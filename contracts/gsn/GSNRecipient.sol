@@ -1,9 +1,11 @@
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayHub.sol";
 import "../../node_modules/@openzeppelin/contracts/GSN/Context.sol";
 
+
+// copied here to be included in coverage
 
 /**
  * @dev Base GSN recipient contract: includes the {IRelayRecipient} interface
@@ -29,7 +31,10 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	/**
 	 * @dev Emitted when a contract changes its {IRelayHub} contract to a new one.
 	 */
-	event RelayHubChanged(address indexed oldRelayHub, address indexed newRelayHub);
+	event RelayHubChanged(
+		address indexed oldRelayHub,
+		address indexed newRelayHub
+	);
 
 	/**
 	 * @dev Returns the address of the {IRelayHub} contract for this recipient.
@@ -47,8 +52,14 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _upgradeRelayHub(address newRelayHub) internal virtual {
 		address currentRelayHub = _relayHub;
-		require(newRelayHub != address(0), "GSNRecipient: new RelayHub is the zero address");
-		require(newRelayHub != currentRelayHub, "GSNRecipient: new RelayHub is the current one");
+		require(
+			newRelayHub != address(0),
+			"GSNRecipient: new RelayHub is the zero address"
+		);
+		require(
+			newRelayHub != currentRelayHub,
+			"GSNRecipient: new RelayHub is the current one"
+		);
 
 		emit RelayHubChanged(currentRelayHub, newRelayHub);
 
@@ -71,7 +82,10 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 *
 	 * Derived contracts should expose this in an external interface with proper access control.
 	 */
-	function _withdrawDeposits(uint256 amount, address payable payee) internal virtual {
+	function _withdrawDeposits(uint256 amount, address payable payee)
+		internal
+		virtual
+	{
 		IRelayHub(_relayHub).withdraw(amount, payee);
 	}
 
@@ -86,7 +100,13 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 *
 	 * IMPORTANT: Contracts derived from {GSNRecipient} should never use `msg.sender`, and use {_msgSender} instead.
 	 */
-	function _msgSender() internal virtual override view returns (address payable) {
+	function _msgSender()
+		internal
+		virtual
+		override
+		view
+		returns (address payable)
+	{
 		if (msg.sender != _relayHub) {
 			return msg.sender;
 		} else {
@@ -120,8 +140,16 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 *
 	 * - the caller must be the `RelayHub` contract.
 	 */
-	function preRelayedCall(bytes memory context) public virtual override returns (bytes32) {
-		require(msg.sender == getHubAddr(), "GSNRecipient: caller is not RelayHub");
+	function preRelayedCall(bytes memory context)
+		public
+		virtual
+		override
+		returns (bytes32)
+	{
+		require(
+			msg.sender == getHubAddr(),
+			"GSNRecipient: caller is not RelayHub"
+		);
 		return _preRelayedCall(context);
 	}
 
@@ -132,7 +160,10 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 * must implement this function with any relayed-call preprocessing they may wish to do.
 	 *
 	 */
-	function _preRelayedCall(bytes memory context) internal virtual returns (bytes32);
+	function _preRelayedCall(bytes memory context)
+		internal
+		virtual
+		returns (bytes32);
 
 	/**
 	 * @dev See `IRelayRecipient.postRelayedCall`.
@@ -149,7 +180,10 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 		uint256 actualCharge,
 		bytes32 preRetVal
 	) public virtual override {
-		require(msg.sender == getHubAddr(), "GSNRecipient: caller is not RelayHub");
+		require(
+			msg.sender == getHubAddr(),
+			"GSNRecipient: caller is not RelayHub"
+		);
 		_postRelayedCall(context, success, actualCharge, preRetVal);
 	}
 
@@ -171,7 +205,11 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 * @dev Return this in acceptRelayedCall to proceed with the execution of a relayed call. Note that this contract
 	 * will be charged a fee by RelayHub
 	 */
-	function _approveRelayedCall() internal pure returns (uint256, bytes memory) {
+	function _approveRelayedCall()
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return _approveRelayedCall("");
 	}
 
@@ -180,14 +218,22 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 *
 	 * This overload forwards `context` to _preRelayedCall and _postRelayedCall.
 	 */
-	function _approveRelayedCall(bytes memory context) internal pure returns (uint256, bytes memory) {
+	function _approveRelayedCall(bytes memory context)
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return (_RELAYED_CALL_ACCEPTED, context);
 	}
 
 	/**
 	 * @dev Return this in acceptRelayedCall to impede execution of a relayed call. No fees will be charged.
 	 */
-	function _rejectRelayedCall(uint256 errorCode) internal pure returns (uint256, bytes memory) {
+	function _rejectRelayedCall(uint256 errorCode)
+		internal
+		pure
+		returns (uint256, bytes memory)
+	{
 		return (_RELAYED_CALL_REJECTED + errorCode, "");
 	}
 
@@ -205,7 +251,11 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 		return (gas * gasPrice * (100 + serviceFee)) / 100;
 	}
 
-	function _getRelayedCallSender() private pure returns (address payable result) {
+	function _getRelayedCallSender()
+		private
+		pure
+		returns (address payable result)
+	{
 		// We need to read 20 bytes (an address) located at array index msg.data.length - 20. In memory, the array
 		// is prefixed with a 32-byte length value, so we first add 32 to get the memory read index. However, doing
 		// so would leave the address in the upper 20 bytes of the 32-byte word, which is inconvenient and would
@@ -222,7 +272,10 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 		// solhint-disable-next-line no-inline-assembly
 		assembly {
 			// Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
-			result := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
+			result := and(
+				mload(add(array, index)),
+				0xffffffffffffffffffffffffffffffffffffffff
+			)
 		}
 		return result;
 	}

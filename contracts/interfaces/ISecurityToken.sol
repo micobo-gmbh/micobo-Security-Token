@@ -11,7 +11,8 @@ import "./IAdmin.sol";
  */
 
 interface ISecurityToken {
-	function addPartitionProxy(bytes32 partition, address proxyAddress) external;
+	function addPartitionProxy(bytes32 partition, address proxyAddress)
+		external;
 
 	function bulkIssueByPartition(
 		bytes32 partition,
@@ -24,9 +25,15 @@ interface ISecurityToken {
 	// Constrainable INTERFACE
 	//******************/
 
-	function getModulesByPartition() external view returns (IConstraintModule[] memory);
+	function getModulesByPartition()
+		external
+		view
+		returns (IConstraintModule[] memory);
 
-	function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external;
+	function setModulesByPartition(
+		bytes32 partition,
+		IConstraintModule[] calldata newModules
+	) external;
 
 	//******************/
 	// Administrable INTERFACE
@@ -37,10 +44,21 @@ interface ISecurityToken {
 
 	function renounceRole(bytes32 role) external;
 
-	function hasRole(bytes32 role, address account) external view returns (bool);
+	function hasRole(bytes32 role, address account)
+		external
+		view
+		returns (bool);
 
-	event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
-	event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+	event RoleGranted(
+		bytes32 indexed role,
+		address indexed account,
+		address indexed sender
+	);
+	event RoleRevoked(
+		bytes32 indexed role,
+		address indexed account,
+		address indexed sender
+	);
 	event RoleRenounced(bytes32 indexed role, address indexed account);
 
 	//******************/
@@ -107,25 +125,52 @@ interface ISecurityToken {
 		bytes data,
 		bytes operatorData
 	);
-	event Issued(address indexed operator, address indexed to, uint256 value, bytes data, bytes operatorData);
-	event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
-	event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
-	event RevokedOperator(address indexed operator, address indexed tokenHolder);
+	event Issued(
+		address indexed operator,
+		address indexed to,
+		uint256 value,
+		bytes data,
+		bytes operatorData
+	);
+	event Redeemed(
+		address indexed operator,
+		address indexed from,
+		uint256 value,
+		bytes data,
+		bytes operatorData
+	);
+	event AuthorizedOperator(
+		address indexed operator,
+		address indexed tokenHolder
+	);
+	event RevokedOperator(
+		address indexed operator,
+		address indexed tokenHolder
+	);
 
 	//******************/
 	// ERC1400Partition INTERFACE
 	//******************/
 
 	// ERC20 proxy compatibility
-	function totalSupplyByPartition(bytes32 partition) external view returns (uint256);
+	function totalSupplyByPartition(bytes32 partition)
+		external
+		view
+		returns (uint256);
 
 	// Partition proxy contracts
 	function partitionProxies() external view returns (address[] memory);
 
 	// Token Information
-	function balanceOfByPartition(bytes32 partition, address tokenHolder) external view returns (uint256); // 1/10
+	function balanceOfByPartition(bytes32 partition, address tokenHolder)
+		external
+		view
+		returns (uint256); // 1/10
 
-	function partitionsOf(address tokenHolder) external view returns (bytes32[] memory); // 2/10
+	function partitionsOf(address tokenHolder)
+		external
+		view
+		returns (bytes32[] memory); // 2/10
 
 	// Token Transfers
 	function transferByPartition(
@@ -145,11 +190,16 @@ interface ISecurityToken {
 	) external returns (bytes32); // 4/10
 
 	// Operators
-	function controllersByPartition(bytes32 partition) external view returns (address[] memory); // 7/10
+	function controllersByPartition(bytes32 partition)
+		external
+		view
+		returns (address[] memory); // 7/10
 
-	function authorizeOperatorByPartition(bytes32 partition, address operator) external; // 8/10
+	function authorizeOperatorByPartition(bytes32 partition, address operator)
+		external; // 8/10
 
-	function revokeOperatorByPartition(bytes32 partition, address operator) external; // 9/10
+	function revokeOperatorByPartition(bytes32 partition, address operator)
+		external; // 9/10
 
 	function isOperatorForPartition(
 		bytes32 partition,
@@ -171,7 +221,11 @@ interface ISecurityToken {
 		bytes operatorData
 	);
 
-	event ChangedPartition(bytes32 indexed fromPartition, bytes32 indexed toPartition, uint256 value);
+	event ChangedPartition(
+		bytes32 indexed fromPartition,
+		bytes32 indexed toPartition,
+		uint256 value
+	);
 
 	// Operator Events
 	event AuthorizedOperatorByPartition(
@@ -179,14 +233,21 @@ interface ISecurityToken {
 		address indexed operator,
 		address indexed tokenHolder
 	);
-	event RevokedOperatorByPartition(bytes32 indexed partition, address indexed operator, address indexed tokenHolder);
+	event RevokedOperatorByPartition(
+		bytes32 indexed partition,
+		address indexed operator,
+		address indexed tokenHolder
+	);
 
 	//******************/
 	// ERC1400Capped INTERFACE
 	//******************/
 
 	// Document Management
-	function getDocument(bytes32 documentName) external view returns (string memory, bytes32); // 1/9
+	function getDocument(bytes32 documentName)
+		external
+		view
+		returns (string memory, bytes32); // 1/9
 
 	function setDocument(
 		bytes32 documentName,
@@ -194,7 +255,11 @@ interface ISecurityToken {
 		bytes32 documentHash
 	) external; // 2/9
 
-	event Document(bytes32 indexed documentName, string uri, bytes32 documentHash);
+	event Document(
+		bytes32 indexed documentName,
+		string uri,
+		bytes32 documentHash
+	);
 
 	// Controller Operation
 	function isControllable() external view returns (bool); // 3/9
@@ -273,7 +338,10 @@ interface ISecurityToken {
 
 	function renounceIssuance() external;
 
-	function setPartitionControllers(bytes32 partition, address[] calldata operators) external;
+	function setPartitionControllers(
+		bytes32 partition,
+		address[] calldata operators
+	) external;
 
 	// Capped
 	function cap() external view returns (uint256);

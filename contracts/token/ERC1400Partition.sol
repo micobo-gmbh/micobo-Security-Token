@@ -448,9 +448,9 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		pure
 		returns (bytes32 toPartition)
 	{
+		/* prettier-ignore */
+		bytes32 changePartitionFlag = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
-			bytes32 changePartitionFlag
-		 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 		bytes32 flag;
 		assembly {
 			flag := mload(add(data, 32))
