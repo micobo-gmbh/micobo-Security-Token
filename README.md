@@ -15,15 +15,14 @@ You need truffle installed globally
 
 ### Compatibility
 
+We implement ERC1400Raw.  
 We implement ERC1400Partition.  
 We implement ERC20 with default partitions.  
 We implement ERC20 as proxies for specific partitions.
 
-We don't implement operator and transfer functionality of ERC1400Raw.  
-We don't implement ERC777.
+We don't implement ERC777 functionality.
 
 #
-
 ## Tests
 
 All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.
@@ -119,23 +118,6 @@ This is and overview of roles that can be used.
 
 ![roles](resources/CommonRoles.png "Roles")
 
-#
-
-## Cap
-
-There is 1 overall cap for the whole token (`_cap`)
-
-It is set during deployment in the constructor.
-
-Get cap with `cap()`
-
-When `CAP_EDITOR`, use `setCap(uint256 newCap)` to set to new value.  
-The new cap must always be greater than the old one!
-
---> SecurityTokenPartitions return overall cap with their `cap()` function.
-
-When using `issueByPartition` or `bulkIssueByPartition`,  
-the issued value must not exceed `_cap`
 
 #
 ## Free Transactions
@@ -154,12 +136,30 @@ GSN can also be turned off completely!
 
 # Explanations
 
+## Cap
+
+There is 1 overall cap for the whole token (`_cap`)
+
+It is set during deployment in the constructor.
+
+Get cap with `cap()`
+
+When `CAP_EDITOR`, use `setCap(uint256 newCap)` to set to new value.  
+The new cap must always be greater than the old one!
+
+*SecurityTokenPartitions return overall cap with their `cap()` function.*
+
+When using `issueByPartition` or `bulkIssueByPartition`,  
+the issued value must not exceed `_cap`
+
+
 ## Admin
 
 Admin is a role.
 It controls assignment and removal of all roles.  
 It can also assign and remove other admins.  
 It cannot renounce itself, as this would leave the contract potentially without admin.
+
 
 ## Controller
 
@@ -168,6 +168,7 @@ As every role, it can be assigned or removed by the admin role, as well as renou
 If the contract is `isControllable()`,  
 Controllers can force-transfer tokens disregarding ownership and constraints using `operatorTransferByPartition`.  
 In this case, the controller is regarded as a kind of master-operator.
+
 
 ## Operator
 

@@ -335,7 +335,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		// so over time, tokens converge towards the base!
 		bytes32 toPartition = bytes32(0);
 
-		// TODO why can only operators do this?
 		if (operatorData.length != 0 && data.length >= 64) {
 			toPartition = _getDestinationPartition(fromPartition, data);
 		}
