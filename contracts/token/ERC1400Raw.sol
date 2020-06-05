@@ -11,9 +11,6 @@ import "../interfaces/IERC1400Raw.sol";
  * @title ERC1400Raw
  * @dev ERC1400Raw logic
  */
-
-// INFO got rid of sender recipient check
-
 contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	using SafeMath for uint256;
 
@@ -44,7 +41,7 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	/**
 	 * @dev Modifier to verify if transfer is validated
 	 *
-	 * outsourced this to check function and modular constraints later on
+	 * outsourced this to validate function and modular constraints later on
 	 */
 	// modifier isValidCertificate(bytes memory data) {}
 
@@ -64,7 +61,7 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 		_name = name;
 		_symbol = symbol;
 		_totalSupply = 0;
-		require(granularity >= 1, "granularity >= 1");
+		require(granularity >= 1, "granularity");
 		// Constructor Blocked - Token granularity can not be lower than 1
 		_granularity = granularity;
 	}
@@ -119,22 +116,12 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 
 	/**
 	 * [ERC1400Raw INTERFACE (6/13)]
-	 * @dev Get the list of controllers as defined by the Administrable contract.
-	 * @return List of addresses of all the controllers.
+	 * @dev Always returns an empty array, since controllers are only managed in Administrable
+	 * @return c Empty list
 	 */
-	// TODO implement in Administrable?
-	/*
-    function controllers() external view returns (address[] memory) {
-        address[] memory activeControllers = _controllers;
-
-        // only return active entries (we only add to _controllers in Administrable)
-        for(uint i = 0; i < _controllers.length; i++) {
-            if(hasRole(bytes32("CONTROLLER"), _controllers[i])) {
-                delete activeControllers[i];
-            }
-        }
-        return activeControllers;
-    }*/
+	function controllers() external override view returns (address[] memory c) {
+		return c;
+	}
 
 	/**
 	 * [ERC1400Raw INTERFACE (7/13)]
@@ -142,9 +129,8 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	 * and redeem tokens on its behalf.
 	 * @param operator Address to set as an operator for 'msg.sender'.
 	 */
-	// we only use authorizeOperatorByPartition()
 	function authorizeOperator(address operator) external override {
-		require(operator != _msgSender(), "");
+		require(operator != _msgSender(), "A7");
 		_authorizedOperator[operator][_msgSender()] = true;
 		emit AuthorizedOperator(operator, _msgSender());
 	}
@@ -155,9 +141,8 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	 * and to transfer and redeem tokens on its behalf.
 	 * @param operator Address to rescind as an operator for 'msg.sender'.
 	 */
-	// we only use revokeOperatorByPartition()
 	function revokeOperator(address operator) external override {
-		require(operator != _msgSender(), "");
+		require(operator != _msgSender(), "A7");
 		_authorizedOperator[operator][_msgSender()] = false;
 		emit RevokedOperator(operator, _msgSender());
 	}
@@ -169,8 +154,12 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	 * @param tokenHolder Address of a token holder which may have the operator address as an operator.
 	 * @return 'true' if operator is an operator of 'tokenHolder' and 'false' otherwise.
 	 */
-	// we only use isOperatorForPartition()
-	function isOperator(address operator, address tokenHolder) external override view returns (bool) {
+	function isOperator(address operator, address tokenHolder)
+		external
+		override
+		view
+		returns (bool)
+	{
 		return _isOperator(operator, tokenHolder);
 	}
 
@@ -274,7 +263,11 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	 * @param tokenHolder Address of a token holder which may have the 'operator' address as an operator.
 	 * @return 'true' if 'operator' is an operator of 'tokenHolder' and 'false' otherwise.
 	 */
-	function _isOperator(address operator, address tokenHolder) internal view returns (bool) {
+	function _isOperator(address operator, address tokenHolder)
+		internal
+		view
+		returns (bool)
+	{
 		return (operator == tokenHolder ||
 			_authorizedOperator[operator][tokenHolder] ||
 			(_isControllable && hasRole(bytes32("CONTROLLER"), operator)));
@@ -309,8 +302,19 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 		// Transfer Blocked - Sender balance insufficient
 
 		// CONTROLLER bypasses constraint modules
-		if (!(_isControllable && hasRole(bytes32("CONTROLLER"), _msgSender()))) {
-			_executeTransfer(_msgSender(), partition, operator, from, to, value, data, operatorData);
+		if (
+			!(_isControllable && hasRole(bytes32("CONTROLLER"), _msgSender()))
+		) {
+			_executeTransfer(
+				_msgSender(),
+				partition,
+				operator,
+				from,
+				to,
+				value,
+				data,
+				operatorData
+			);
 		}
 
 		// _callSender(partition, operator, from, to, value, data, operatorData);
@@ -343,8 +347,8 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 		// Transfer Blocked - Token granularity
 		require(from != address(0), "A5");
 		// Transfer Blocked - Sender not eligible
-		require(_balances[from] >= value, "A4");
-		// Transfer Blocked - Sender balance insufficient
+		// require(_balances[from] >= value, "A4");
+		// already checked in _redeemByPartitionn
 
 		// is REDEEMER
 		require(hasRole(bytes32("REDEEMER"), _msgSender()), "A7");
@@ -466,8 +470,7 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	 * [NOT MANDATORY FOR ERC1400Raw STANDARD]
 	 * @dev Set list of token controllers.
 	 * @param operators Controller addresses.
+	 * INFO instead of setting the controllers here, we set admin roles in Administrable constructor
 	 */
-
-	// instead of setting the controllers here, we set admin roles in Administrable constructor
 	// function _setControllers(address[] memory operators) internal {}
 }

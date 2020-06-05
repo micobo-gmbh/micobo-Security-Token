@@ -80,7 +80,7 @@ contract("Test GSN functionality", async (accounts) => {
 			gas: 104310,
 			gasPrice: 20000000000,
 		})
-		console.log(tx["tx"])
+		// console.log(tx["tx"])
 
 		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]), true)
 	})
@@ -100,7 +100,7 @@ contract("Test GSN functionality", async (accounts) => {
 			gas: 192366, // 92366
 			gasPrice: 20000000000,
 		})
-		console.log(tx["tx"])
+		// console.log(tx["tx"])
 
 		// console.log(balance)
 
@@ -180,7 +180,7 @@ contract("Test GSN functionality", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.upgradeRelayHub(zeroHub),
 			truffleAssert.ErrorType.REVERT,
-			"GSNRecipient: new RelayHub is the zero address"
+			"zero"
 		)
 
 		await contracts.micoboSecurityToken.upgradeRelayHub(newHub)
@@ -190,7 +190,7 @@ contract("Test GSN functionality", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.upgradeRelayHub(newHub),
 			truffleAssert.ErrorType.REVERT,
-			"GSNRecipient: new RelayHub is the current one"
+			"current one"
 		)
 
 		await contracts.micoboSecurityToken.upgradeRelayHub(relayHub)
@@ -202,7 +202,7 @@ contract("Test GSN functionality", async (accounts) => {
 
 		const balance = await web3.eth.getBalance(accounts[0])
 
-		console.log(balance)
+		// console.log(balance)
 
 		let tx = await contracts.micoboSecurityToken.withdrawDeposits(1000, accounts[0], { from: accounts[1] })
 
@@ -218,13 +218,13 @@ contract("Test GSN functionality", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.preRelayedCall("0x"),
 			truffleAssert.ErrorType.REVERT,
-			"GSNRecipient: caller is not RelayHub"
+			"not hub"
 		)
 
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.postRelayedCall("0x", false, 0, "0x00000000000000000000000000000000"),
 			truffleAssert.ErrorType.REVERT,
-			"GSNRecipient: caller is not RelayHub"
+			"not hub"
 		)
 	})
 
@@ -254,7 +254,7 @@ contract("Test GSN functionality", async (accounts) => {
 				gasPrice: 20000000000,
 			}
 		)
-		console.log(tx["tx"])
+		// console.log(tx["tx"])
 
 		// tokens have been transferred
 		assert.deepEqual(

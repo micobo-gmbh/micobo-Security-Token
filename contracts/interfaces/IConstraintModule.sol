@@ -1,6 +1,11 @@
 pragma solidity 0.6.6;
 
 
+/**
+ * @author Simon Dosch
+ * @title IConstraintModule
+ * @dev ConstraintModule's interface
+ */
 interface IConstraintModule {
 	// ConstraintModule should also implement an interface to the token they are referring to
 	// to call functions like hasRole() from Administrable

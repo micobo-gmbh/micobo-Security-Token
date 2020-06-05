@@ -1,15 +1,15 @@
 pragma solidity 0.6.6;
 
 import "./IConstraintModule.sol";
-import "./IAdmin.sol";
 
 
 /**
- * @title Interface for using the Security Token
- * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
+ * @author Simon Dosch
+ * @title ISecurityToken
+ * @dev Interface for using the Security Token
+ * this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
  */
-
 interface ISecurityToken {
 	function addPartitionProxy(bytes32 partition, address proxyAddress)
 		external;

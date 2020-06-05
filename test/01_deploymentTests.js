@@ -24,7 +24,7 @@ contract("Test Deployment", async (accounts) => {
 				accounts[0]
 			),
 			truffleAssert.ErrorType.REVERT,
-			"granularity >= 1"
+			"granularity"
 		)
 
 		micoboSecurityToken = await MicoboSecurityToken.new(
@@ -70,6 +70,10 @@ contract("Test Deployment", async (accounts) => {
 		assert.deepEqual(await micoboSecurityToken.symbol(), conf.symbol)
 
 		assert.deepEqual((await micoboSecurityToken.granularity()).toNumber(), conf.granularity)
+
+		assert.deepEqual((await micoboSecurityToken.decimals()).toNumber(), 18)
+
+		assert.deepEqual(await micoboSecurityToken.controllers(), [])
 
 		// total cap should be equal to standard partition cap at this point
 		assert.deepEqual((await micoboSecurityToken.cap()).toNumber(), conf.standardCap)

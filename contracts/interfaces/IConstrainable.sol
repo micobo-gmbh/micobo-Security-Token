@@ -3,8 +3,29 @@ pragma solidity 0.6.6;
 import "../interfaces/IConstraintModule.sol";
 
 
+/**
+ * @author Simon Dosch
+ * @title IConstrainable
+ * @dev Constrainable interface
+ */
 interface IConstrainable {
-	function getModulesByPartition(bytes32 partition) external view returns (IConstraintModule[] memory);
+	/**
+	 * @dev Returns all modules for requested partition
+	 * @param partition Partition to get modules for
+	 * @return IConstraintModule[]
+	 */
+	function getModulesByPartition(bytes32 partition)
+		external
+		view
+		returns (IConstraintModule[] memory);
 
-	function setModulesByPartition(bytes32 partition, IConstraintModule[] calldata newModules) external;
+	/**
+	 * @dev Sets all modules for partition
+	 * @param partition Partition to set modules for
+	 * @param newModules IConstraintModule[] array of new modules for this partition
+	 */
+	function setModulesByPartition(
+		bytes32 partition,
+		IConstraintModule[] calldata newModules
+	) external;
 }

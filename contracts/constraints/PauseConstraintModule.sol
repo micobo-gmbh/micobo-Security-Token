@@ -133,7 +133,7 @@ contract PauseConstraintModule is IConstraintModule {
 	 * @dev Modifier to make a function callable only when the contract is not paused.
 	 */
 	modifier whenNotPaused() {
-		require(!_paused, "contract is paused");
+		require(!_paused, "paused");
 		_;
 	}
 
@@ -141,7 +141,7 @@ contract PauseConstraintModule is IConstraintModule {
 	 * @dev Modifier to make a function callable only when the contract is paused.
 	 */
 	modifier whenPaused() {
-		require(_paused, "contract is not paused");
+		require(_paused, "not paused");
 		_;
 	}
 

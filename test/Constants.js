@@ -3,11 +3,13 @@ module.exports = {
 		ADMIN: web3.utils.padRight(web3.utils.fromAscii("ADMIN"), 64),
 		CONTROLLER: web3.utils.padRight(web3.utils.fromAscii("CONTROLLER"), 64),
 		ISSUER: web3.utils.padRight(web3.utils.fromAscii("ISSUER"), 64),
-		PAUSER: web3.utils.padRight(web3.utils.fromAscii("PAUSER"), 64),
 		REDEEMER: web3.utils.padRight(web3.utils.fromAscii("REDEEMER"), 64),
-		CAP_EDITOR: web3.utils.padRight(web3.utils.fromAscii("CAP_EDITOR"), 64),
 		MODULE_EDITOR: web3.utils.padRight(web3.utils.fromAscii("MODULE_EDITOR"), 64),
+
 		DOCUMENT_EDITOR: web3.utils.padRight(web3.utils.fromAscii("DOCUMENT_EDITOR"), 64),
+		CAP_EDITOR: web3.utils.padRight(web3.utils.fromAscii("CAP_EDITOR"), 64),
+
+		PAUSER: web3.utils.padRight(web3.utils.fromAscii("PAUSER"), 64),
 		WHITELIST_EDITOR: web3.utils.padRight(web3.utils.fromAscii("WHITELIST_EDITOR"), 64),
 		TIME_LOCK_EDITOR: web3.utils.padRight(web3.utils.fromAscii("TIME_LOCK_EDITOR"), 64),
 		SPENDING_LIMITS_EDITOR: web3.utils.padRight(web3.utils.fromAscii("SPENDING_LIMITS_EDITOR"), 64),

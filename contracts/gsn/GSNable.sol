@@ -36,7 +36,7 @@ contract GSNable is IGSNable, GSNRecipient {
 	 * @dev Modifier to make a function callable only when _isGSNController returns true
 	 */
 	modifier onlyGSNController() {
-		require(_isGSNController(), "only GSN controller");
+		require(_isGSNController(), "A7");
 		_;
 	}
 

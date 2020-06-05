@@ -4,11 +4,12 @@ import "./ISecurityToken.sol";
 
 
 /**
- * @title Interface for using the Security Token Partition
- * @dev this interface is meant solely for usage with libraries like truffle or web3.js.
+ * @author Simon Dosch
+ * @title ISecurityTokenPartition
+ * @dev Interface for using the Security Token Partition
+ * this interface is meant solely for usage with libraries like truffle or web3.js.
  * it is not used by any deployed contract
  */
-
 interface ISecurityTokenPartition {
 	function securityTokenAddress() external view returns (ISecurityToken);
 
@@ -44,12 +45,19 @@ interface ISecurityTokenPartition {
 
 	function balanceOf(address who) external view returns (uint256);
 
-	function allowance(address owner, address spender) external view returns (uint256);
+	function allowance(address owner, address spender)
+		external
+		view
+		returns (uint256);
 
 	// Transfer events are implemented in ERC1400ERC20
 	event Transfer(address indexed from, address indexed to, uint256 value);
 
-	event Approval(address indexed owner, address indexed spender, uint256 value);
+	event Approval(
+		address indexed owner,
+		address indexed spender,
+		uint256 value
+	);
 
 	//******************/
 	// ERC1400Raw
@@ -83,10 +91,28 @@ interface ISecurityTokenPartition {
 		bytes operatorData
 	);
 
-	event Issued(address indexed operator, address indexed to, uint256 value, bytes data, bytes operatorData);
-	event Redeemed(address indexed operator, address indexed from, uint256 value, bytes data, bytes operatorData);
-	event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
-	event RevokedOperator(address indexed operator, address indexed tokenHolder);
+	event Issued(
+		address indexed operator,
+		address indexed to,
+		uint256 value,
+		bytes data,
+		bytes operatorData
+	);
+	event Redeemed(
+		address indexed operator,
+		address indexed from,
+		uint256 value,
+		bytes data,
+		bytes operatorData
+	);
+	event AuthorizedOperator(
+		address indexed operator,
+		address indexed tokenHolder
+	);
+	event RevokedOperator(
+		address indexed operator,
+		address indexed tokenHolder
+	);
 
 	// GSN
 	function setGSNAllowed(bool allow) external;

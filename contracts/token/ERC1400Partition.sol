@@ -10,6 +10,7 @@ import "../interfaces/IERC1400Partition.sol";
  */
 contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	/******************** Mappings to find partition ******************************/
+
 	// List of partitions.
 	bytes32[] internal _totalPartitions;
 
@@ -48,8 +49,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 
 	/**
 	 * [ERC1400Partition CONSTRUCTOR]
-	 * @dev Initialize ERC1400Partition parameters + register
-	 * the contract implementation in ERC1820Registry.
+	 * @dev Initialize ERC1400Partition
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.
 	 * @param granularity Granularity of the token.
@@ -65,7 +65,12 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 
 	/********************** NEW FUNCTIONS **************************/
 
-	// for ERC20 compatibility via proxy
+	/**
+	 * @dev Returns the total supply of a given partition
+	 * For ERC20 compatibility via proxy
+	 * @param partition Requested partition
+	 * @return uint256 _totalSupplyByPartition
+	 */
 	function totalSupplyByPartition(bytes32 partition)
 		public
 		override
@@ -75,6 +80,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		return _totalSupplyByPartition[partition];
 	}
 
+	/**
+	 * @dev Returns all partition proxy addresses
+	 * @return address[] Array of all partition proxy addresses
+	 */
 	function partitionProxies()
 		public
 		override
@@ -185,7 +194,12 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	 * For example, a security token may return the bytes32("unrestricted").
 	 * @return Array of default partitions.
 	 */
-	function getDefaultPartitions() external view returns (bytes32[] memory) {
+	function getDefaultPartitions()
+		external
+		override
+		view
+		returns (bytes32[] memory)
+	{
 		return _defaultPartitions;
 	}
 
@@ -195,7 +209,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
 	 * @param partitions partitions to use by default when not specified.
 	 */
-	function setDefaultPartitions(bytes32[] calldata partitions) external {
+	function setDefaultPartitions(bytes32[] calldata partitions)
+		external
+		override
+	{
 		require(
 			hasRole(bytes32("DEFAULT_PARTITIONS_EDITOR"), _msgSender()),
 			"A7"
@@ -517,8 +534,8 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes calldata data
 	) external override {
 		_transferByDefaultPartitions(
-			msg.sender,
-			msg.sender,
+			_msgSender(),
+			_msgSender(),
 			to,
 			value,
 			data,
@@ -540,10 +557,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external override {
-		require(_isOperator(msg.sender, from), "58"); // 0x58	invalid operator (transfer agent)
+		require(_isOperator(_msgSender(), from), "58"); // 0x58	invalid operator (transfer agent)
 
 		_transferByDefaultPartitions(
-			msg.sender,
+			_msgSender(),
 			from,
 			to,
 			value,

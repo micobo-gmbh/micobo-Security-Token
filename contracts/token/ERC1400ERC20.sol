@@ -7,63 +7,141 @@ import "../interfaces/IERC1400Raw.sol";
 
 
 /**
- * @author openzeppelin
- * @title Capped token
- * @dev token with a total cap and partition specific caps.
- * Cap cannot be changed afterwards.
+ * @author Simon Dosch
+ * @title ERC1400ERC20
+ * @dev Expands ERC1400s function by those of the ERC20 standard
  */
 contract ERC1400ERC20 is ERC1400Partition, IERC20 {
+	/**
+	 * @dev Mapping from (tokenHolder, spender) to allowed value.
+	 */
+	mapping(address => mapping(address => uint256)) internal _allowances;
+
+	/**
+	 * [ERC1400ERC20 CONSTRUCTOR]
+	 * @dev Initialize ERC1400ERC20 parameters
+	 * @param name Name of the token.
+	 * @param symbol Symbol of the token.
+	 * @param granularity Granularity of the token.
+	 */
 	constructor(
 		string memory name,
 		string memory symbol,
 		uint256 granularity
 	) public ERC1400Partition(name, symbol, granularity) {}
 
-	// Mapping from (tokenHolder, spender) to allowed value.
-	mapping(address => mapping(address => uint256)) internal _allowed;
+	/**
+	 * @dev Returns the ERC20 decimal property as 18
+	 * @return uint8 Always returns decimals as 18
+	 */
+	function decimals() external pure returns (uint8) {
+		return uint8(18);
+	}
 
+	/**
+	 * @dev Returns the amount of tokens in existence.
+	 */
 	function totalSupply() public override view returns (uint256) {
 		return _totalSupply;
 	}
 
+	/**
+	 * @dev Returns the amount of tokens owned by `account`.
+	 */
 	function balanceOf(address who) public override view returns (uint256) {
 		return _balances[who];
 	}
 
-	function transfer(address to, uint256 value) external override returns (bool) {
-		_transferByDefaultPartitions(_msgSender(), _msgSender(), to, value, "", "");
+	/**
+	 * @dev Moves `amount` tokens from the caller's account to `recipient`.
+	 *
+	 * Returns a boolean value indicating whether the operation succeeded.
+	 *
+	 * Emits a {Transfer} event.
+	 */
+	function transfer(address to, uint256 value)
+		external
+		override
+		returns (bool)
+	{
+		_transferByDefaultPartitions(
+			_msgSender(),
+			_msgSender(),
+			to,
+			value,
+			"",
+			""
+		);
+		emit Transfer(_msgSender(), to, value);
 		return true;
 	}
 
-	function approve(address spender, uint256 value) external override returns (bool) {
-		require(spender != address(0), "A5");
+	/**
+	 * @dev Returns the remaining number of tokens that `spender` will be
+	 * allowed to spend on behalf of `owner` through {transferFrom}. This is
+	 * zero by default.
+	 *
+	 * This value changes when {approve} or {transferFrom} are called.
+	 */
+	function allowance(address owner, address spender)
+		external
+		override
+		view
+		returns (uint256)
+	{
+		return _allowances[owner][spender];
+	}
+
+	/**
+	 * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+	 *
+	 * Returns a boolean value indicating whether the operation succeeded.
+	 *
+	 * Emits an {Approval} event.
+	 */
+	function approve(address spender, uint256 value)
+		external
+		override
+		returns (bool)
+	{
 		// Transfer Blocked - Sender not eligible
-		_allowed[_msgSender()][spender] = value;
+		require(spender != address(0), "A5");
+
+		// mitigate https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+		_allowances[_msgSender()][spender] = 0;
+
+		_allowances[_msgSender()][spender] = value;
+
 		emit Approval(_msgSender(), spender, value);
 		return true;
 	}
 
+	/**
+	 * @dev Moves `amount` tokens from `sender` to `recipient` using the
+	 * allowance mechanism. `amount` is then deducted from the caller's
+	 * allowance.
+	 *
+	 * Returns a boolean value indicating whether the operation succeeded.
+	 *
+	 * Emits a {Transfer} event.
+	 */
 	function transferFrom(
 		address from,
 		address to,
 		uint256 value
 	) external override returns (bool) {
 		// check if is operator by partition or has enough allowance here
-		require(value <= _allowed[from][_msgSender()], "A7");
+		require(value <= _allowances[from][_msgSender()], "A7");
 		// Transfer Blocked - Identity restriction
 
-		_allowed[from][_msgSender()] = _allowed[from][_msgSender()].sub(value);
+		_allowances[from][_msgSender()] = _allowances[from][_msgSender()].sub(
+			value
+		);
 
 		// transfer by partition
 		_transferByDefaultPartitions(from, from, to, value, "", "");
+
+		emit Transfer(from, to, value);
 		return true;
-	}
-
-	// Implemented in ERC1400Raw
-	// function totalSupply() external view returns (uint256)
-	// function balanceOf(address who) external view returns (uint256)
-
-	function allowance(address owner, address spender) external override view returns (uint256) {
-		return _allowed[owner][spender];
 	}
 }

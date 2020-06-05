@@ -28,7 +28,7 @@ contract("Test Issuing and Cap", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.setCap(conf.standardCap - 100),
 			truffleAssert.ErrorType.REVERT,
-			"cap must be greater than old one"
+			"cap"
 		)
 
 		await truffleAssert.passes(contracts.micoboSecurityToken.setCap(conf.standardCap - -100))
@@ -145,7 +145,7 @@ contract("Test Issuing and Cap", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.bulkIssueByPartition(conf.standardPartition, tokenHolders, values, "0x0"),
 			"revert",
-			"must be same length"
+			"length"
 		)
 	})
 
@@ -166,7 +166,7 @@ contract("Test Issuing and Cap", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.bulkIssueByPartition(conf.standardPartition, tokenHolders, values, "0x0"),
 			"revert",
-			"would exceed cap"
+			"exceeds"
 		)
 	})
 })

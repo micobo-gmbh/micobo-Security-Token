@@ -7,10 +7,13 @@ import "../interfaces/IERC1400Capped.sol";
 
 
 /**
- * @author openzeppelin
- * @title Capped token
- * @dev token with a total cap and partition specific caps.
- * Cap cannot be changed afterwards.
+ * @author Simon Dosch
+ * @title SecurityToken
+ * @dev Main contract of the micobo Security Token Contract Suite
+ * implements new functions addPartitionProxy and bulkIssueByPartition
+ * implements access control for GSN
+ * implements IERC1400 and IERC1400Capped
+ * inherits ERC1400ERC20
  */
 contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	/**
@@ -46,7 +49,12 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		_isControllable = true;
 	}
 
-	// add a new Partition proxy contract
+	/**
+	 * @dev Adds a new Partition proxy contract
+	 * sender must have ADMIN role
+	 * @param partition partition id this proy will control
+	 * @param proxyAddress address of the SecurityTokenPartition
+	 */
 	function addPartitionProxy(bytes32 partition, address proxyAddress) public {
 		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
 
@@ -57,7 +65,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		// _totalPartitions is being updated when when minting for the first time
 	}
 
-	// bulk minting
+	/**
+	 * @dev Mints to a number of token holder at the same time
+	 * Must be issuable and tokenHolders and values must bne same length
+	 * @param partition partition id tokens should be minted for
+	 * @param tokenHolders addresses of all token receiver in the same order as "values"
+	 * @param values amounts of tokens to be minted in the same order as "tokenHolders"
+	 * @param data Additional data for issueByPartition
+	 */
 	function bulkIssueByPartition(
 		bytes32 partition,
 		address[] memory tokenHolders,
@@ -65,16 +80,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes memory data
 	) public {
 		require(_isIssuable, "A8");
-		require(
-			tokenHolders.length == values.length,
-			"tokenHolders and values must be same length"
-		);
+		require(tokenHolders.length == values.length, "length");
 
 		for (uint256 i = 0; i < tokenHolders.length; i++) {
-			require(
-				_totalSupply.add(values[i]) <= _cap,
-				"totalSupply would exceed cap"
-			);
+			require(_totalSupply.add(values[i]) <= _cap, "exceeds");
 			_issueByPartition(
 				partition,
 				_msgSender(),
@@ -86,7 +95,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		}
 	}
 
-	// GSN
+	/**
+	 * @dev Adding access control by overriding this function!
+	 * @return true if sender is GSN_CONTROLLER
+	 */
 	function _isGSNController() internal override view returns (bool) {
 		return hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
 	}
@@ -186,10 +198,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		// total cap is always the sum of all partitionCaps, so it can't be violated
 
-		require(
-			_totalSupply.add(value) <= _cap,
-			"totalSupply would exceed cap"
-		);
+		require(_totalSupply.add(value) <= _cap, "exceeds");
 
 		_issueByPartition(
 			partition,
@@ -204,11 +213,11 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	/**
 	 * [ERC1400 INTERFACE (6/9)]
 	 * @dev Redeem tokens of a specific partition.
+	 * only controllers can redeem
 	 * @param partition Name of the partition.
 	 * @param value Number of tokens redeemed.
 	 * @param data Information attached to the redemption, by the redeemer.
 	 */
-	// only controllers can redeem
 	function redeemByPartition(
 		bytes32 partition,
 		uint256 value,
@@ -235,7 +244,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @param data Information attached to the redemption.
 	 * @param operatorData Information attached to the redemption, by the operator.
 	 */
-
 	function operatorRedeemByPartition(
 		bytes32 partition,
 		address tokenHolder,
@@ -261,8 +269,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		);
 	}
 
-	// only used for standardized use of the off-chain validator?
-	// we could test-run transfers locally if we want to find out if they succeed
 	/**
 	 * [ERC1400 INTERFACE (8/9)]
 	 * @dev Know the reason on success or failure based on the EIP-1066 application-specific status codes.
@@ -276,7 +282,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * transfer restriction rule responsible for making the transfer operation invalid).
 	 * @return Destination partition.
 	 */
-
 	function canTransferByPartition(
 		bytes32 partition,
 		address to,
@@ -319,7 +324,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * transfer restriction rule responsible for making the transfer operation invalid).
 	 * @return Destination partition.
 	 */
-
 	function canOperatorTransferByPartition(
 		bytes32 partition,
 		address from,
@@ -375,7 +379,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * transfer restriction rule responsible for making the transfer operation invalid).
 	 * @return Destination partition.
 	 */
-
 	function _canTransfer(
 		bytes32 partition,
 		address operator,
@@ -513,9 +516,9 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	/**
 	 * [NOT MANDATORY FOR ERC1400 STANDARD]
 	 * @dev Definitely renounce the possibility to control tokens on behalf of tokenHolders.
+	 * INFO this disables ERC20 proxyx contracts
 	 * Once set to false, '_isControllable' can never be set to 'true' again.
 	 */
-	// INFO this disables ERC20 proxyx contracts
 	function renounceControl() external override {
 		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
 		_isControllable = false;
@@ -552,7 +555,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @param partition Name of the partition.
 	 * @param operators Controller addresses.
 	 */
-
 	function setPartitionControllers(
 		bytes32 partition,
 		address[] calldata operators
@@ -561,7 +563,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		_setPartitionControllers(partition, operators);
 	}
 
-	//**************CAPPED*******************
+	/********************** CAPPED **************************/
 
 	/**
 	 * @dev Returns the cap on the token's total supply.
@@ -570,18 +572,19 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		return _cap;
 	}
 
+	/**
+	 * @dev Sets cap to a new value
+	 * New value need to be higher than old one
+	 * Is only callable by CAP?_EDITOR
+	 * @param newCap value of new cap
+	 */
 	function setCap(uint256 newCap) public override {
-		require(
-			hasRole(bytes32("CAP_EDITOR"), _msgSender()),
-			"A7, not allowed to set cap"
-		);
-		require((newCap > _cap), "cap must be greater than old one");
+		require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), "A7");
+		require((newCap > _cap), "cap");
 
 		// set new cap
 		_cap = newCap;
 	}
-
-	//**************CAPPED*******************
 }
 
 /**

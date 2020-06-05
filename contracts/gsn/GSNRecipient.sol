@@ -52,14 +52,8 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _upgradeRelayHub(address newRelayHub) internal virtual {
 		address currentRelayHub = _relayHub;
-		require(
-			newRelayHub != address(0),
-			"GSNRecipient: new RelayHub is the zero address"
-		);
-		require(
-			newRelayHub != currentRelayHub,
-			"GSNRecipient: new RelayHub is the current one"
-		);
+		require(newRelayHub != address(0), "zero");
+		require(newRelayHub != currentRelayHub, "current one");
 
 		emit RelayHubChanged(currentRelayHub, newRelayHub);
 
@@ -146,10 +140,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 		override
 		returns (bytes32)
 	{
-		require(
-			msg.sender == getHubAddr(),
-			"GSNRecipient: caller is not RelayHub"
-		);
+		require(msg.sender == getHubAddr(), "not hub");
 		return _preRelayedCall(context);
 	}
 
@@ -180,10 +171,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 		uint256 actualCharge,
 		bytes32 preRetVal
 	) public virtual override {
-		require(
-			msg.sender == getHubAddr(),
-			"GSNRecipient: caller is not RelayHub"
-		);
+		require(msg.sender == getHubAddr(), "not hub");
 		_postRelayedCall(context, success, actualCharge, preRetVal);
 	}
 

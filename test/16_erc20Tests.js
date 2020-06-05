@@ -18,6 +18,10 @@ contract("Test ERC20 Functionality", async (accounts) => {
 		await contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[0], value * 2, "0x0")
 	})
 
+	it("can get decimals", async () => {
+		assert.deepEqual((await contracts.micoboSecurityToken.decimals()).toNumber(), 18)
+	})
+
 	it("can get user balance", async () => {
 		assert.deepEqual((await contracts.micoboSecurityToken.balanceOf(accounts[0])).toNumber(), value * 2)
 	})
