@@ -1,4 +1,5 @@
 .idea/
+bin/
 .secret
 contracts/dummy/
 node_modules
@@ -7,3 +8,4 @@ build/
 coverage
 coverage.json
 .coverage_contracts
+*.tgz

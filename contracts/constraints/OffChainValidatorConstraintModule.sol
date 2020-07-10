@@ -1,9 +1,9 @@
 pragma solidity 0.6.6;
 
-/*
-import '../interfaces/IConstraintModule.sol';
-import '../interfaces/ISecurityToken.sol';
-*/
+import "../interfaces/IConstraintModule.sol";
+
+
+// import '../interfaces/ISecurityToken.sol';
 
 /**
  * @author Simon Dosch
@@ -11,9 +11,9 @@ import '../interfaces/ISecurityToken.sol';
  * @dev ConstraintModule
  * Validates off-chain validator signature in data field
  */
-/*
-contract OffChainValidator is IConstraintModule {
 
+abstract contract OffChainValidator is IConstraintModule {
+	/*
     // TODO
 
     ISecurityToken _securityToken;
@@ -51,7 +51,7 @@ contract OffChainValidator is IConstraintModule {
 	 * @return valid transfer is valid
 	 * @return reason Why the transfer failed (intended for require statement)
 	 */
-/* function executeTransfer(
+	/* function executeTransfer(
 		address msg_sender,
 		bytes32 partition,
 		address operator,
@@ -61,25 +61,24 @@ contract OffChainValidator is IConstraintModule {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external returns (bool valid, string memory reason); */
-
-/**
- * @dev Validates transfer. Cannot modify state
- * @param msg_sender Sender of this function call
- * @param partition Partition the tokens are being transferred from
- * @param operator Address of operator or controller who initiated the transfer
- * @param from Token holder.
- * @param to Token recipient.
- * @param value Number of tokens to transfer.
- * @param data Information attached to the transfer.
- * @param operatorData Information attached to the transfer, by the operator.
- * @return valid transfer is valid
- * @return code ERC1066 error code
- * @return extradata Additional bytes32 parameter that can be used to define
- * application specific reason codes with additional details (for example the
- * transfer restriction rule responsible for making the transfer operation invalid).
- * @return reason Why the transfer failed (intended for require statement)
- */
-/* function validateTransfer(
+	/**
+	 * @dev Validates transfer. Cannot modify state
+	 * @param msg_sender Sender of this function call
+	 * @param partition Partition the tokens are being transferred from
+	 * @param operator Address of operator or controller who initiated the transfer
+	 * @param from Token holder.
+	 * @param to Token recipient.
+	 * @param value Number of tokens to transfer.
+	 * @param data Information attached to the transfer.
+	 * @param operatorData Information attached to the transfer, by the operator.
+	 * @return valid transfer is valid
+	 * @return code ERC1066 error code
+	 * @return extradata Additional bytes32 parameter that can be used to define
+	 * application specific reason codes with additional details (for example the
+	 * transfer restriction rule responsible for making the transfer operation invalid).
+	 * @return reason Why the transfer failed (intended for require statement)
+	 */
+	/* function validateTransfer(
 		address msg_sender,
 		bytes32 partition,
 		address operator,
@@ -97,11 +96,10 @@ contract OffChainValidator is IConstraintModule {
 			bytes32 extradata,
 			string memory reason
 		); */
-
-/**
- * @dev Returns module name
- * @return bytes32 name of the constraint module
- */
-/* function getModuleName() external view returns (bytes32);
+	/**
+	 * @dev Returns module name
+	 * @return bytes32 name of the constraint module
+	 */
+	/* function getModuleName() external view returns (bytes32);
+	 */
 }
-*/

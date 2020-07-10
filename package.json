@@ -16,7 +16,8 @@
 		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
 		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",
 		"size": "truffle compile --all && truffle exec scripts/check-size.js",
-		"solcover": "truffle run coverage --temp /build/solcover --network development"
+		"solcover": "truffle run coverage --temp /build/solcover --network development",
+		"mythx": "truffle run verify --debug --style stylish contracts/token/SecurityToken.sol"
 	},
 	"husky": {
 		"hooks": {
@@ -66,12 +67,12 @@
 		"@openzeppelin/gsn-provider": "^0.1.10",
 		"@truffle/hdwallet-provider": "^1.0.21",
 		"acorn": "^7.1.1",
-		"eth-gas-reporter": "^0.2.17",
 		"erc1820": "0.0.2",
+		"eth-gas-reporter": "^0.2.17",
 		"solc": "0.6.6",
 		"solidity-coverage": "0.7.5",
 		"truffle-assertions": "^0.9.1",
-		"truffle-security": "^1.7.1",
+		"truffle-security": "file:truffle-security-1.7.2.tgz",
 		"typescript": "^3.6.4",
 		"web3": "^1.2.7"
 	},
