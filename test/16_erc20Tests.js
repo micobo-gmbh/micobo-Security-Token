@@ -66,27 +66,15 @@ contract("Test ERC20 Functionality", async (accounts) => {
 		assert.deepEqual((await contracts.micoboSecurityToken.balanceOf(accounts[1])).toNumber(), value * 2)
 	})
 
-	// check default partition behaviour (partition overflow)
+	// check ALL partition behaviour (partition overflow)
 
-	it("transfer using default partitions", async () => {
+	it("transfer using all partitions", async () => {
 		// mint some new tokens to test with
 		await contracts.micoboSecurityToken.issueByPartition(Partitions.SECOND, accounts[1], value * 2, "0x0")
 
 		await contracts.micoboSecurityToken.issueByPartition(Partitions.THIRD, accounts[1], value * 2, "0x0")
 
-		// cannot transfer from second and third, since default partitions has not been updated
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
-				from: accounts[1],
-			})
-		)
-
-		// update default partitions
-		await contracts.micoboSecurityToken.addRole(Role.DEFAULT_PARTITIONS_EDITOR, accounts[0])
-
-		await contracts.micoboSecurityToken.setDefaultPartitions([Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
-
-		//not the transfer works
+		//the transfer works
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transfer(accounts[0], value * 3, {
 				from: accounts[1],
@@ -110,6 +98,7 @@ contract("Test ERC20 Functionality", async (accounts) => {
 			})
 		)
 
+		// the order of total partitions seems to change and the THIRD is being used to transfer all 2000
 		assert.deepEqual(
 			(await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.BASE, accounts[1])).toNumber(),
 			0
@@ -117,12 +106,12 @@ contract("Test ERC20 Functionality", async (accounts) => {
 
 		assert.deepEqual(
 			(await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.SECOND, accounts[1])).toNumber(),
-			0
+			1000
 		)
 
 		assert.deepEqual(
 			(await contracts.micoboSecurityToken.balanceOfByPartition(Partitions.THIRD, accounts[1])).toNumber(),
-			value
+			0
 		)
 	})
 })

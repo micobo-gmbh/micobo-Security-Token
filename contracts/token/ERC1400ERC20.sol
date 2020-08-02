@@ -64,7 +64,7 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 		override
 		returns (bool)
 	{
-		_transferByDefaultPartitions(
+		_transferFromTotalPartitions(
 			_msgSender(),
 			_msgSender(),
 			to,
@@ -139,7 +139,7 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 		);
 
 		// transfer by partition
-		_transferByDefaultPartitions(from, from, to, value, "", "");
+		_transferFromTotalPartitions(from, from, to, value, "", "");
 
 		emit Transfer(from, to, value);
 		return true;

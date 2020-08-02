@@ -29,8 +29,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	// Mapping from (tokenHolder, partition) to balance of corresponding partition.
 	mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;
 
-	// List of token default partitions (for ERC20 compatibility).
-	bytes32[] internal _defaultPartitions;
 	/****************************************************************************/
 
 	/**************** Mappings to find partition operators ************************/
@@ -58,10 +56,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		string memory name,
 		string memory symbol,
 		uint256 granularity
-	) public ERC1400Raw(name, symbol, granularity) {
-		// set base partition
-		_defaultPartitions.push(bytes32(0));
-	}
+	) public ERC1400Raw(name, symbol, granularity) {}
 
 	/********************** NEW FUNCTIONS **************************/
 
@@ -200,7 +195,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		view
 		returns (bytes32[] memory)
 	{
-		return _defaultPartitions;
+		return _totalPartitions;
 	}
 
 	/**
@@ -213,11 +208,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		external
 		override
 	{
-		require(
-			hasRole(bytes32("DEFAULT_PARTITIONS_EDITOR"), _msgSender()),
-			"A7"
-		);
-		_defaultPartitions = partitions;
+		this;
 	}
 
 	/**
@@ -532,7 +523,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		uint256 value,
 		bytes calldata data
 	) external override {
-		_transferByDefaultPartitions(
+		_transferFromTotalPartitions(
 			_msgSender(),
 			_msgSender(),
 			to,
@@ -558,7 +549,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	) external override {
 		require(_isOperator(_msgSender(), from), "58"); // 0x58	invalid operator (transfer agent)
 
-		_transferByDefaultPartitions(
+		_transferFromTotalPartitions(
 			_msgSender(),
 			from,
 			to,
@@ -570,7 +561,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 
 	/**
 	 * [NOT MANDATORY FOR ERC1400Partition STANDARD]
-	 * @dev Transfer tokens from default partitions.
+	 * @dev Transfer tokens from all partitions.
 	 * @param operator The address performing the transfer.
 	 * @param from Token holder.
 	 * @param to Token recipient.
@@ -578,15 +569,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	 * @param data Information attached to the transfer, and intended for the token holder ('from') [CAN CONTAIN THE DESTINATION PARTITION].
 	 * @param operatorData Information attached to the transfer by the operator (if any).
 	 */
-	/**
-	 * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
-	 * @dev Empty function to erase ERC1400Raw redeemFrom() function since it doesn't handle partitions.
-	 */
-	/**
-	 * [NOT MANDATORY FOR ERC1400Partition STANDARD][OVERRIDES ERC1400Raw METHOD]
-	 * @dev Empty function to erase ERC1400Raw redeem() function since it doesn't handle partitions.
-	 */
-	function _transferByDefaultPartitions(
+	function _transferFromTotalPartitions(
 		address operator,
 		address from,
 		address to,
@@ -594,16 +577,16 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes memory data,
 		bytes memory operatorData
 	) internal {
-		require(_defaultPartitions.length != 0, "A8"); // Transfer Blocked - Token restriction
+		require(_totalPartitions.length != 0, "A8"); // Transfer Blocked - Token restriction
 
 		uint256 _remainingValue = value;
 		uint256 _localBalance;
 
-		for (uint256 i = 0; i < _defaultPartitions.length; i++) {
-			_localBalance = _balanceOfByPartition[from][_defaultPartitions[i]];
+		for (uint256 i = 0; i < _totalPartitions.length; i++) {
+			_localBalance = _balanceOfByPartition[from][_totalPartitions[i]];
 			if (_remainingValue <= _localBalance) {
 				_transferByPartition(
-					_defaultPartitions[i],
+					_totalPartitions[i],
 					operator,
 					from,
 					to,
@@ -615,7 +598,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 				break;
 			} else if (_localBalance != 0) {
 				_transferByPartition(
-					_defaultPartitions[i],
+					_totalPartitions[i],
 					operator,
 					from,
 					to,

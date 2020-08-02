@@ -23,39 +23,4 @@ contract("Test default partition behaviour", async (accounts) => {
 
 		assert.deepEqual(partitions, [conf.standardPartition])
 	})
-
-	it("can read default partitions", async () => {
-		let res = await contracts.micoboSecurityToken.getDefaultPartitions()
-
-		assert.deepEqual(res, [conf.standardPartition])
-	})
-
-	it("can set default partitions", async () => {
-		// not default partitions editor
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.setDefaultPartitions([Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
-		)
-
-		// add role
-		await contracts.micoboSecurityToken.addRole(Role.DEFAULT_PARTITIONS_EDITOR, accounts[0])
-
-		// now it works
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setDefaultPartitions([Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
-		)
-
-		let res = await contracts.micoboSecurityToken.getDefaultPartitions()
-
-		assert.deepEqual(res, [Partitions.BASE, Partitions.SECOND, Partitions.THIRD])
-	})
-
-	it("cannot transfer by default partition if no default partition is set", async () => {
-		await contracts.micoboSecurityToken.setDefaultPartitions([])
-
-		await truffleAssert.fails(
-			contracts.micoboSecurityToken.transferWithData(accounts[1], value, "0x"),
-			truffleAssert.ErrorType.REVERT,
-			"A8"
-		)
-	})
 })
