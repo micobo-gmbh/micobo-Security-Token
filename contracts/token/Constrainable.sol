@@ -133,5 +133,6 @@ contract Constrainable is IConstrainable, Administrable {
 	) external override {
 		require(hasRole(bytes32("MODULE_EDITOR"), _msgSender()), "A7");
 		_modulesByPartition[partition] = newModules;
+		emit ModulesByPartitionSet(_msgSender(), partition, newModules);
 	}
 }

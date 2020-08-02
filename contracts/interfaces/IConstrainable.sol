@@ -9,6 +9,12 @@ import "../interfaces/IConstraintModule.sol";
  * @dev Constrainable interface
  */
 interface IConstrainable {
+	event ModulesByPartitionSet(
+		address indexed caller,
+		bytes32 indexed partition,
+		IConstraintModule[] indexed newModules
+	);
+
 	/**
 	 * @dev Returns all modules for requested partition
 	 * @param partition Partition to get modules for
