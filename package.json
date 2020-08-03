@@ -14,9 +14,9 @@
 		"compile-constraints": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/interfaces/IConstraintModule.sol",
 		"compile-whitelist": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/constraints/WhitelistConstraintModule.sol",
 		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg app --type SecurityToken --out ./build/go/securityToken.go",
-		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/VestingPeriodConstraintModule.go",
-		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/IConstraintModule.go",
-		"abigen-whitelist": "abigen --abi ./build/solc/WhitelistConstraintModule.abi --bin ./build/solc/WhitelistConstraintModule.bin --pkg app --type WhitelistConstraintModule --out ./build/go/WhitelistConstraintModule.go",
+		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg app --type VestingPeriodConstraintModule --out ./build/go/vestingPeriodConstraintModule.go",
+		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg app --type IConstraintModule --out ./build/go/iConstraintModule.go",
+		"abigen-whitelist": "abigen --abi ./build/solc/WhitelistConstraintModule.abi --bin ./build/solc/WhitelistConstraintModule.bin --pkg app --type WhitelistConstraintModule --out ./build/go/whitelistConstraintModule.go",
 		"size": "truffle compile --all && truffle exec scripts/check-size.js",
 		"solcover": "truffle run coverage --temp /build/solcover --network development",
 		"mythx": "truffle run verify --debug --style stylish contracts/token/SecurityToken.sol"
