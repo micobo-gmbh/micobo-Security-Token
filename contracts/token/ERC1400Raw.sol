@@ -22,6 +22,11 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	// Indicate whether the token can still be controlled by operators or not anymore.
 	bool internal _isControllable;
 
+	/**
+	 * @dev Indicates the paused state
+	 */
+	bool internal _paused;
+
 	// Mapping from tokenHolder to balance.
 	mapping(address => uint256) internal _balances;
 
@@ -300,6 +305,8 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 		// Transfer Blocked - Receiver not eligible
 		// require(_balances[from] >= value, "A4"); // already checked in ERC1400Partition
 		// Transfer Blocked - Sender balance insufficient
+
+		require(!_paused, "A8 - paused");
 
 		// CONTROLLER bypasses constraint modules
 		if (

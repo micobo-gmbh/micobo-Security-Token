@@ -13,7 +13,6 @@
 		"compile-all": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/**/*.sol",
 		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg ethcore --type SecurityToken --out ./build/go/securityToken.go",
 		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg ethcore --type IConstraintModule --out ./build/go/iConstraintModule.go",
-		"abigen-pause": "abigen --abi ./build/solc/PauseConstraintModule.abi --bin ./build/solc/PauseConstraintModule.bin --pkg ethcore --type PauseConstraintModule --out ./build/go/pauseConstraintModule.go",
 		"abigen-spending": "abigen --abi ./build/solc/SpendingLimitsConstraintModule.abi --bin ./build/solc/SpendingLimitsConstraintModule.bin --pkg ethcore --type SpendingLimitsConstraintModule --out ./build/go/spendingLimitsConstraintModule.go",
 		"abigen-timelock": "abigen --abi ./build/solc/TimeLockConstraintModule.abi --bin ./build/solc/TimeLockConstraintModule.bin --pkg ethcore --type TimeLockConstraintModule --out ./build/go/timeLockConstraintModule.go",
 		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg ethcore --type VestingPeriodConstraintModule --out ./build/go/vestingPeriodConstraintModule.go",

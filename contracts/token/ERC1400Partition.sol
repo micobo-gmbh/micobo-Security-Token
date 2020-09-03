@@ -202,7 +202,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	 * [ERC1400Partition INTERFACE (6/10)]
 	 * @dev Set default partitions to transfer from.
 	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
-	 * partitions to use by default when not specified.
 	 */
 	function setDefaultPartitions(
 		bytes32[] calldata /* partitions */

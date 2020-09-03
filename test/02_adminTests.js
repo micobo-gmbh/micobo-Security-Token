@@ -11,8 +11,6 @@ contract("Test Admin Contract", async (accounts) => {
 		contracts = {
 			micoboSecurityToken: await MicoboSecurityToken.deployed(),
 		}
-
-		console.log(Role)
 	})
 
 	it("accounts[0] is admin", async () => {

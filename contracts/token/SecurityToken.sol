@@ -425,6 +425,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		if (!_isMultiple(value)) return (hex"A9", "", partition);
 		// Transfer Blocked - Token granularity
 
+		if (_paused) return (hex"A8", "", partition);
+
 		(bool valid, bytes1 code, bytes32 extradata, ) = _validateTransfer(
 			_msgSender(),
 			partition,
@@ -584,6 +586,62 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		// set new cap
 		_cap = newCap;
+	}
+
+	/********************** PAUSABLE **************************/
+
+	// EVENTS
+	/**
+	 * @dev Emitted when the pause is triggered by a pauser (`account`).
+	 */
+	event Paused(address account);
+
+	/**
+	 * @dev Emitted when the pause is lifted by a pauser (`account`).
+	 */
+	event Unpaused(address account);
+
+	// FUNCTIONS
+	/**
+	 * @dev Returns true if the contract is paused, and false otherwise.
+	 * @return bool True if the contract is paused
+	 */
+	function paused() public view returns (bool) {
+		return _paused;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is not paused.
+	 */
+	modifier whenNotPaused() {
+		require(!_paused, "paused");
+		_;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is paused.
+	 */
+	modifier whenPaused() {
+		require(_paused, "not paused");
+		_;
+	}
+
+	/**
+	 * @dev Called by a pauser to pause, triggers stopped state.
+	 */
+	function pause() public whenNotPaused {
+		require(hasRole(bytes32("PAUSER"), msg.sender), "A7");
+		_paused = true;
+		emit Paused(msg.sender);
+	}
+
+	/**
+	 * @dev Called by a pauser to unpause, returns to normal state.
+	 */
+	function unpause() public whenPaused {
+		require(hasRole(bytes32("PAUSER"), msg.sender), "A7");
+		_paused = false;
+		emit Unpaused(msg.sender);
 	}
 }
 

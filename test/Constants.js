@@ -50,7 +50,6 @@ module.exports = {
 
 	Module: {
 		TIME_LOCK: web3.utils.padRight(web3.utils.fromAscii("TIME_LOCK"), 64),
-		PAUSE: web3.utils.padRight(web3.utils.fromAscii("PAUSE"), 64),
 		SPENDING_LIMIT: web3.utils.padRight(web3.utils.fromAscii("SPENDING_LIMIT"), 64),
 		VESTING: web3.utils.padRight(web3.utils.fromAscii("VESTING"), 64),
 		WHITELIST: web3.utils.padRight(web3.utils.fromAscii("WHITELIST"), 64),

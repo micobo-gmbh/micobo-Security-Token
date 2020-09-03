@@ -1,6 +1,6 @@
 const truffleAssert = require("truffle-assertions")
 const MicoboSecurityToken = artifacts.require("SecurityToken")
-const PauseConstraintModule = artifacts.require("PauseConstraintModule")
+const TimeLockConstraintModule = artifacts.require("TimeLockConstraintModule")
 
 const { conf } = require("../token-config")
 const { Role } = require("./Constants")
@@ -348,17 +348,15 @@ contract("Test Token Transfer", async (accounts) => {
 	})
 
 	it("controller bypasses constraints modules", async () => {
-		pauseConstraintModule = await PauseConstraintModule.new(contracts.micoboSecurityToken.address)
+		timeLockConstraintModule = await TimeLockConstraintModule.new(contracts.micoboSecurityToken.address)
 
 		await contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [
-			pauseConstraintModule.address,
+			timeLockConstraintModule.address,
 		])
 
-		// pause it
-		await contracts.micoboSecurityToken.addRole(Role.PAUSER, accounts[0])
-		await pauseConstraintModule.pause()
-
-		assert.deepEqual(await pauseConstraintModule.paused(), true)
+		// lock it
+		await contracts.micoboSecurityToken.addRole(Role.TIME_LOCK_EDITOR, accounts[0])
+		await timeLockConstraintModule.editTimeLock(1893456000) // 01/01/2030 @ 12:00 (UTC)
 
 		// fails if not controller
 		await truffleAssert.fails(
@@ -382,7 +380,8 @@ contract("Test Token Transfer", async (accounts) => {
 			)
 		)
 
-		await pauseConstraintModule.unpause()
+		//reset
+		await timeLockConstraintModule.editTimeLock(1577836800) // 01/01/2020 @ 12:00 (UTC)
 	})
 
 	it("can ERC1400Raw transfer", async () => {

@@ -7,7 +7,7 @@ const { conf } = require("../token-config")
 const { Role, Module } = require("./Constants")
 
 contract("Test Pausing", async (accounts) => {
-	let contracts, pauseConstraintModule
+	let contracts
 
 	let value = 1000
 
@@ -24,58 +24,48 @@ contract("Test Pausing", async (accounts) => {
 		await contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value, "0x0")
 	})
 
-	it("deploy PauseConstraintModule", async () => {
-		pauseConstraintModule = await PauseConstraintModule.new(contracts.micoboSecurityToken.address)
-	})
-
-	it("register PauseConstraintModule", async () => {
-		await truffleAssert.passes(
-			contracts.micoboSecurityToken.setModulesByPartition(conf.standardPartition, [pauseConstraintModule.address])
-		)
-	})
-
 	// PAUSING UND UNPAUSING
 
 	it("pauser can pause and unpause contract", async () => {
 		// without being pauser
-		await truffleAssert.fails(pauseConstraintModule.pause())
+		await truffleAssert.fails(contracts.micoboSecurityToken.pause())
 
 		// make pauser
 		await contracts.micoboSecurityToken.addRole(Role.PAUSER, accounts[0])
 
 		// being pauser
-		await truffleAssert.passes(pauseConstraintModule.pause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.pause())
 
 		// is paused
-		assert.deepEqual(await pauseConstraintModule.paused(), true)
+		assert.deepEqual(await contracts.micoboSecurityToken.paused(), true)
 
 		await contracts.micoboSecurityToken.removeRole(Role.PAUSER, accounts[0])
 
 		// fails to unpause when not pauser
-		await truffleAssert.fails(pauseConstraintModule.unpause())
+		await truffleAssert.fails(contracts.micoboSecurityToken.unpause())
 
 		await contracts.micoboSecurityToken.addRole(Role.PAUSER, accounts[0])
 
 		// unopause being pauser
-		await truffleAssert.passes(pauseConstraintModule.unpause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.unpause())
 
 		// is unpaused again
-		assert.deepEqual(await pauseConstraintModule.paused(), false)
+		assert.deepEqual(await contracts.micoboSecurityToken.paused(), false)
 	})
 
 	it("cannot unpause contract if unpaused and vice versa", async () => {
-		assert.deepEqual(await pauseConstraintModule.paused(), false)
+		assert.deepEqual(await contracts.micoboSecurityToken.paused(), false)
 
 		// unpause fails
-		await truffleAssert.fails(pauseConstraintModule.unpause())
+		await truffleAssert.fails(contracts.micoboSecurityToken.unpause())
 
-		await truffleAssert.passes(pauseConstraintModule.pause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.pause())
 
-		assert.deepEqual(await pauseConstraintModule.paused(), true)
+		assert.deepEqual(await contracts.micoboSecurityToken.paused(), true)
 
-		await truffleAssert.fails(pauseConstraintModule.pause())
+		await truffleAssert.fails(contracts.micoboSecurityToken.pause())
 
-		await truffleAssert.passes(pauseConstraintModule.unpause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.unpause())
 	})
 
 	// LIMITS WHEN PAUSED
@@ -83,9 +73,9 @@ contract("Test Pausing", async (accounts) => {
 	it("cannot transfer tokens if paused", async () => {
 		// if setModulesByPartition succeeded
 
-		await truffleAssert.passes(pauseConstraintModule.pause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.pause())
 
-		assert.deepEqual(await pauseConstraintModule.paused(), true)
+		assert.deepEqual(await contracts.micoboSecurityToken.paused(), true)
 
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
@@ -93,16 +83,12 @@ contract("Test Pausing", async (accounts) => {
 			})
 		)
 
-		await truffleAssert.passes(pauseConstraintModule.unpause())
+		await truffleAssert.passes(contracts.micoboSecurityToken.unpause())
 
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
 				from: accounts[0],
 			})
 		)
-	})
-
-	it("gets correct module name", async () => {
-		assert.deepEqual(await pauseConstraintModule.getModuleName(), Module.PAUSE)
 	})
 })
