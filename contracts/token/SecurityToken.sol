@@ -47,6 +47,9 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		_isIssuable = true;
 		_isControllable = true;
+
+		_owner = admin;
+		emit OwnershipTransferred(address(0), admin);
 	}
 
 	/**
@@ -586,6 +589,36 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		// set new cap
 		_cap = newCap;
+	}
+
+	/********************** OWNABLE **************************/
+
+	address private _owner;
+
+	event OwnershipTransferred(
+		address indexed previousOwner,
+		address indexed newOwner
+	);
+
+	/**
+	 * @dev Returns the address of the current owner.
+	 */
+	function owner() public view returns (address) {
+		return _owner;
+	}
+
+	/**
+	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
+	 * Can only be called by the current owner.
+	 */
+	function transferOwnership(address newOwner) public virtual {
+		require(hasRole(bytes32("ADMIN"), msg.sender), "A7");
+		require(
+			newOwner != address(0),
+			"Ownable: new owner is the zero address"
+		);
+		emit OwnershipTransferred(_owner, newOwner);
+		_owner = newOwner;
 	}
 
 	/********************** PAUSABLE **************************/

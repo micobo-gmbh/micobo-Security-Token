@@ -17,6 +17,23 @@ contract("Test Admin Contract", async (accounts) => {
 		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[0]), true)
 	})
 
+	it("accounts[0] is owner", async () => {
+		assert.deepEqual(await contracts.micoboSecurityToken.owner(), accounts[0])
+	})
+
+	it("can transfer ownership only if admin", async () => {
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferOwnership(accounts[1], {
+				from: accounts[1],
+			}),
+			truffleAssert.ErrorType.REVERT,
+			"A7"
+		)
+
+		await contracts.micoboSecurityToken.transferOwnership(accounts[1]),
+			assert.deepEqual(await contracts.micoboSecurityToken.owner(), accounts[1])
+	})
+
 	it("can add and remove roles", async () => {
 		// other admin
 		await contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1])
