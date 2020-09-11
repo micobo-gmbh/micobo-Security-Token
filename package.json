@@ -9,8 +9,9 @@
 	"scripts": {
 		"test": "truffle test",
 		"deploy": "truffle migrate --reset",
-		"compile-token": "solc --abi --hashes --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
-		"compile-all": "solc --abi --bin --optimize --optimize-runs 4096 -o build/solc --overwrite --allow-paths . contracts/**/*.sol",
+		"ganache": "ganache-cli -i 1234 --db ~/ganache-db -m \"sail prevent round weasel physical pear million rebel weekend sea hole mosquito\"",
+		"compile-token": "solc --abi --hashes --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
+		"compile-all": "solc --abi --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/**/*.sol",
 		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg ethcore --type SecurityToken --out ./build/go/securityToken.go",
 		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg ethcore --type IConstraintModule --out ./build/go/iConstraintModule.go",
 		"abigen-spending": "abigen --abi ./build/solc/SpendingLimitsConstraintModule.abi --bin ./build/solc/SpendingLimitsConstraintModule.bin --pkg ethcore --type SpendingLimitsConstraintModule --out ./build/go/spendingLimitsConstraintModule.go",

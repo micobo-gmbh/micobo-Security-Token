@@ -101,6 +101,31 @@ contract("Test TimeLock Module", async (accounts) => {
 		)
 	})
 
+	it("cannot transfer when amount timelocked", async () => {
+		// we lock 2500
+		await timeLockConstraintModule.editAmountTimeLock(accounts[0], 1893456000, 2500) // 01/01/2030 @ 12:00 (UTC)
+
+		// transfer of 1000 fails
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
+				from: accounts[0],
+			}),
+			"A8 - amount is still locked"
+		)
+	})
+
+	it("can transfer when amount timelocked is not too great", async () => {
+		// we lock 1500
+		await timeLockConstraintModule.editAmountTimeLock(accounts[0], 1577836800, 1500) // 01/01/2030 @ 12:00 (UTC)
+
+		// transfer of 1000 succeeds
+		await truffleAssert.passes(
+			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
+				from: accounts[0],
+			})
+		)
+	})
+
 	it("gets correct module name", async () => {
 		assert.deepEqual(await timeLockConstraintModule.getModuleName(), Module.TIME_LOCK)
 	})

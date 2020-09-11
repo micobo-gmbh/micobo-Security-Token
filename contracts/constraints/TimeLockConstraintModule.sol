@@ -1,5 +1,7 @@
 pragma solidity 0.6.6;
 
+import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+
 import "../interfaces/IConstraintModule.sol";
 import "../interfaces/ISecurityToken.sol";
 
@@ -11,6 +13,8 @@ import "../interfaces/ISecurityToken.sol";
  * Lock specific accounts or the whole partition for a period of time
  */
 contract TimeLockConstraintModule is IConstraintModule {
+	using SafeMath for uint256;
+
 	/**
 	 * @dev Address of securityToken this ConstraintModule is used by
 	 */
@@ -23,6 +27,11 @@ contract TimeLockConstraintModule is IConstraintModule {
 
 	// EVENTS
 	/**
+	 * @dev Emitted when an amount timelock entry is edited
+	 */
+	event AmountTimelockEdit(address account, uint256 time, uint256 amount);
+
+	/**
 	 * @dev Emitted when an account timelock entry is edited
 	 */
 	event AccountTimelockEdit(address account, uint256 time);
@@ -33,6 +42,16 @@ contract TimeLockConstraintModule is IConstraintModule {
 	event TimelockEdit(uint256 time);
 
 	// MODULE DATA
+	/**
+	 * @dev Tracks which amounts are locked for how long
+	 */
+	mapping(address => Lock) private _amountTimeLock;
+
+	struct Lock {
+		uint256 time;
+		uint256 amount;
+	}
+
 	/**
 	 * @dev Tracks which accounts are locked for how long
 	 */
@@ -53,6 +72,25 @@ contract TimeLockConstraintModule is IConstraintModule {
 	}
 
 	// MODULE FUNCTIONS
+	/**
+	 * @dev Edits an account timelock entry
+	 * @param account The edited account
+	 * @param time The new timestamp until which the amount will be locked
+	 * @param amount The amount of tokens being locked
+	 */
+	function editAmountTimeLock(
+		address account,
+		uint256 time,
+		uint256 amount
+	) public {
+		require(
+			_securityToken.hasRole(bytes32("TIME_LOCK_EDITOR"), msg.sender),
+			"A7"
+		);
+		_amountTimeLock[account] = Lock(time, amount);
+		emit AmountTimelockEdit(account, time, amount);
+	}
+
 	/**
 	 * @dev Edits an account timelock entry
 	 * @param account The edited account
@@ -128,9 +166,9 @@ contract TimeLockConstraintModule is IConstraintModule {
 	 */
 	function validateTransfer(
 		address msg_sender,
-		bytes32, /* partition */
+		bytes32 partition,
 		address, /* operator */
-		address, /* from */
+		address from,
 		address, /* to */
 		uint256, /* value */
 		bytes memory, /* data */
@@ -150,9 +188,19 @@ contract TimeLockConstraintModule is IConstraintModule {
 			return (false, hex"A8", "", "A8 - partition is still locked");
 		} else if (_accountTimeLock[msg_sender] > now) {
 			return (false, hex"A8", "", "A8 - account is still locked");
-		} else {
-			return (true, code, extradata, "");
+		} else if (_amountTimeLock[msg_sender].time > now) {
+			// this balance already has "value" substracted from it
+			uint256 userBalance = _securityToken.balanceOfByPartition(
+				partition,
+				from
+			);
+
+			if (userBalance < _amountTimeLock[msg_sender].amount) {
+				return (false, hex"A8", "", "A8 - amount is still locked");
+			}
 		}
+
+		return (true, code, extradata, "");
 	}
 
 	/**
