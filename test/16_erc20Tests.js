@@ -19,7 +19,7 @@ contract("Test ERC20 Functionality", async (accounts) => {
 	})
 
 	it("can get decimals", async () => {
-		assert.deepEqual((await contracts.micoboSecurityToken.decimals()).toNumber(), 18)
+		assert.deepEqual((await contracts.micoboSecurityToken.decimals()).toNumber(), 0)
 	})
 
 	it("can get user balance", async () => {

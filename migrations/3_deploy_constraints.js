@@ -13,15 +13,15 @@ module.exports = async (deployer, network, accounts) => {
 
 		let tl = await deployer.deploy(TimeLockConstraintModule, st.address)
 
-		let sl = await deployer.deploy(SpendingLimitsConstraintModule, st.address)
+		// let sl = await deployer.deploy(SpendingLimitsConstraintModule, st.address)
 
-		let vp = await deployer.deploy(VestingPeriodConstraintModule, st.address)
+		// let vp = await deployer.deploy(VestingPeriodConstraintModule, st.address)
 
 		// TODO off-chain validation
 
 		await st.setModulesByPartition(
 			"0x0000000000000000000000000000000000000000000000000000000000000000",
-			[wl.address, tl.address, sl.address, vp.address],
+			[wl.address, tl.address /* , sl.address, vp.address */],
 			{
 				from: accounts[0],
 			}

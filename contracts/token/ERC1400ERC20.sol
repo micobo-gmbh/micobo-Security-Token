@@ -31,11 +31,11 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 	) public ERC1400Partition(name, symbol, granularity) {}
 
 	/**
-	 * @dev Returns the ERC20 decimal property as 18
-	 * @return uint8 Always returns decimals as 18
+	 * @dev Returns the ERC20 decimal property as 0
+	 * @return uint8 Always returns decimals as 0
 	 */
 	function decimals() external pure returns (uint8) {
-		return uint8(18);
+		return uint8(0);
 	}
 
 	/**
