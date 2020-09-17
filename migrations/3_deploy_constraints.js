@@ -50,6 +50,12 @@ module.exports = async (deployer, network, accounts) => {
 			"0x52454445454d4552000000000000000000000000000000000000000000000000",
 			"0xe375639d0Fa6feC13e6F00A09A3D3BAcf18A354F"
 		)
+
+		// add issuer for elements backend
+		await st.addRole(
+			"0x4953535545520000000000000000000000000000000000000000000000000000",
+			"0xe375639d0Fa6feC13e6F00A09A3D3BAcf18A354F"
+		)
 	} catch (e) {
 		throw e
 	}

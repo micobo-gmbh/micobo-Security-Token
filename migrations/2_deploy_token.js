@@ -8,7 +8,7 @@ const ERC1820 = require("erc1820")
 module.exports = async (deployer, network, accounts) => {
 	await ERC1820.deploy(web3, accounts[0])
 
-	gnosisMultisigAddress = "0x18B79c6489DC977e5Ac26d693acbE4Ac0e5C7eFa"
+	gnosisMultisigAddress = "0xCf58fD93bd6C6d2802e2Cdf33B37933dAEc024Ea"
 
 	try {
 		await deployer.deploy(
