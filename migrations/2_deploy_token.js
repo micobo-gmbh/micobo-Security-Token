@@ -10,24 +10,53 @@ module.exports = async (deployer, network, accounts) => {
 
 	gnosisMultisigAddress = "0xCf58fD93bd6C6d2802e2Cdf33B37933dAEc024Ea"
 
-	try {
-		await deployer.deploy(
-			SecurityToken,
-			conf.name,
-			conf.symbol,
-			1,
-			1000000,
-			accounts[0],
-			accounts[7],
-			accounts[0],
-			accounts[0],
-			accounts[0]
-		)
+	// use this for testing
+	if (network == "development") {
+		console.log("TEST MIGRATION")
+		try {
+			await deployer.deploy(
+				SecurityToken,
+				conf.name, // name
+				conf.symbol, // symbol
+				conf.granularity, // granularity of 2 for testing
+				conf.standardCap, // cap
+				accounts[0], // admin
+				accounts[7], // controller is account 7, as to avoid confusion, because controller disregards constraints
+				accounts[0], // issuer
+				accounts[0], // redeemer
+				accounts[0] // module_editor
+			)
 
-		let st = await SecurityToken.deployed()
+			let st = await SecurityToken.deployed()
 
-		await deployer.deploy(SecurityTokenPartition, st.address, conf.standardPartition)
-	} catch (e) {
-		throw e
+			// TODO we might not need this anymore
+			await deployer.deploy(SecurityTokenPartition, st.address, conf.standardPartition)
+		} catch (e) {
+			throw e
+		}
+
+		// this for everything else
+	} else {
+		try {
+			await deployer.deploy(
+				SecurityToken,
+				conf.name, // name
+				conf.symbol, // symbol
+				1, // granularity
+				1000000, // cap
+				gnosisMultisigAddress, // admin
+				gnosisMultisigAddress, // controller
+				gnosisMultisigAddress, // issuer
+				gnosisMultisigAddress, // redeemer
+				gnosisMultisigAddress // module_editor
+			)
+
+			// let st = await SecurityToken.deployed()
+
+			// TODO we might not need this anymore
+			// await deployer.deploy(SecurityTokenPartition, st.address, conf.standardPartition)
+		} catch (e) {
+			throw e
+		}
 	}
 }

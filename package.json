@@ -20,7 +20,8 @@
 		"abigen-whitelist": "abigen --abi ./build/solc/WhitelistConstraintModule.abi --bin ./build/solc/WhitelistConstraintModule.bin --pkg ethcore --type WhitelistConstraintModule --out ./build/go/whitelistConstraintModule.go",
 		"size": "truffle compile --all && truffle exec scripts/check-size.js",
 		"solcover": "truffle run coverage --temp /build/solcover --network development",
-		"mythx": "truffle run verify --debug --style stylish contracts/token/SecurityToken.sol"
+		"mythx": "truffle run verify --debug --style stylish contracts/token/SecurityToken.sol",
+		"gsn": "npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545"
 	},
 	"husky": {
 		"hooks": {
@@ -75,7 +76,7 @@
 		"solc": "0.6.6",
 		"solidity-coverage": "0.7.5",
 		"truffle-assertions": "^0.9.1",
-		"truffle-security": "file:truffle-security-1.7.2.tgz",
+		"truffle-security": "1.7.3",
 		"typescript": "^3.6.4",
 		"web3": "^1.2.7"
 	},

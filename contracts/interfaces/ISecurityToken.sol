@@ -348,6 +348,8 @@ interface ISecurityToken {
 
 	function setCap(uint256 newCap) external;
 
+	event CapSet(uint256 newCap);
+
 	// GSN
 	function setGSNAllowed(bool allow) external;
 

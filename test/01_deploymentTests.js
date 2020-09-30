@@ -71,7 +71,7 @@ contract("Test Deployment", async (accounts) => {
 
 		assert.deepEqual((await micoboSecurityToken.granularity()).toNumber(), conf.granularity)
 
-		assert.deepEqual((await micoboSecurityToken.decimals()).toNumber(), 18)
+		assert.deepEqual((await micoboSecurityToken.decimals()).toNumber(), 0)
 
 		assert.deepEqual(await micoboSecurityToken.controllers(), [])
 

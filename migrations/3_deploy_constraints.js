@@ -6,6 +6,11 @@ const SpendingLimitsConstraintModule = artifacts.require("SpendingLimitsConstrai
 const VestingPeriodConstraintModule = artifacts.require("VestingPeriodConstraintModule")
 
 module.exports = async (deployer, network, accounts) => {
+	if (network == "development") {
+		console.log("skipping constraint migration")
+		return
+	}
+
 	try {
 		let st = await SecurityToken.deployed()
 
@@ -19,18 +24,15 @@ module.exports = async (deployer, network, accounts) => {
 
 		// TODO off-chain validation
 
-		await st.setModulesByPartition(
-			"0x0000000000000000000000000000000000000000000000000000000000000000",
-			[wl.address, tl.address /* , sl.address, vp.address */],
-			{
-				from: accounts[0],
-			}
-		)
+		await st.setModulesByPartition("0x0000000000000000000000000000000000000000000000000000000000000000", [
+			wl.address,
+			tl.address,
+		])
 
 		// add whitelist editor for elements backend
 		await st.addRole(
 			"0x57484954454c4953545f454449544f5200000000000000000000000000000000",
-			"0xe375639d0Fa6feC13e6F00A09A3D3BAcf18A354F"
+			"0xe375639d0Fa6feC13e6F00A09A3D3BAcf18A354F" // account[1] and static backend signer
 		)
 
 		// add timelock editor for elements backend

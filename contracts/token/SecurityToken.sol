@@ -589,6 +589,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		// set new cap
 		_cap = newCap;
+		emit CapSet(newCap);
 	}
 
 	/********************** OWNABLE **************************/

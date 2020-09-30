@@ -61,8 +61,7 @@ module.exports = {
 			},
 			network_id: 4,
 			gas: 10000000, // 10.000.000
-			gasPrice: 1000000000, // 1gwei in wei
-			confirmations: 2,
+			gasPrice: 3000000000, // 3gwei in wei
 			skipDryRun: true,
 		},
 

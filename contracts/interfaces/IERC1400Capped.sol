@@ -18,4 +18,9 @@ interface IERC1400Capped {
 	 * @param newCap value of new cap
 	 */
 	function setCap(uint256 newCap) external;
+
+	/**
+	 * @dev Event emitted when a new cap is set
+	 */
+	event CapSet(uint256 newCap);
 }

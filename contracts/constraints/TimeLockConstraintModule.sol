@@ -29,17 +29,17 @@ contract TimeLockConstraintModule is IConstraintModule {
 	/**
 	 * @dev Emitted when an amount timelock entry is edited
 	 */
-	event AmountTimelockEdit(address account, uint256 time, uint256 amount);
+	event AmountTimeLockEdit(address account, uint256 time, uint256 amount);
 
 	/**
 	 * @dev Emitted when an account timelock entry is edited
 	 */
-	event AccountTimelockEdit(address account, uint256 time);
+	event AccountTimeLockEdit(address account, uint256 time);
 
 	/**
 	 * @dev Emitted when the overall timelock entry is edited
 	 */
-	event TimelockEdit(uint256 time);
+	event TimeLockEdit(uint256 time);
 
 	// MODULE DATA
 	/**
@@ -60,7 +60,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 	/**
 	 * @dev Until when the whole token is locked
 	 */
-	uint256 _timeLock;
+	uint256 private _timeLock;
 
 	/**
 	 * [TimeLockConstraintModule CONSTRUCTOR]
@@ -88,7 +88,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 			"A7"
 		);
 		_amountTimeLock[account] = Lock(time, amount);
-		emit AmountTimelockEdit(account, time, amount);
+		emit AmountTimeLockEdit(account, time, amount);
 	}
 
 	/**
@@ -102,7 +102,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 			"A7"
 		);
 		_accountTimeLock[account] = time;
-		emit AccountTimelockEdit(account, time);
+		emit AccountTimeLockEdit(account, time);
 	}
 
 	/**
@@ -115,7 +115,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 			"A7"
 		);
 		_timeLock = time;
-		emit TimelockEdit(time);
+		emit TimeLockEdit(time);
 	}
 
 	/**
@@ -209,5 +209,34 @@ contract TimeLockConstraintModule is IConstraintModule {
 	 */
 	function getModuleName() public override view returns (bytes32) {
 		return _module_name;
+	}
+
+	/**
+	 * @dev Returns token timelock
+	 * @return uint256 unix timestamp until which the token is locked
+	 */
+	function getTimeLock() public view returns (uint256) {
+		return _timeLock;
+	}
+
+	/**
+	 * @dev Returns account timelock
+	 * @return uint256 unix timestamp until which the accounnt is locked
+	 */
+	function getAccountTimeLock(address account) public view returns (uint256) {
+		return _accountTimeLock[account];
+	}
+
+	/**
+	 * @dev Returns amount timelock
+	 * @return time uint256 unix timestamp until which the amount is locked
+	 * @return amount uint256 amount that is locked
+	 */
+	function getAmountTimeLock(address account)
+		public
+		view
+		returns (uint256 time, uint256 amount)
+	{
+		return (_amountTimeLock[account].time, _amountTimeLock[account].amount);
 	}
 }

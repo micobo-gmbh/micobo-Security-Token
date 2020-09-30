@@ -45,19 +45,36 @@ contract("Test TimeLock Module", async (accounts) => {
 			timeLockConstraintModule.editAccountTimeLock(accounts[0], 1893456000) // 01/01/2030 @ 12:00 (UTC)
 		)
 
+		await truffleAssert.fails(
+			timeLockConstraintModule.editAmountTimeLock(accounts[0], 1893456000, 100) // 01/01/2030 @ 12:00 (UTC)
+		)
+
 		await contracts.micoboSecurityToken.addRole(Role.TIME_LOCK_EDITOR, accounts[0])
 
 		await truffleAssert.passes(
 			timeLockConstraintModule.editTimeLock(1893456000) // 01/01/2030 @ 12:00 (UTC)
 		)
 
+		assert.deepEqual((await timeLockConstraintModule.getTimeLock()).toNumber(), 1893456000)
+
 		await truffleAssert.passes(
 			timeLockConstraintModule.editAccountTimeLock(accounts[0], 1893456000) // 01/01/2030 @ 12:00 (UTC)
 		)
 
+		assert.deepEqual((await timeLockConstraintModule.getAccountTimeLock(accounts[0])).toNumber(), 1893456000)
+
+		await truffleAssert.passes(
+			timeLockConstraintModule.editAmountTimeLock(accounts[0], 1893456000, 100) // 01/01/2030 @ 12:00 (UTC)
+		)
+
+		assert.deepEqual((await timeLockConstraintModule.getAmountTimeLock(accounts[0]))[0].toNumber(), 1893456000)
+
+		assert.deepEqual((await timeLockConstraintModule.getAmountTimeLock(accounts[0]))[1].toNumber(), 100)
+
 		//reset
 		await timeLockConstraintModule.editTimeLock(1577836800) // 01/01/2020 @ 12:00 (UTC)
 		await timeLockConstraintModule.editAccountTimeLock(accounts[0], 1577836800) // 01/01/2020 @ 12:00 (UTC)
+		await timeLockConstraintModule.editAmountTimeLock(accounts[0], 1577836800, 0) // 01/01/2020 @ 12:00 (UTC)
 	})
 
 	it("cannot transfer when timelocked", async () => {

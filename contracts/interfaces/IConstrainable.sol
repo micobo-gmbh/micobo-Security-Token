@@ -12,7 +12,7 @@ interface IConstrainable {
 	event ModulesByPartitionSet(
 		address indexed caller,
 		bytes32 indexed partition,
-		IConstraintModule[] indexed newModules
+		IConstraintModule[] newModules
 	);
 
 	/**
