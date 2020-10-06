@@ -53,22 +53,6 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	}
 
 	/**
-	 * @dev Adds a new Partition proxy contract
-	 * sender must have ADMIN role
-	 * @param partition partition id this proy will control
-	 * @param proxyAddress address of the SecurityTokenPartition
-	 */
-	function addPartitionProxy(bytes32 partition, address proxyAddress) public {
-		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
-
-		_partitionProxies.push(proxyAddress);
-
-		_setPartitionControllers(partition, _partitionProxies);
-
-		// _totalPartitions is being updated when when minting for the first time
-	}
-
-	/**
 	 * @dev Mints to a number of token holder at the same time
 	 * Must be issuable and tokenHolders and values must bne same length
 	 * @param partition partition id tokens should be minted for

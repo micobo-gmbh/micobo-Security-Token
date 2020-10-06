@@ -1,5 +1,4 @@
 const SecurityToken = artifacts.require("SecurityToken")
-const SecurityTokenPartition = artifacts.require("SecurityTokenPartition")
 
 const { conf } = require("../token-config")
 
@@ -26,11 +25,6 @@ module.exports = async (deployer, network, accounts) => {
 				accounts[0], // redeemer
 				accounts[0] // module_editor
 			)
-
-			let st = await SecurityToken.deployed()
-
-			// TODO we might not need this anymore
-			await deployer.deploy(SecurityTokenPartition, st.address, conf.standardPartition)
 		} catch (e) {
 			throw e
 		}
@@ -50,11 +44,6 @@ module.exports = async (deployer, network, accounts) => {
 				gnosisMultisigAddress, // redeemer
 				gnosisMultisigAddress // module_editor
 			)
-
-			// let st = await SecurityToken.deployed()
-
-			// TODO we might not need this anymore
-			// await deployer.deploy(SecurityTokenPartition, st.address, conf.standardPartition)
 		} catch (e) {
 			throw e
 		}

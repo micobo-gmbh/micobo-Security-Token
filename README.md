@@ -147,8 +147,6 @@ Get cap with `cap()`
 When `CAP_EDITOR`, use `setCap(uint256 newCap)` to set to new value.  
 The new cap must always be greater than the old one!
 
-*SecurityTokenPartitions return overall cap with their `cap()` function.*
-
 When using `issueByPartition` or `bulkIssueByPartition`,  
 the issued value must not exceed `_cap`
 

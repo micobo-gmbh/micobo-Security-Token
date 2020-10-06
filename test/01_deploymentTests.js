@@ -1,11 +1,10 @@
 const truffleAssert = require("truffle-assertions")
 const MicoboSecurityToken = artifacts.require("SecurityToken")
-const SecurityTokenPartition = artifacts.require("SecurityTokenPartition")
 
 const { conf } = require("../token-config")
 
 contract("Test Deployment", async (accounts) => {
-	let micoboSecurityToken, securityTokenPartition
+	let micoboSecurityToken
 
 	// deepEqual compares with '==='
 
@@ -40,30 +39,6 @@ contract("Test Deployment", async (accounts) => {
 		)
 	})
 
-	it("adds the standard partition", async () => {
-		securityTokenPartition = await SecurityTokenPartition.new(micoboSecurityToken.address, conf.standardPartition)
-
-		// add partition
-		await truffleAssert.fails(
-			micoboSecurityToken.addPartitionProxy(conf.standardPartition, securityTokenPartition.address, {
-				from: accounts[1],
-			}),
-			truffleAssert.ErrorType.REVERT,
-			"A7"
-		)
-
-		// add partition
-		await micoboSecurityToken.addPartitionProxy(conf.standardPartition, securityTokenPartition.address)
-
-		assert.deepEqual(await securityTokenPartition.securityTokenAddress(), micoboSecurityToken.address)
-
-		assert.deepEqual(await securityTokenPartition.partitionId(), conf.standardPartition)
-
-		assert.deepEqual((await micoboSecurityToken.cap()).toNumber(), conf.standardCap)
-
-		assert.deepEqual(await micoboSecurityToken.partitionProxies(), [securityTokenPartition.address])
-	})
-
 	it("Token gives me all the correct token information", async () => {
 		assert.deepEqual(await micoboSecurityToken.name(), conf.name)
 
@@ -79,17 +54,5 @@ contract("Test Deployment", async (accounts) => {
 		assert.deepEqual((await micoboSecurityToken.cap()).toNumber(), conf.standardCap)
 
 		assert.deepEqual((await micoboSecurityToken.totalSupply()).toNumber(), 0)
-	})
-
-	it("partition gives me all the correct token information", async () => {
-		assert.deepEqual(await securityTokenPartition.name(), conf.name)
-
-		assert.deepEqual(await securityTokenPartition.symbol(), conf.symbol)
-
-		assert.deepEqual((await securityTokenPartition.decimals()).toNumber(), 18)
-
-		assert.deepEqual((await securityTokenPartition.cap()).toNumber(), conf.standardCap)
-
-		assert.deepEqual((await securityTokenPartition.totalSupply()).toNumber(), 0)
 	})
 })

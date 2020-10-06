@@ -274,7 +274,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	/********************** ERC1400Partition INTERNAL FUNCTIONS **************************/
 
 	/**
-	 * [changed to PUBLIC for SecurityTokenPartition]
+	 * [INTERNAL]
 	 * @dev Indicate whether the operator address is an operator of the tokenHolder
 	 * address for the given partition.
 	 * @param partition Name of the partition.
