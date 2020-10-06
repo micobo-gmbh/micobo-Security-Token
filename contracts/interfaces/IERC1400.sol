@@ -121,64 +121,6 @@ interface IERC1400 {
 		bytes operatorData
 	);
 
-	/**
-	 * [ERC1400 INTERFACE (8/9)]
-	 * @dev Know the reason on success or failure based on the EIP-1066 application-specific status codes.
-	 * @param partition Name of the partition.
-	 * @param to Token recipient.
-	 * @param value Number of tokens to transfer.
-	 * @param data Information attached to the transfer, by the token holder.
-	 * @return ESC (Ethereum Status Code) following the EIP-1066 standard.
-	 * @return Additional bytes32 parameter that can be used to define
-	 * application specific reason codes with additional details (for example the
-	 * transfer restriction rule responsible for making the transfer operation invalid).
-	 * @return Destination partition.
-	 */
-	function canTransferByPartition(
-		bytes32 partition,
-		address to,
-		uint256 value,
-		bytes calldata data
-	)
-		external
-		view
-		returns (
-			bytes1,
-			bytes32,
-			bytes32
-		); // 8/9
-
-	/**
-	 * [ERC1400 INTERFACE (9/9)]
-	 * @dev Know the reason on success or failure based on the EIP-1066 application-specific status codes.
-	 * @param partition Name of the partition.
-	 * @param from Token holder.
-	 * @param to Token recipient.
-	 * @param value Number of tokens to transfer.
-	 * @param data Information attached to the transfer. [CAN CONTAIN THE DESTINATION PARTITION]
-	 * @param operatorData Information attached to the transfer, by the operator.
-	 * @return ESC (Ethereum Status Code) following the EIP-1066 standard.
-	 * @return Additional bytes32 parameter that can be used to define
-	 * application specific reason codes with additional details (for example the
-	 * transfer restriction rule responsible for making the transfer operation invalid).
-	 * @return Destination partition.
-	 */
-	function canOperatorTransferByPartition(
-		bytes32 partition,
-		address from,
-		address to,
-		uint256 value,
-		bytes calldata data,
-		bytes calldata operatorData
-	)
-		external
-		view
-		returns (
-			bytes1,
-			bytes32,
-			bytes32
-		); // 9/9
-
 	/********************** ERC1400 OPTIONAL FUNCTIONS **************************/
 
 	/**
