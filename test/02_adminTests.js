@@ -40,11 +40,20 @@ contract("Test Admin Contract", async (accounts) => {
 
 		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.ADMIN, accounts[1]), true)
 
+		await contracts.micoboSecurityToken.bulkAddRole(
+			[Role.SPENDING_LIMITS_EDITOR, Role.TIME_LOCK_EDITOR, Role.VESTING_PERIOD_EDITOR],
+			[accounts[4], accounts[5], accounts[6]]
+		)
+
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.SPENDING_LIMITS_EDITOR, accounts[4]), true)
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.TIME_LOCK_EDITOR, accounts[5]), true)
+		assert.deepEqual(await contracts.micoboSecurityToken.hasRole(Role.VESTING_PERIOD_EDITOR, accounts[6]), true)
+
 		// account that already has the role cannot have the same role assigned again
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.addRole(Role.ADMIN, accounts[1]),
 			truffleAssert.ErrorType.REVERT,
-			"A7"
+			"already has role"
 		)
 
 		await contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[1])
@@ -54,7 +63,7 @@ contract("Test Admin Contract", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.removeRole(Role.MODULE_EDITOR, accounts[1]),
 			truffleAssert.ErrorType.REVERT,
-			"A7"
+			"does not have role"
 		)
 
 		// constraintsEditor
@@ -100,11 +109,27 @@ contract("Test Admin Contract", async (accounts) => {
 			})
 		)
 
+		// give admin role to oneself through bulk adding
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.bulkAddRole([Role.ADMIN], [accounts[1]], {
+				from: accounts[1],
+			})
+		)
+
 		// remove admin role from other admin
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.removeRole(Role.ADMIN, accounts[0], {
 				from: accounts[1],
 			})
+		)
+	})
+
+	it("cannot send odd number of roles and accounts to bulkAddRole", async () => {
+		// give admin role to oneself through bulk adding
+		await truffleAssert.fails(
+			contracts.micoboSecurityToken.bulkAddRole([Role.ADMIN, Role.VESTING_PERIOD_EDITOR], [accounts[1]]),
+			truffleAssert.ErrorType.REVERT,
+			"length"
 		)
 	})
 

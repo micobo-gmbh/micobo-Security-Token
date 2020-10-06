@@ -49,7 +49,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 	 * @dev Modifier to make a function callable only when the caller is a specific role.
 	 */
 	modifier onlyRole(bytes32 role) {
-		require(hasRole(role, _msgSender()), "A7");
+		require(hasRole(role, _msgSender()), "unauthorized");
 		_;
 	}
 
@@ -65,6 +65,23 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 		onlyRole(bytes32("ADMIN"))
 	{
 		_add(role, account);
+	}
+
+	/**
+	 * @param roles Roles that are being assigned
+	 * @param accounts The addresses that are being assigned a role
+	 * @dev Assigns a bulk of roles to accounts
+	 * only ADMIN
+	 */
+	function bulkAddRole(bytes32[] memory roles, address[] memory accounts)
+		public
+		override
+		onlyRole(bytes32("ADMIN"))
+	{
+		require(roles.length == accounts.length, "length");
+		for (uint256 i = 0; i < roles.length; i++) {
+			_add(roles[i], accounts[i]);
+		}
 	}
 
 	/**
@@ -87,8 +104,6 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 	 * ATTENTION: it is possible to remove the last ADMINN role by renouncing it!
 	 */
 	function renounceRole(bytes32 role) public override {
-		require(hasRole(role, _msgSender()), "A7");
-
 		_remove(role, _msgSender());
 
 		emit RoleRenounced(role, _msgSender());
@@ -113,7 +128,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 	 * @dev give an account access to a role
 	 */
 	function _add(bytes32 role, address account) internal {
-		require(!hasRole(role, account), "A7");
+		require(!hasRole(role, account), "already has role");
 
 		_roles[role][account] = true;
 
@@ -126,7 +141,7 @@ contract Administrable is IAdmin, GSNable, ReentrancyGuard {
 	 * address must have role
 	 */
 	function _remove(bytes32 role, address account) internal {
-		require(hasRole(role, account), "A7");
+		require(hasRole(role, account), "does not have role");
 
 		_roles[role][account] = false;
 

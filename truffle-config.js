@@ -103,7 +103,7 @@ module.exports = {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 1024, // 2^10
+					runs: 512, // 2^9
 				},
 				evmVersion: "istanbul",
 			},

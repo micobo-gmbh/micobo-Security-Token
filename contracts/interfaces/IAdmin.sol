@@ -16,6 +16,15 @@ interface IAdmin {
 	function addRole(bytes32 role, address account) external;
 
 	/**
+	 * @param roles Roles that are being assigned
+	 * @param accounts The addresses that are being assigned a role
+	 * @dev Assigns a bulk of roles to accounts
+	 * only ADMIN
+	 */
+	function bulkAddRole(bytes32[] calldata roles, address[] calldata accounts)
+		external;
+
+	/**
 	 * @param role Role that is being removed
 	 * @param account The address that a role is removed from
 	 * @dev Removes a role from an account
