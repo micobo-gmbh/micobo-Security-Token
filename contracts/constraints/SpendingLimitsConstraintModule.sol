@@ -92,7 +92,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 				bytes32("SPENDING_LIMITS_EDITOR"),
 				msg.sender
 			),
-			"A7"
+			"!SPENDING_LIMITS_EDITOR"
 		);
 		_;
 	}

@@ -87,23 +87,6 @@ interface IERC1400Partition {
 	) external returns (bytes32);
 
 	/**
-	 * [ERC1400Partition INTERFACE (5/10)]
-	 * @dev Get default partitions to transfer from.
-	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
-	 * For example, a security token may return the bytes32("unrestricted").
-	 * @return Array of default partitions.
-	 */
-	function getDefaultPartitions() external view returns (bytes32[] memory);
-
-	/**
-	 * [ERC1400Partition INTERFACE (6/10)]
-	 * @dev Set default partitions to transfer from.
-	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
-	 * @param partitions partitions to use by default when not specified.
-	 */
-	function setDefaultPartitions(bytes32[] calldata partitions) external;
-
-	/**
 	 * [ERC1400Partition INTERFACE (7/10)]
 	 * @dev Get controllers for a given partition.
 	 * Function used for ERC1400Raw and ERC20 backwards compatibility.

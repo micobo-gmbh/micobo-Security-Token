@@ -55,6 +55,14 @@ module.exports = {
 			network_id: "*",
 		},
 
+		test: {
+			provider: () => {
+				return new HDWalletProvider(mnemonic, "http://localhost:8545")
+			},
+			port: 8545,
+			network_id: "*",
+		},
+
 		rinkeby: {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
@@ -103,7 +111,7 @@ module.exports = {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 512, // 2^9
+					runs: 1024, // 2^10
 				},
 				evmVersion: "istanbul",
 			},

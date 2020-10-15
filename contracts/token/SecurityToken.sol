@@ -42,6 +42,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		_add(bytes32("MODULE_EDITOR"), module_editor);
 
 		_cap = cap;
+		emit CapSet(cap);
 
 		setInterfaceImplementation("ERC1400Token", address(this));
 
@@ -66,11 +67,14 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		uint256[] memory values,
 		bytes memory data
 	) public {
-		require(_isIssuable, "A8");
-		require(tokenHolders.length == values.length, "length");
+		require(_isIssuable, "token not issuable");
+		require(
+			tokenHolders.length == values.length,
+			"different array lengths"
+		);
 
 		for (uint256 i = 0; i < tokenHolders.length; i++) {
-			require(_totalSupply.add(values[i]) <= _cap, "exceeds");
+			require(_totalSupply.add(values[i]) <= _cap, "exceeds cap");
 			_issueByPartition(
 				partition,
 				_msgSender(),
@@ -143,7 +147,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		string calldata uri,
 		bytes32 documentHash
 	) external override {
-		require(hasRole(bytes32("DOCUMENT_EDITOR"), _msgSender()), "A7");
+		require(
+			hasRole(bytes32("DOCUMENT_EDITOR"), _msgSender()),
+			"!DOCUMENT_EDITOR"
+		);
 		_documents[documentName] = Doc({ docURI: uri, docHash: documentHash });
 		emit Document(documentName, uri, documentHash);
 	}
@@ -181,11 +188,11 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		uint256 value,
 		bytes calldata data // onlyMinter is taken care of in _issue function
 	) external override {
-		require(_isIssuable, "A8");
+		require(_isIssuable, "token not issuable");
 
 		// total cap is always the sum of all partitionCaps, so it can't be violated
 
-		require(_totalSupply.add(value) <= _cap, "exceeds");
+		require(_totalSupply.add(value) <= _cap, "exceeds cap");
 
 		_issueByPartition(
 			partition,
@@ -242,7 +249,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		require(
 			_isOperatorForPartition(partition, _msgSender(), tokenHolder),
-			"A7"
+			"!CONTROLLER or !operator"
 		);
 		// Transfer Blocked - Identity restriction
 
@@ -309,7 +316,10 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes memory data,
 		bytes memory operatorData
 	) internal {
-		require(_balanceOfByPartition[from][fromPartition] >= value, "A4");
+		require(
+			_balanceOfByPartition[from][fromPartition] >= value,
+			"insufficient balance"
+		);
 		// Transfer Blocked - Sender balance insufficient
 
 		_removeTokenFromPartition(from, fromPartition, value);
@@ -334,7 +344,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * Once set to false, '_isControllable' can never be set to 'true' again.
 	 */
 	function renounceControl() external override {
-		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
+		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
 		_isControllable = false;
 	}
 
@@ -344,7 +354,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * Once set to false, '_isIssuable' can never be set to 'true' again.
 	 */
 	function renounceIssuance() external override {
-		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
+		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
 		_isIssuable = false;
 	}
 
@@ -373,7 +383,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		bytes32 partition,
 		address[] calldata operators
 	) external override {
-		require(hasRole(bytes32("ADMIN"), _msgSender()), "A7");
+		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
 		_setPartitionControllers(partition, operators);
 	}
 
@@ -393,8 +403,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @param newCap value of new cap
 	 */
 	function setCap(uint256 newCap) public override {
-		require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), "A7");
-		require((newCap > _cap), "cap");
+		require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), "!CAP_EDITOR");
+		require((newCap > _cap), "new cap needs to be higher");
 
 		// set new cap
 		_cap = newCap;
@@ -422,7 +432,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * Can only be called by the current owner.
 	 */
 	function transferOwnership(address newOwner) public virtual {
-		require(hasRole(bytes32("ADMIN"), msg.sender), "A7");
+		require(hasRole(bytes32("ADMIN"), msg.sender), "!ADMIN");
 		require(
 			newOwner != address(0),
 			"Ownable: new owner is the zero address"
@@ -473,7 +483,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @dev Called by a pauser to pause, triggers stopped state.
 	 */
 	function pause() public whenNotPaused {
-		require(hasRole(bytes32("PAUSER"), msg.sender), "A7");
+		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
 		_paused = true;
 		emit Paused(msg.sender);
 	}
@@ -482,7 +492,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 	 * @dev Called by a pauser to unpause, returns to normal state.
 	 */
 	function unpause() public whenPaused {
-		require(hasRole(bytes32("PAUSER"), msg.sender), "A7");
+		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
 		_paused = false;
 		emit Unpaused(msg.sender);
 	}

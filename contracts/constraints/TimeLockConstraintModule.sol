@@ -85,7 +85,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 	) public {
 		require(
 			_securityToken.hasRole(bytes32("TIME_LOCK_EDITOR"), msg.sender),
-			"A7"
+			"!TIME_LOCK_EDITOR"
 		);
 		_amountTimeLock[account] = Lock(time, amount);
 		emit AmountTimeLockEdit(account, time, amount);
@@ -99,7 +99,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 	function editAccountTimeLock(address account, uint256 time) public {
 		require(
 			_securityToken.hasRole(bytes32("TIME_LOCK_EDITOR"), msg.sender),
-			"A7"
+			"!TIME_LOCK_EDITOR"
 		);
 		_accountTimeLock[account] = time;
 		emit AccountTimeLockEdit(account, time);
@@ -112,7 +112,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 	function editTimeLock(uint256 time) public {
 		require(
 			_securityToken.hasRole(bytes32("TIME_LOCK_EDITOR"), msg.sender),
-			"A7"
+			"!TIME_LOCK_EDITOR"
 		);
 		_timeLock = time;
 		emit TimeLockEdit(time);

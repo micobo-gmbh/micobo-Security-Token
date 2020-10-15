@@ -105,7 +105,7 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 		returns (bool)
 	{
 		// Transfer Blocked - Sender not eligible
-		require(spender != address(0), "A5");
+		require(spender != address(0), "zero address");
 
 		// mitigate https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
 		_allowances[_msgSender()][spender] = 0;
@@ -131,7 +131,7 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 		uint256 value
 	) external override returns (bool) {
 		// check if is operator by partition or has enough allowance here
-		require(value <= _allowances[from][_msgSender()], "A7");
+		require(value <= _allowances[from][_msgSender()], "allowance too low");
 		// Transfer Blocked - Identity restriction
 
 		_allowances[from][_msgSender()] = _allowances[from][_msgSender()].sub(

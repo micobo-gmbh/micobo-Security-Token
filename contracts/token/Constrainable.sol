@@ -131,7 +131,11 @@ contract Constrainable is IConstrainable, Administrable {
 		bytes32 partition,
 		IConstraintModule[] calldata newModules
 	) external override {
-		require(hasRole(bytes32("MODULE_EDITOR"), _msgSender()), "A7");
+		// TODO use this pattern everywhere
+		require(
+			hasRole(bytes32("MODULE_EDITOR"), _msgSender()),
+			"!MODULE_EDITOR"
+		);
 		_modulesByPartition[partition] = newModules;
 		emit ModulesByPartitionSet(_msgSender(), partition, newModules);
 	}

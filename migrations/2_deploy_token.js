@@ -11,7 +11,7 @@ module.exports = async (deployer, network, accounts) => {
 
 	// use this for testing
 	if (network == "development") {
-		console.log("TEST MIGRATION")
+		console.log("DEV MIGRATION")
 		try {
 			await deployer.deploy(
 				SecurityToken,
@@ -20,7 +20,25 @@ module.exports = async (deployer, network, accounts) => {
 				conf.granularity, // granularity of 2 for testing
 				conf.standardCap, // cap
 				accounts[0], // admin
-				accounts[7], // controller is account 7, as to avoid confusion, because controller disregards constraints
+				accounts[7], // controller is account 7 to avoid confusion, because controller disregards constraints
+				accounts[0], // issuer
+				accounts[0], // redeemer
+				accounts[0] // module_editor
+			)
+		} catch (e) {
+			throw e
+		}
+	} else if (network == "test") {
+		console.log("TEST MIGRATION")
+		try {
+			await deployer.deploy(
+				SecurityToken,
+				conf.name, // name
+				conf.symbol, // symbol
+				1, // granularity
+				conf.standardCap, // cap
+				accounts[0], // admin
+				accounts[0], // controller is account 7 to avoid confusion, because controller disregards constraints
 				accounts[0], // issuer
 				accounts[0], // redeemer
 				accounts[0] // module_editor

@@ -167,7 +167,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external override returns (bytes32) {
-		require(_isOperatorForPartition(partition, _msgSender(), from), "A7");
+		require(
+			_isOperatorForPartition(partition, _msgSender(), from),
+			"!CONTROLLER or !operator"
+		);
 		// Transfer Blocked - Identity restriction
 
 		return
@@ -180,33 +183,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 				data,
 				operatorData
 			);
-	}
-
-	/**
-	 * [ERC1400Partition INTERFACE (5/10)]
-	 * @dev Get default partitions to transfer from.
-	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
-	 * For example, a security token may return the bytes32("unrestricted").
-	 * @return Array of default partitions.
-	 */
-	function getDefaultPartitions()
-		external
-		override
-		view
-		returns (bytes32[] memory)
-	{
-		return _totalPartitions;
-	}
-
-	/**
-	 * [ERC1400Partition INTERFACE (6/10)]
-	 * @dev Set default partitions to transfer from.
-	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
-	 */
-	function setDefaultPartitions(
-		bytes32[] calldata /* partitions */
-	) external override {
-		this;
 	}
 
 	/**
@@ -316,7 +292,10 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes memory data,
 		bytes memory operatorData
 	) internal returns (bytes32) {
-		require(_balanceOfByPartition[from][fromPartition] >= value, "A4");
+		require(
+			_balanceOfByPartition[from][fromPartition] >= value,
+			"balance too low"
+		);
 		// Transfer Blocked - Sender balance insufficient
 
 		// The RIVER Principle
@@ -377,7 +356,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		// If the total supply is zero, finds and deletes the partition.
 		if (_totalSupplyByPartition[partition] == 0) {
 			uint256 index1 = _indexOfTotalPartitions[partition];
-			require(index1 > 0, "A8");
+			require(index1 > 0, "last partition");
 			// Transfer Blocked - Token restriction
 
 			// move the last item into the index being vacated
@@ -393,7 +372,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		// If the balance of the TokenHolder's partition is zero, finds and deletes the partition.
 		if (_balanceOfByPartition[from][partition] == 0) {
 			uint256 index2 = _indexOfPartitionsOf[from][partition];
-			require(index2 > 0, "A8");
+			require(index2 > 0, "last partition");
 			// Transfer Blocked - Token restriction
 
 			// move the last item into the index being vacated
@@ -545,7 +524,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external override {
-		require(_isOperator(_msgSender(), from), "58"); // 0x58	invalid operator (transfer agent)
+		require(_isOperator(_msgSender(), from), "!operator");
 
 		_transferFromTotalPartitions(
 			_msgSender(),
@@ -575,7 +554,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes memory data,
 		bytes memory operatorData
 	) internal {
-		require(_totalPartitions.length != 0, "A8"); // Transfer Blocked - Token restriction
+		require(_totalPartitions.length != 0, "no partitions"); // Transfer Blocked - Token restriction
 
 		uint256 _remainingValue = value;
 		uint256 _localBalance;
@@ -608,6 +587,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 			}
 		}
 
-		require(_remainingValue == 0, "A8"); // Transfer Blocked - Token restriction
+		require(_remainingValue == 0, "insufficient balance"); // Transfer Blocked - Token restriction
 	}
 }

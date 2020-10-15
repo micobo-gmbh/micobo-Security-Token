@@ -83,7 +83,7 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 				bytes32("VESTING_PERIOD_EDITOR"),
 				msg.sender
 			),
-			"A8"
+			"!VESTING_PERIOD_EDITOR"
 		);
 
 		_vestingStart = vestingStart;

@@ -52,7 +52,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _upgradeRelayHub(address newRelayHub) internal virtual {
 		address currentRelayHub = _relayHub;
-		require(newRelayHub != address(0), "zero");
+		require(newRelayHub != address(0), "zero address");
 		require(newRelayHub != currentRelayHub, "current one");
 
 		emit RelayHubChanged(currentRelayHub, newRelayHub);

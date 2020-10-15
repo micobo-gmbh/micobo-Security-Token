@@ -62,7 +62,7 @@ contract WhitelistConstraintModule is IConstraintModule {
 	function editWhitelist(address account, bool whitelisted) public {
 		require(
 			_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender),
-			"A8"
+			"!WHITELIST_EDITOR"
 		);
 		_editWhitelist(account, whitelisted);
 	}
@@ -77,7 +77,7 @@ contract WhitelistConstraintModule is IConstraintModule {
 	{
 		require(
 			_securityToken.hasRole(bytes32("WHITELIST_EDITOR"), msg.sender),
-			"A8"
+			"!WHITELIST_EDITOR"
 		);
 
 		for (uint256 i = 0; i < accounts.length; i++) {
