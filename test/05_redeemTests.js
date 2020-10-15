@@ -119,7 +119,7 @@ contract("Test Redeeming", async (accounts) => {
 				from: accounts[3],
 			}),
 			truffleAssert.ErrorType.REVERT,
-			"A9"
+			"violates granularity"
 		)
 
 		//should pass now

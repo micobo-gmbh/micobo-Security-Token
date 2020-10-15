@@ -140,54 +140,10 @@ contract TimeLockConstraintModule is IConstraintModule {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external override returns (bool, string memory) {
-		(bool valid, , , string memory reason) = validateTransfer(
-			msg_sender,
-			partition,
-			operator,
-			from,
-			to,
-			value,
-			data,
-			operatorData
-		);
-
-		return (valid, reason);
-	}
-
-	/**
-	 * @dev Validates transfer. Cannot modify state
-	 * @param msg_sender Sender of this function call
-	 * @return valid transfer is valid
-	 * @return code ERC1066 error code
-	 * @return extradata Additional bytes32 parameter that can be used to define
-	 * application specific reason codes with additional details (for example the
-	 * transfer restriction rule responsible for making the transfer operation invalid).
-	 * @return reason Why the transfer failed (intended for require statement)
-	 */
-	function validateTransfer(
-		address msg_sender,
-		bytes32 partition,
-		address, /* operator */
-		address from,
-		address, /* to */
-		uint256, /* value */
-		bytes memory, /* data */
-		bytes memory /* operatorData */
-	)
-		public
-		override
-		view
-		returns (
-			bool valid,
-			bytes1 code,
-			bytes32 extradata,
-			string memory reason
-		)
-	{
 		if (_timeLock > now) {
-			return (false, hex"A8", "", "A8 - partition is still locked");
+			return (false, "partition is still locked");
 		} else if (_accountTimeLock[msg_sender] > now) {
-			return (false, hex"A8", "", "A8 - account is still locked");
+			return (false, "account is still locked");
 		} else if (_amountTimeLock[msg_sender].time > now) {
 			// this balance already has "value" substracted from it
 			uint256 userBalance = _securityToken.balanceOfByPartition(
@@ -196,11 +152,11 @@ contract TimeLockConstraintModule is IConstraintModule {
 			);
 
 			if (userBalance < _amountTimeLock[msg_sender].amount) {
-				return (false, hex"A8", "", "A8 - amount is still locked");
+				return (false, "amount is still locked");
 			}
 		}
 
-		return (true, code, extradata, "");
+		return (true, "");
 	}
 
 	/**

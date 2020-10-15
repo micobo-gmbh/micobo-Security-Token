@@ -27,7 +27,7 @@ contract("Test Admin Contract", async (accounts) => {
 				from: accounts[1],
 			}),
 			truffleAssert.ErrorType.REVERT,
-			"A7"
+			"!ADMIN"
 		)
 
 		await contracts.micoboSecurityToken.transferOwnership(accounts[1]),
@@ -221,7 +221,7 @@ contract("Test Admin Contract", async (accounts) => {
 				from: accounts[0],
 			}),
 			truffleAssert.ErrorType.REVERT,
-			"A8"
+			"not issuable"
 		)
 
 		await truffleAssert.fails(
@@ -232,7 +232,7 @@ contract("Test Admin Contract", async (accounts) => {
 				"0x0"
 			),
 			truffleAssert.ErrorType.REVERT,
-			"A8"
+			"not issuable"
 		)
 	})
 })

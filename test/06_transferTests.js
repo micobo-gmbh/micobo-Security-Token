@@ -33,7 +33,7 @@ contract("Test Token Transfer", async (accounts) => {
 				{ from: accounts[1] }
 			),
 			truffleAssert.ErrorType.REVERT,
-			"A6"
+			"zero address"
 		)
 
 		// never reaches ERC1400Raw.sol:318
@@ -47,7 +47,7 @@ contract("Test Token Transfer", async (accounts) => {
 				{ from: accounts[1] }
 			),
 			truffleAssert.ErrorType.REVERT,
-			"A4"
+			"insufficient funds"
 		)
 
 		// fails granularity test
@@ -56,7 +56,7 @@ contract("Test Token Transfer", async (accounts) => {
 				from: accounts[1],
 			}),
 			truffleAssert.ErrorType.REVERT,
-			"A9"
+			"violates granularity"
 		)
 
 		await truffleAssert.passes(
@@ -346,7 +346,7 @@ contract("Test Token Transfer", async (accounts) => {
 				from: accounts[2],
 			}),
 			truffleAssert.ErrorType.REVERT,
-			"58"
+			"!operator"
 		)
 
 		await contracts.micoboSecurityToken.authorizeOperator(accounts[2], {

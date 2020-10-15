@@ -41,7 +41,7 @@ contract("Test Issuing and Cap", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.issueByPartition(conf.standardPartition, accounts[1], value - 1, "0x0"),
 			truffleAssert.ErrorType.REVERT,
-			"A9"
+			"violates granularity"
 		)
 
 		await truffleAssert.fails(
@@ -52,7 +52,7 @@ contract("Test Issuing and Cap", async (accounts) => {
 				"0x0"
 			),
 			truffleAssert.ErrorType.REVERT,
-			"A6"
+			"zero address"
 		)
 
 		await truffleAssert.passes(

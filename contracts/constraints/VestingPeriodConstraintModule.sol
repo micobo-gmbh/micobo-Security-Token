@@ -119,60 +119,9 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external override returns (bool, string memory) {
-		(bool valid, , , string memory reason) = validateTransfer(
-			msg_sender,
-			partition,
-			operator,
-			from,
-			to,
-			value,
-			data,
-			operatorData
-		);
-
-		if (valid) {
-			_amountSpentByUser[from] = _amountSpentByUser[from].add(value);
-		}
-
-		return (valid, reason);
-	}
-
-	/**
-	 * @dev Validates transfer. Cannot modify state
-	 * @param partition Partition the tokens are being transferred from
-	 * @param from Token holder.
-	 * @param value Number of tokens to transfer.
-	 * @return invalid transfer is valid
-	 * @return code ERC1066 error code
-	 * @return extradata Additional bytes32 parameter that can be used to define
-	 * application specific reason codes with additional details (for example the
-	 * transfer restriction rule responsible for making the transfer operation invalid).
-	 * @return reason Why the transfer failed (intended for require statement)
-	 */
-	function validateTransfer(
-		address, /* msg_sender */
-		bytes32 partition,
-		address, /* operator */
-		address from,
-		address, /* to */
-		uint256 value,
-		bytes memory, /* data */
-		bytes memory /* operatorData */
-	)
-		public
-		override
-		view
-		returns (
-			// we start with false here to save gas and negate it before returning --> (!invalid)
-			bool invalid,
-			bytes1 code,
-			bytes32 extradata,
-			string memory reason
-		)
-	{
 		// dormant Period not over
 		if (now < _vestingStart) {
-			return (false, hex"A8", "", "A8 - vesting has not started yet");
+			return (false, "vesting has not started yet");
 		}
 		// dormant period is over
 
@@ -180,10 +129,11 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
 		// amount exceeds allowance minus amountAlreadySpent by this acount
 		if (value > (allowed.sub(_amountSpentByUser[from]))) {
-			return (false, hex"A8", "", "A8 - amount exceeds vested amount");
+			return (false, "amount exceeds vested amount");
 		}
 
-		return (true, code, extradata, reason);
+		_amountSpentByUser[from] = _amountSpentByUser[from].add(value);
+		return (true, "");
 	}
 
 	/**

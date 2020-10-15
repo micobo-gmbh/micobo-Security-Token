@@ -40,7 +40,7 @@ contract("Test ERC20 Functionality", async (accounts) => {
 		await truffleAssert.fails(
 			contracts.micoboSecurityToken.approve("0x0000000000000000000000000000000000000000", value),
 			truffleAssert.ErrorType.REVERT,
-			"A5"
+			"zero address"
 		)
 
 		await contracts.micoboSecurityToken.approve(accounts[1], value)
@@ -58,7 +58,7 @@ contract("Test ERC20 Functionality", async (accounts) => {
 				{ from: accounts[1] }
 			),
 			truffleAssert.ErrorType.REVERT,
-			"A7"
+			"allowance too low"
 		)
 
 		assert.deepEqual((await contracts.micoboSecurityToken.balanceOf(accounts[0])).toNumber(), 0)

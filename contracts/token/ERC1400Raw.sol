@@ -46,7 +46,7 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	/**
 	 * @dev Modifier to verify if transfer is validated
 	 *
-	 * outsourced this to validate function and modular constraints later on
+	 * outsourced this to execute function and modular constraints later on
 	 */
 	// modifier isValidCertificate(bytes memory data) {}
 

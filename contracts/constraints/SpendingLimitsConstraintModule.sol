@@ -171,7 +171,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 				// accumulated amount plus the amount to be transferred exceeds the allowed amount
 				if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
 					invalid = true;
-					reason = "A8 - spending limit for this period reached";
+					reason = "spending limit for this period reached";
 				} else {
 					// accumulated amount plus the amount to be transferred does not exceed the allowed amount
 					// increase accumulated amount and leave periodEnd
@@ -181,7 +181,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 				// period ended, no tx in the relevant timeperiod
 				if (value > _spendinglimits[i].amountAllowed) {
 					invalid = true;
-					reason = "A8 - spending limit for this period reached";
+					reason = "spending limit for this period reached";
 				} else {
 					user.amount = value;
 					user.periodEnd = _spendinglimits[i].periodLength.add(now);
@@ -190,75 +190,6 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 		}
 
 		return (!invalid, reason);
-	}
-
-	/**
-	 * @dev Validates transfer. Cannot modify state
-	 * @param from Token holder.
-	 * @param value Number of tokens to transfer.
-	 * @return invalid transfer is valid
-	 * @return code ERC1066 error code
-	 * @return extradata Additional bytes32 parameter that can be used to define
-	 * application specific reason codes with additional details (for example the
-	 * transfer restriction rule responsible for making the transfer operation invalid).
-	 * @return reason Why the transfer failed (intended for require statement)
-	 */
-	function validateTransfer(
-		address, /* msg_sender */
-		bytes32, /* partition */
-		address, /* operator */
-		address from,
-		address, /* to */
-		uint256 value,
-		bytes memory, /* data */
-		bytes memory /* operatorData */
-	)
-		public
-		override
-		view
-		returns (
-			// we start with false here to save gas and negate it before returning --> (!invalid)
-			bool invalid,
-			bytes1 code,
-			bytes32 extradata,
-			string memory reason
-		)
-	{
-		// if any of the timelocks are violated, valid is set to false
-		for (uint256 i = 0; i < _spendinglimits.length; i++) {
-			User storage user = _ATU[from][i];
-
-			// period has not ended => there has been at least 1 tx
-			if (now <= user.periodEnd) {
-				// accumulated amount plus the amount to be transferred exceeds the allowed amount
-				if (user.amount.add(value) > _spendinglimits[i].amountAllowed) {
-					invalid = true;
-					reason = "spending limit for this period reached";
-					code = hex"A8";
-				} else {
-					// accumulated amount plus the amount to be transferred does not exceed the allowed amount
-					// increase accumulated amount and leave periodEnd
-
-					// INFO no record keeping for view
-					// user.amount = user.amount.add(value);
-					this;
-				}
-			} else {
-				// period ended => no tx in the relevant timeperiod
-				if (value > _spendinglimits[i].amountAllowed) {
-					invalid = true;
-					reason = "spending limit for this period reached";
-					code = hex"A8";
-				} else {
-					// INFO no record keeping for view
-					// user.amount = value;
-					// user.periodEnd = _spendinglimits[i].periodLength.add(now);
-					this;
-				}
-			}
-		}
-
-		return (!invalid, code, extradata, reason);
 	}
 
 	/**

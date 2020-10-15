@@ -294,7 +294,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	) internal returns (bytes32) {
 		require(
 			_balanceOfByPartition[from][fromPartition] >= value,
-			"balance too low"
+			"insufficient funds"
 		);
 		// Transfer Blocked - Sender balance insufficient
 

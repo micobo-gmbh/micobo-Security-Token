@@ -104,7 +104,7 @@ contract("Test TimeLock Module", async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
 				from: accounts[0],
 			}),
-			"A8 - account is still locked"
+			"account is still locked"
 		)
 	})
 
@@ -127,7 +127,7 @@ contract("Test TimeLock Module", async (accounts) => {
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], value, "0x0", {
 				from: accounts[0],
 			}),
-			"A8 - amount is still locked"
+			"amount is still locked"
 		)
 	})
 
