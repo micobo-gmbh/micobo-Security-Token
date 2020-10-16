@@ -46,17 +46,18 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	address[] internal _partitionProxies;
 
 	/**
-	 * [ERC1400Partition CONSTRUCTOR]
 	 * @dev Initialize ERC1400Partition
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.
 	 * @param granularity Granularity of the token.
 	 */
-	constructor(
+	function _initializeERC1400Partition(
 		string memory name,
 		string memory symbol,
 		uint256 granularity
-	) public ERC1400Raw(name, symbol, granularity) {}
+	) internal {
+		_initializeERC1400Raw(name, symbol, granularity);
+	}
 
 	/********************** NEW FUNCTIONS **************************/
 

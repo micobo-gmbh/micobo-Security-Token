@@ -37,7 +37,7 @@ module.exports = {
 	 * $ truffle test --network <network-name>
 	 */
 
-	contracts_directory: "./contracts",
+	contracts_directory: "./factories",
 
 	networks: {
 		// Useful for testing. The `development` name is special - truffle uses it by default
@@ -47,17 +47,6 @@ module.exports = {
 		// options below to some value.
 
 		development: {
-			provider: () => {
-				return new GSNProvider("http://localhost:8545", {
-					// we set default to false here and use it explicitly when needed
-					useGSN: false,
-				})
-			},
-			port: 8545,
-			network_id: "*",
-		},
-
-		test: {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "http://localhost:8545")
 			},
@@ -107,15 +96,15 @@ module.exports = {
 	// Configure your compilers
 	compilers: {
 		solc: {
-			version: "0.6.6", // Version truffle should use, default: truffle's internal version
+			// version: "0.5.3", // Version truffle should use, default: truffle's internal version
 			docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
-					runs: 1,
+					runs: 1024, // 2^10
 				},
-				evmVersion: "istanbul",
+				evmVersion: "constantinople",
 			},
 		},
 	},

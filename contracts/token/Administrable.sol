@@ -1,6 +1,5 @@
 pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IAdmin.sol";
 import "../gsn/GSNable.sol";
 
@@ -10,7 +9,7 @@ import "../gsn/GSNable.sol";
  * @title Administrable
  * @dev Manages roles for inheriting contracts
  */
-contract Administrable is IAdmin, GSNable, ReentrancyGuard {
+contract Administrable is IAdmin, GSNable {
 	/**
      * @dev list of standard roles
      * roles can be added (i.e. for constraint modules)

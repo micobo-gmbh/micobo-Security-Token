@@ -1,4 +1,5 @@
 const SecurityToken = artifacts.require("SecurityToken")
+const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
 const TimeLockConstraintModule = artifacts.require("TimeLockConstraintModule")

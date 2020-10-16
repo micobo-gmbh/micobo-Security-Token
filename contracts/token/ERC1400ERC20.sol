@@ -18,17 +18,18 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 	mapping(address => mapping(address => uint256)) internal _allowances;
 
 	/**
-	 * [ERC1400ERC20 CONSTRUCTOR]
 	 * @dev Initialize ERC1400ERC20 parameters
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.
 	 * @param granularity Granularity of the token.
 	 */
-	constructor(
+	function _initializeERC1400ERC20(
 		string memory name,
 		string memory symbol,
 		uint256 granularity
-	) public ERC1400Partition(name, symbol, granularity) {}
+	) internal {
+		_initializeERC1400Partition(name, symbol, granularity);
+	}
 
 	/**
 	 * @dev Returns the ERC20 decimal property as 0

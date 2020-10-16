@@ -2,6 +2,7 @@ pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 import "../erc1820/ERC1820Client.sol";
+import "../utils/ReentrancyGuard.sol";
 
 import "./Constrainable.sol";
 import "../interfaces/IERC1400Raw.sol";
@@ -11,7 +12,12 @@ import "../interfaces/IERC1400Raw.sol";
  * @title ERC1400Raw
  * @dev ERC1400Raw logic
  */
-contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
+contract ERC1400Raw is
+	IERC1400Raw,
+	Constrainable,
+	ERC1820Client,
+	ReentrancyGuard
+{
 	using SafeMath for uint256;
 
 	string internal _name;
@@ -51,24 +57,26 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 	// modifier isValidCertificate(bytes memory data) {}
 
 	/**
-	 * [ERC1400Raw CONSTRUCTOR]
 	 * @dev Initialize ERC1400Raw and CertificateController parameters + register
 	 * the contract implementation in ERC1820Registry.
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.
 	 * @param granularity Granularity of the token.
 	 */
-	constructor(
+	function _initializeERC1400Raw(
 		string memory name,
 		string memory symbol,
 		uint256 granularity
-	) public {
+	) internal {
 		_name = name;
 		_symbol = symbol;
 		_totalSupply = 0;
+
+		// Token granularity can not be lower than 1
 		require(granularity >= 1, "granularity too low");
-		// Constructor Blocked - Token granularity can not be lower than 1
 		_granularity = granularity;
+
+		_initializeReentrancyGuard();
 	}
 
 	/********************** ERC1400Raw EXTERNAL FUNCTIONS ***************************/
@@ -319,14 +327,4 @@ contract ERC1400Raw is IERC1400Raw, Constrainable, ERC1820Client {
 
 		emit Issued(operator, to, value, data, operatorData);
 	}
-
-	/********************** ERC1400Raw OPTIONAL FUNCTIONS ***************************/
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400Raw STANDARD]
-	 * @dev Set list of token controllers.
-	 * @param operators Controller addresses.
-	 * INFO instead of setting the controllers here, we set admin roles in Administrable constructor
-	 */
-	// function _setControllers(address[] memory operators) internal {}
 }

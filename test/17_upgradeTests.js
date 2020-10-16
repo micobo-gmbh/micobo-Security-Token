@@ -1,16 +1,10 @@
-const truffleAssert = require("truffle-assertions")
 const SecurityToken = artifacts.require("SecurityToken")
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 const { conf } = require("../token-config")
-const { Role } = require("./Constants")
 
-contract("Test Off-Chain Validation", async (accounts) => {
-	// TODO
-
+contract("Test default partition behaviour", async (accounts) => {
 	let contracts
-
-	// deepEqual compares with '==='
 
 	before(async () => {
 		const chainId = await web3.eth.net.getId()
@@ -19,4 +13,14 @@ contract("Test Off-Chain Validation", async (accounts) => {
 			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
 		}
 	})
+
+	it("update implementation", async () => {
+		// TODO
+	})
+
+	it("upgrade proxy", async () => {
+		// TODO
+	})
+
+	// etc
 })

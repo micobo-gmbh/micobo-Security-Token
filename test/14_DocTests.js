@@ -1,5 +1,6 @@
 const truffleAssert = require("truffle-assertions")
-const MicoboSecurityToken = artifacts.require("SecurityToken")
+const SecurityToken = artifacts.require("SecurityToken")
+const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 const { Role } = require("./Constants")
 
@@ -13,8 +14,10 @@ contract("Test Document Management", async (accounts) => {
 	let contracts
 
 	before(async () => {
+		const chainId = await web3.eth.net.getId()
+
 		contracts = {
-			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
 		}
 	})
 

@@ -1,5 +1,6 @@
 const TimeLockConstraintModule = artifacts.require("TimeLockConstraintModule")
-const MicoboSecurityToken = artifacts.require("SecurityToken")
+const SecurityToken = artifacts.require("SecurityToken")
+const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 const truffleAssert = require("truffle-assertions")
 
@@ -14,8 +15,10 @@ contract("Test TimeLock Module", async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
+		const chainId = await web3.eth.net.getId()
+
 		contracts = {
-			micoboSecurityToken: await MicoboSecurityToken.deployed(),
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
 		}
 
 		// mint some new tokens to test with

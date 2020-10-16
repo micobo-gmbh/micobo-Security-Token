@@ -5,6 +5,8 @@ import "./ERC1400ERC20.sol";
 import "../interfaces/IERC1400.sol";
 import "../interfaces/IERC1400Capped.sol";
 
+import "../../node_modules/@openzeppelin/upgrades/contracts/Initializable.sol";
+
 
 /**
  * @author Simon Dosch
@@ -15,16 +17,20 @@ import "../interfaces/IERC1400Capped.sol";
  * implements IERC1400 and IERC1400Capped
  * inherits ERC1400ERC20
  */
-contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
+contract SecurityToken is
+	ERC1400ERC20,
+	IERC1400,
+	IERC1400Capped,
+	Initializable
+{
 	/**
-	 * [ERC1400 CONSTRUCTOR]
 	 * @dev Initialize ERC1400 + register
 	 * the contract implementation in ERC1820Registry.
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.
 	 * @param granularity Granularity of the token.
 	 */
-	constructor(
+	function initialize(
 		string memory name,
 		string memory symbol,
 		uint256 granularity,
@@ -34,7 +40,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 		address issuer,
 		address redeemer,
 		address module_editor
-	) public ERC1400ERC20(name, symbol, granularity) {
+	) public initializer {
 		_add(bytes32("ADMIN"), admin);
 		_add(bytes32("CONTROLLER"), controller);
 		_add(bytes32("ISSUER"), issuer);
@@ -51,6 +57,8 @@ contract SecurityToken is ERC1400ERC20, IERC1400, IERC1400Capped {
 
 		_owner = admin;
 		emit OwnershipTransferred(address(0), admin);
+
+		_initializeERC1400ERC20(name, symbol, granularity);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
 const SecurityToken = artifacts.require("SecurityToken")
+const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 module.exports = async (deployer, network, accounts) => {
 	if (network == "development") {

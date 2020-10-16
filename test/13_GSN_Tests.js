@@ -1,7 +1,8 @@
 const truffleAssert = require("truffle-assertions")
 const { conf } = require("../token-config")
 const { Role } = require("./Constants")
-const MicoboSecurityToken = artifacts.require("SecurityToken")
+const SecurityToken = artifacts.require("SecurityToken")
+const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 const GSNModule = artifacts.require("GSNModule")
 
 const { deployRelayHub, runRelayer, fundRecipient, registerRelay } = require("@openzeppelin/gsn-helpers")
@@ -22,11 +23,11 @@ contract("Test GSN functionality", async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		contracts = {
-			micoboSecurityToken: await MicoboSecurityToken.deployed(),
-		}
+		const chainId = await web3.eth.net.getId()
 
-		// console.log(contracts.micoboSecurityToken.address)
+		contracts = {
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
+		}
 
 		// setup GSN
 		try {
