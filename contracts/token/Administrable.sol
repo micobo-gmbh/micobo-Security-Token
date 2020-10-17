@@ -3,13 +3,15 @@ pragma solidity 0.6.6;
 import "../interfaces/IAdmin.sol";
 import "../gsn/GSNable.sol";
 
+import "../storage/SecurityTokenStorage.sol";
+
 
 /**
  * @author Simon Dosch
  * @title Administrable
  * @dev Manages roles for inheriting contracts
  */
-contract Administrable is IAdmin, GSNable {
+contract Administrable is IAdmin, GSNable, SecurityTokenStorage {
 	/**
      * @dev list of standard roles
      * roles can be added (i.e. for constraint modules)
@@ -36,11 +38,6 @@ contract Administrable is IAdmin, GSNable {
 	 *
 	 * ...
      */
-
-	/**
-	 * @dev Contains all the roles mapped to wether an account holds it or not
-	 */
-	mapping(bytes32 => mapping(address => bool)) internal _roles;
 
 	// EVENTS in IAdmin.sol
 

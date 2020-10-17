@@ -1,6 +1,6 @@
 pragma solidity 0.6.6;
 
-import "./ERC1400ERC20.sol";
+import "../token/ERC1400ERC20.sol";
 
 import "../interfaces/IERC1400.sol";
 import "../interfaces/IERC1400Capped.sol";
@@ -10,14 +10,14 @@ import "../../node_modules/@openzeppelin/upgrades/contracts/Initializable.sol";
 
 /**
  * @author Simon Dosch
- * @title SecurityToken
+ * @title NewSecurityToken
  * @dev Main contract of the micobo Security Token Contract Suite
  * implements new functions addPartitionProxy and bulkIssueByPartition
  * implements access control for GSN
  * implements IERC1400 and IERC1400Capped
  * inherits ERC1400ERC20
  */
-contract SecurityToken is
+contract NewSecurityToken is
 	ERC1400ERC20,
 	IERC1400,
 	IERC1400Capped,
@@ -28,7 +28,7 @@ contract SecurityToken is
 	 */
 	function version() public view returns (string memory) {
 		this;
-		return "1.0.0";
+		return "2.0.0";
 	}
 
 	/**

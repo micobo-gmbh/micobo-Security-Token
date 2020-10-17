@@ -20,26 +20,6 @@ contract ERC1400Raw is
 {
 	using SafeMath for uint256;
 
-	string internal _name;
-	string internal _symbol;
-	uint256 internal _granularity;
-	uint256 internal _totalSupply;
-
-	// Indicate whether the token can still be controlled by operators or not anymore.
-	bool internal _isControllable;
-
-	/**
-	 * @dev Indicates the paused state
-	 */
-	bool internal _paused;
-
-	// Mapping from tokenHolder to balance.
-	mapping(address => uint256) internal _balances;
-
-	/******************** Mappings related to operator **************************/
-	// Mapping from (operator, tokenHolder) to authorized status. [TOKEN-HOLDER-SPECIFIC]
-	mapping(address => mapping(address => bool)) internal _authorizedOperator;
-
 	// INFO
 	// moved functionality to admin contract controller role
 	// Array of controllers. [GLOBAL - NOT TOKEN-HOLDER-SPECIFIC]

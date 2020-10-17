@@ -9,42 +9,6 @@ import "../interfaces/IERC1400Partition.sol";
  * @dev ERC1400Partition logic
  */
 contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
-	/******************** Mappings to find partition ******************************/
-
-	// List of partitions.
-	bytes32[] internal _totalPartitions;
-
-	// Mapping from partition to their index.
-	mapping(bytes32 => uint256) internal _indexOfTotalPartitions;
-
-	// Mapping from partition to global balance of corresponding partition.
-	mapping(bytes32 => uint256) internal _totalSupplyByPartition;
-
-	// Mapping from tokenHolder to their partitions.
-	mapping(address => bytes32[]) internal _partitionsOf;
-
-	// Mapping from (tokenHolder, partition) to their index.
-	mapping(address => mapping(bytes32 => uint256)) internal _indexOfPartitionsOf;
-
-	// Mapping from (tokenHolder, partition) to balance of corresponding partition.
-	mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;
-
-	/****************************************************************************/
-
-	/**************** Mappings to find partition operators ************************/
-	// Mapping from (tokenHolder, partition, operator) to 'approved for partition' status. [TOKEN-HOLDER-SPECIFIC]
-	mapping(address => mapping(bytes32 => mapping(address => bool))) internal _authorizedOperatorByPartition;
-
-	// Mapping from partition to controllers for the partition. [NOT TOKEN-HOLDER-SPECIFIC]
-	mapping(bytes32 => address[]) internal _controllersByPartition;
-
-	// --> we can leave this here, partition controllers can be set by the admin just like other roles
-	// Mapping from (partition, operator) to PartitionController status. [NOT TOKEN-HOLDER-SPECIFIC]
-	mapping(bytes32 => mapping(address => bool)) internal _isControllerByPartition;
-	/****************************************************************************/
-
-	address[] internal _partitionProxies;
-
 	/**
 	 * @dev Initialize ERC1400Partition
 	 * @param name Name of the token.

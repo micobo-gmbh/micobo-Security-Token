@@ -11,8 +11,6 @@ import "../interfaces/IConstrainable.sol";
  * @dev Adds transfer constraints in the form of updatable constraint modules
  */
 contract Constrainable is IConstrainable, Administrable {
-	mapping(bytes32 => IConstraintModule[]) private _modulesByPartition;
-
 	/**
 	 * @dev Validates live transfer. Can modify state
 	 * @param msg_sender Sender of this function call

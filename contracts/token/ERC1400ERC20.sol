@@ -13,11 +13,6 @@ import "../interfaces/IERC1400Raw.sol";
  */
 contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 	/**
-	 * @dev Mapping from (tokenHolder, spender) to allowed value.
-	 */
-	mapping(address => mapping(address => uint256)) internal _allowances;
-
-	/**
 	 * @dev Initialize ERC1400ERC20 parameters
 	 * @param name Name of the token.
 	 * @param symbol Symbol of the token.

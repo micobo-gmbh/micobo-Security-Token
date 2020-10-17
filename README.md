@@ -175,6 +175,15 @@ Users can authorize addresses to transfer tokens on their behalf on a "by partit
 This authorization can be revoked at any time.
 
 #
+## RIVER Principle
+`If not specified otherwise, tokens will always be transferred to the „base“(0)-partition!`
+
+    This way, partitions containing locked or vesting tokens can not be changed afterwards.  
+    
+    Partitions are like token guardians: they hold on to your tokens using different constraint modules.  
+    
+    Once you can release them, they go into the „base“-partition where they can be transferred freely (or following the constraints defined there) from now on
+#
 
 #### Diagrams
 
