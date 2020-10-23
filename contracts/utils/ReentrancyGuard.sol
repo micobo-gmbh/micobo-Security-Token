@@ -1,4 +1,6 @@
-pragma solidity ^0.6.6;
+pragma solidity 0.6.6;
+
+import "../token/ERC1400Capped.sol";
 
 
 /**
@@ -17,9 +19,7 @@ pragma solidity ^0.6.6;
  * to protect against it, check out our blog post
  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
  */
-contract ReentrancyGuard {
-	bool private _notEntered;
-
+contract ReentrancyGuard is ERC1400Capped {
 	function _initializeReentrancyGuard() internal {
 		// Storing an initial non-zero value makes deployment a bit more
 		// expensive, but in exchange the refund on every call to nonReentrant

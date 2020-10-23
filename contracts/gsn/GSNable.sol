@@ -2,7 +2,6 @@ pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
 import "./GSNRecipient.sol";
-import "../interfaces/IGSNable.sol";
 
 
 /**
@@ -11,7 +10,17 @@ import "../interfaces/IGSNable.sol";
  * @dev enables GSN capability by implementing GSNRecipient
  * Can be set to accept ALL, NONE or add a MODULE implementing restrictions
  */
-contract GSNable is IGSNable, GSNRecipient {
+contract GSNable is GSNRecipient {
+	/**
+	 * @dev Emitted when a new GSN mode is set
+	 */
+	event GSNModeSet(gsnMode);
+
+	/**
+	 * @dev Emitted when a new GSN module address is set
+	 */
+	event GSNModuleSet(IRelayRecipient);
+
 	/**
 	 * @dev Add access control by overriding this function!
 	 * should return true if sender is authorized
@@ -20,12 +29,6 @@ contract GSNable is IGSNable, GSNRecipient {
 		this;
 		return true;
 	}
-
-	/**
-	 * @dev Can be set to accept ALL, NONE or MODULE mode
-	 * Initialized with ALL
-	 */
-	gsnMode private _gsnMode = gsnMode.ALL;
 
 	/**
 	 * @dev Address of the GSN MODULE implementing IRelayRecipient
@@ -111,7 +114,7 @@ contract GSNable is IGSNable, GSNRecipient {
 	 * @dev Sets GSN mode to either ALL, NONE or MODULE
 	 * @param mode ALL, NONE or MODULE
 	 */
-	function setGSNMode(gsnMode mode) public override onlyGSNController {
+	function setGSNMode(gsnMode mode) public onlyGSNController {
 		_gsnMode = gsnMode(mode);
 		emit GSNModeSet(mode);
 	}
@@ -120,13 +123,7 @@ contract GSNable is IGSNable, GSNRecipient {
 	 * @dev Gets GSN mode
 	 * @return gsnMode ALL, NONE or MODULE
 	 */
-	function getGSNMode()
-		public
-		override
-		view
-		onlyGSNController
-		returns (gsnMode)
-	{
+	function getGSNMode() public view onlyGSNController returns (gsnMode) {
 		return _gsnMode;
 	}
 
@@ -136,7 +133,6 @@ contract GSNable is IGSNable, GSNRecipient {
 	 */
 	function setGSNModule(IRelayRecipient newGSNModule)
 		public
-		override
 		onlyGSNController
 	{
 		_gsnModule = newGSNModule;
@@ -147,11 +143,7 @@ contract GSNable is IGSNable, GSNRecipient {
 	 * @dev Upgrades the relay hub address
 	 * @param newRelayHub Address of new relay hub
 	 */
-	function upgradeRelayHub(address newRelayHub)
-		public
-		override
-		onlyGSNController
-	{
+	function upgradeRelayHub(address newRelayHub) public onlyGSNController {
 		_upgradeRelayHub(newRelayHub);
 	}
 
@@ -162,7 +154,6 @@ contract GSNable is IGSNable, GSNRecipient {
 	 */
 	function withdrawDeposits(uint256 amount, address payable payee)
 		public
-		override
 		onlyGSNController
 	{
 		_withdrawDeposits(amount, payee);

@@ -1,23 +1,19 @@
 pragma solidity 0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+
 import "../erc1820/ERC1820Client.sol";
 import "../utils/ReentrancyGuard.sol";
-
-import "./Constrainable.sol";
 import "../interfaces/IERC1400Raw.sol";
 
 
 /**
+ * @author Simon Dosch
  * @title ERC1400Raw
  * @dev ERC1400Raw logic
+ * inspired by and modeled after https://github.com/ConsenSys/UniversalToken
  */
-contract ERC1400Raw is
-	IERC1400Raw,
-	Constrainable,
-	ERC1820Client,
-	ReentrancyGuard
-{
+contract ERC1400Raw is IERC1400Raw, ERC1820Client, ReentrancyGuard {
 	using SafeMath for uint256;
 
 	// INFO
@@ -27,37 +23,6 @@ contract ERC1400Raw is
 
 	// Mapping from operator to controller status. [GLOBAL - NOT TOKEN-HOLDER-SPECIFIC]
 	// mapping(address => bool) internal _isController;
-	/****************************************************************************/
-
-	/**
-	 * @dev Modifier to verify if transfer is validated
-	 *
-	 * outsourced this to execute function and modular constraints later on
-	 */
-	// modifier isValidCertificate(bytes memory data) {}
-
-	/**
-	 * @dev Initialize ERC1400Raw and CertificateController parameters + register
-	 * the contract implementation in ERC1820Registry.
-	 * @param name Name of the token.
-	 * @param symbol Symbol of the token.
-	 * @param granularity Granularity of the token.
-	 */
-	function _initializeERC1400Raw(
-		string memory name,
-		string memory symbol,
-		uint256 granularity
-	) internal {
-		_name = name;
-		_symbol = symbol;
-		_totalSupply = 0;
-
-		// Token granularity can not be lower than 1
-		require(granularity >= 1, "granularity too low");
-		_granularity = granularity;
-
-		_initializeReentrancyGuard();
-	}
 
 	/********************** ERC1400Raw EXTERNAL FUNCTIONS ***************************/
 
@@ -81,6 +46,7 @@ contract ERC1400Raw is
 
 	/**
 	 * [ERC1400Raw INTERFACE (3/13)]
+	 * INFO replaced by ERC20
 	 * @dev Get the total number of issued tokens.
 	 * @return Total supply of tokens currently in circulation.
 	 */
@@ -90,6 +56,7 @@ contract ERC1400Raw is
 
 	/**
 	 * [ERC1400Raw INTERFACE (4/13)]
+	 * INFO replaced by ERC20
 	 * @dev Get the balance of the account with address 'tokenHolder'.
 	 * @param tokenHolder Address for which the balance is returned.
 	 * @return Amount of token held by 'tokenHolder' in the token contract.
@@ -112,9 +79,9 @@ contract ERC1400Raw is
 	 * @dev Always returns an empty array, since controllers are only managed in Administrable
 	 * @return c Empty list
 	 */
-	function controllers() external override view returns (address[] memory c) {
+	/* function controllers() external override view returns (address[] memory c) {
 		return c;
-	}
+	} */
 
 	/**
 	 * [ERC1400Raw INTERFACE (7/13)]
@@ -155,6 +122,30 @@ contract ERC1400Raw is
 	{
 		return _isOperator(operator, tokenHolder);
 	}
+
+	/**
+	 * [ERC1400Raw INTERFACE (10/13)]
+	 * function transferWithData
+	 * is overridden in ERC1400Partition
+	 */
+
+	/**
+	 * [ERC1400Raw INTERFACE (11/13)]
+	 * function transferFromWithData
+	 * is overridden in ERC1400Partition
+	 */
+
+	/**
+	 * [ERC1400Raw INTERFACE (12/13)]
+	 * function redeem
+	 * is not needed when using ERC1400Partition
+	 */
+
+	/**
+	 * [ERC1400Raw INTERFACE (13/13)]
+	 * function redeemFrom
+	 * is not needed when using ERC1400Partition
+	 */
 
 	/********************** ERC1400Raw INTERNAL FUNCTIONS ***************************/
 

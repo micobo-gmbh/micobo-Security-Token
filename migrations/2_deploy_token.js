@@ -41,8 +41,11 @@ module.exports = async (deployer, network, accounts) => {
 	console.log(tx.logs[0].args.proxy)
 
 	const chainId = await web3.eth.net.getId()
-
-	securityTokenJSON.networks[chainId].address = tx.logs[0].args.proxy
+	try {
+		securityTokenJSON.networks[chainId].address = tx.logs[0].args.proxy
+	} catch (e) {
+		console.log(e)
+	}
 
 	// use this for testing
 	/* if (network == "development") {

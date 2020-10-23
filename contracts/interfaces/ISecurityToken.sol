@@ -307,11 +307,6 @@ interface ISecurityToken {
 
 	function renounceIssuance() external;
 
-	function setPartitionControllers(
-		bytes32 partition,
-		address[] calldata operators
-	) external;
-
 	// Capped
 	function cap() external view returns (uint256);
 

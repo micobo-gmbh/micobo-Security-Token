@@ -136,30 +136,6 @@ contract("Test Admin Contract", async (accounts) => {
 		)
 	})
 
-	it("can set and renew partition controllers", async () => {
-		// not admin
-		await truffleAssert.fails(
-			contracts.securityToken.setPartitionControllers(conf.standardPartition, [accounts[0]], {
-				from: accounts[1],
-			})
-		)
-
-		await truffleAssert.passes(
-			contracts.securityToken.setPartitionControllers(conf.standardPartition, [accounts[0]])
-		)
-
-		assert.deepEqual(await contracts.securityToken.controllersByPartition(conf.standardPartition), [accounts[0]])
-
-		await truffleAssert.passes(
-			contracts.securityToken.setPartitionControllers(conf.standardPartition, [accounts[1], accounts[2]])
-		)
-
-		assert.deepEqual(await contracts.securityToken.controllersByPartition(conf.standardPartition), [
-			accounts[1],
-			accounts[2],
-		])
-	})
-
 	it("can renounce control", async () => {
 		assert.deepEqual(await contracts.securityToken.isControllable(), true)
 

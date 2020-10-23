@@ -1,28 +1,22 @@
 pragma solidity 0.6.6;
 
-import "../token/ERC1400ERC20.sol";
-
-import "../interfaces/IERC1400.sol";
-import "../interfaces/IERC1400Capped.sol";
-
 import "../../node_modules/@openzeppelin/upgrades/contracts/Initializable.sol";
+
+import "../token/ERC1400ERC20.sol";
+import "../interfaces/IERC1400.sol";
 
 
 /**
  * @author Simon Dosch
- * @title NewSecurityToken
+ * @title SecurityToken
  * @dev Main contract of the micobo Security Token Contract Suite
- * implements new functions addPartitionProxy and bulkIssueByPartition
+ * inspired by and modeled after https://github.com/ConsenSys/UniversalToken
  * implements access control for GSN
- * implements IERC1400 and IERC1400Capped
+ * implements new function bulkIssueByPartition
+ * implements IERC1400
  * inherits ERC1400ERC20
  */
-contract NewSecurityToken is
-	ERC1400ERC20,
-	IERC1400,
-	IERC1400Capped,
-	Initializable
-{
+contract NewSecurityToken is ERC1400ERC20, IERC1400, Initializable {
 	/**
 	 * @dev Returns the version string of the {SecurityToken} for which this recipient implementation was built.
 	 */
@@ -31,6 +25,7 @@ contract NewSecurityToken is
 		return "2.0.0";
 	}
 
+	// INITIALIZATION
 	/**
 	 * @dev Initialize ERC1400 + register
 	 * the contract implementation in ERC1820Registry.
@@ -39,8 +34,8 @@ contract NewSecurityToken is
 	 * @param granularity Granularity of the token.
 	 */
 	function initialize(
-		string memory name,
-		string memory symbol,
+		string calldata name,
+		string calldata symbol,
 		uint256 granularity,
 		uint256 cap,
 		address admin,
@@ -48,7 +43,7 @@ contract NewSecurityToken is
 		address issuer,
 		address redeemer,
 		address module_editor
-	) public initializer {
+	) external initializer {
 		_add(bytes32("ADMIN"), admin);
 		_add(bytes32("CONTROLLER"), controller);
 		_add(bytes32("ISSUER"), issuer);
@@ -66,9 +61,41 @@ contract NewSecurityToken is
 		_owner = admin;
 		emit OwnershipTransferred(address(0), admin);
 
-		_initializeERC1400ERC20(name, symbol, granularity);
+		// ERC1400Raw
+		_name = name;
+		_symbol = symbol;
+		_totalSupply = 0;
+
+		// Token granularity can not be lower than 1
+		require(granularity >= 1, "granularity too low");
+		_granularity = granularity;
+
+		// GSN
+		_gsnMode = gsnMode.ALL;
+
+		// Default RelayHub address, deployed on mainnet and all testnets at the same address
+		_relayHub = 0xD216153c06E857cD7f72665E0aF1d7D82172F494;
+
+		_RELAYED_CALL_ACCEPTED = 0;
+		_RELAYED_CALL_REJECTED = 11;
+
+		// How much gas is forwarded to postRelayedCall
+		_POST_RELAYED_CALL_MAX_GAS = 100000;
+
+		// Reentrancy
+		_initializeReentrancyGuard();
 	}
 
+	// GSN
+	/**
+	 * @dev Adding access control by overriding this function!
+	 * @return true if sender is GSN_CONTROLLER
+	 */
+	function _isGSNController() internal override view returns (bool) {
+		return hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
+	}
+
+	// BULK ISSUANCE
 	/**
 	 * @dev Mints to a number of token holder at the same time
 	 * Must be issuable and tokenHolders and values must bne same length
@@ -100,14 +127,6 @@ contract NewSecurityToken is
 				""
 			);
 		}
-	}
-
-	/**
-	 * @dev Adding access control by overriding this function!
-	 * @return true if sender is GSN_CONTROLLER
-	 */
-	function _isGSNController() internal override view returns (bool) {
-		return hasRole(bytes32("GSN_CONTROLLER"), _msgSender());
 	}
 
 	/********************** ERC1400 EXTERNAL FUNCTIONS **************************/
@@ -258,6 +277,18 @@ contract NewSecurityToken is
 		);
 	}
 
+	/**
+	 * [ERC1400 INTERFACE (8/9)]
+	 * function canTransferByPartition
+	 * not implemented
+	 */
+
+	/**
+	 * [ERC1400 INTERFACE (9/9)]
+	 * function canOperatorTransferByPartition
+	 * not implemented
+	 */
+
 	/********************** ERC1400 INTERNAL FUNCTIONS **************************/
 
 	/**
@@ -290,6 +321,9 @@ contract NewSecurityToken is
 			data,
 			operatorData
 		);
+
+		// purely for better visibility on etherscan
+		emit Transfer(address(0), to, value);
 	}
 
 	/**
@@ -328,6 +362,9 @@ contract NewSecurityToken is
 			data,
 			operatorData
 		);
+
+		// purely for better visibility on etherscan
+		emit Transfer(from, address(0), value);
 	}
 
 	/********************** ERC1400 OPTIONAL FUNCTIONS **************************/
@@ -335,7 +372,6 @@ contract NewSecurityToken is
 	/**
 	 * [NOT MANDATORY FOR ERC1400 STANDARD]
 	 * @dev Definitely renounce the possibility to control tokens on behalf of tokenHolders.
-	 * INFO this disables ERC20 proxyx contracts
 	 * Once set to false, '_isControllable' can never be set to 'true' again.
 	 */
 	function renounceControl() external override {
@@ -351,142 +387,5 @@ contract NewSecurityToken is
 	function renounceIssuance() external override {
 		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
 		_isIssuable = false;
-	}
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400 STANDARD]
-	 * @dev Set list of token controllers.
-	 * @param operators Controller addresses.
-	 */
-	// REPLACED with Administrable
-	/*
-    function setControllers(address[] calldata operators)
-    external
-    onlyRole(0)
-    {
-        _setControllers(operators);
-    }
-    */
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400 STANDARD]
-	 * @dev Set list of token partition controllers.
-	 * @param partition Name of the partition.
-	 * @param operators Controller addresses.
-	 */
-	function setPartitionControllers(
-		bytes32 partition,
-		address[] calldata operators
-	) external override {
-		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
-		_setPartitionControllers(partition, operators);
-	}
-
-	/********************** CAPPED **************************/
-
-	/**
-	 * @dev Returns the cap on the token's total supply.
-	 */
-	function cap() public override view returns (uint256) {
-		return _cap;
-	}
-
-	/**
-	 * @dev Sets cap to a new value
-	 * New value need to be higher than old one
-	 * Is only callable by CAP?_EDITOR
-	 * @param newCap value of new cap
-	 */
-	function setCap(uint256 newCap) public override {
-		require(hasRole(bytes32("CAP_EDITOR"), _msgSender()), "!CAP_EDITOR");
-		require((newCap > _cap), "new cap needs to be higher");
-
-		// set new cap
-		_cap = newCap;
-		emit CapSet(newCap);
-	}
-
-	/********************** OWNABLE **************************/
-
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
-
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
-	function owner() public view returns (address) {
-		return _owner;
-	}
-
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
-	function transferOwnership(address newOwner) public virtual {
-		require(hasRole(bytes32("ADMIN"), msg.sender), "!ADMIN");
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
-		emit OwnershipTransferred(_owner, newOwner);
-		_owner = newOwner;
-	}
-
-	/********************** PAUSABLE **************************/
-
-	// EVENTS
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
-
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
-
-	// FUNCTIONS
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 * @return bool True if the contract is paused
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "paused");
-		_;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "not paused");
-		_;
-	}
-
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public whenNotPaused {
-		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
-		_paused = true;
-		emit Paused(msg.sender);
-	}
-
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public whenPaused {
-		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
-		_paused = false;
-		emit Unpaused(msg.sender);
 	}
 }

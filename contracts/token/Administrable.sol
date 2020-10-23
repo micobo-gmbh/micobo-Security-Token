@@ -3,15 +3,13 @@ pragma solidity 0.6.6;
 import "../interfaces/IAdmin.sol";
 import "../gsn/GSNable.sol";
 
-import "../storage/SecurityTokenStorage.sol";
-
 
 /**
  * @author Simon Dosch
  * @title Administrable
- * @dev Manages roles for inheriting contracts
+ * @dev Manages roles for all inheriting contracts
  */
-contract Administrable is IAdmin, GSNable, SecurityTokenStorage {
+contract Administrable is IAdmin, GSNable {
 	/**
      * @dev list of standard roles
      * roles can be added (i.e. for constraint modules)

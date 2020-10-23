@@ -14,7 +14,7 @@ contract WhitelistConstraintModule is IConstraintModule {
 	/**
 	 * @dev Address of securityToken this ConstraintModule is used by
 	 */
-	ISecurityToken _securityToken;
+	ISecurityToken private _securityToken;
 
 	/**
 	 * @dev Standard module name

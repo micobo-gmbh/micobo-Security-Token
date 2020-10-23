@@ -19,7 +19,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 	/**
 	 * @dev Address of securityToken this ConstraintModule is used by
 	 */
-	ISecurityToken _securityToken;
+	ISecurityToken private _securityToken;
 
 	/**
 	 * @dev Standard module name
@@ -132,7 +132,7 @@ contract SpendingLimitsConstraintModule is IConstraintModule {
 	 */
 	function deleteTimelock(uint256 index) public onlySpendingLimitsEditor {
 		require(_spendinglimits.length > index, "out of bounds");
-		_spendinglimits[index] = _spendinglimits[_spendinglimits.length - 1];
+		_spendinglimits[index] = _spendinglimits[_spendinglimits.length.sub(1)];
 		_spendinglimits.pop();
 		emit TimelockDeleted(index);
 	}

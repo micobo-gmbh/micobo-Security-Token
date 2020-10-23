@@ -4,9 +4,21 @@ import "../node_modules/@openzeppelin/upgrades/contracts/upgradeability/ProxyFac
 import "../node_modules/@openzeppelin/upgrades/contracts/ownership/Ownable.sol";
 
 
+/**
+ * @author Simon Dosch
+ * @title SecurityTokenFactory
+ * @dev Updateable contract factory for easily deploying SecurityToken Proxies
+ */
 contract SecurityTokenFactory is ProxyFactory, OpenZeppelinUpgradesOwnable {
+	/**
+	 * @dev address of the master contract
+	 */
 	address public implementationContract;
 
+	/**
+	 * @dev Initializes the token factory
+	 * @param _implementationContract address of the master implementation proxies will point to
+	 */
 	constructor(address _implementationContract)
 		public
 		OpenZeppelinUpgradesOwnable()
@@ -14,6 +26,10 @@ contract SecurityTokenFactory is ProxyFactory, OpenZeppelinUpgradesOwnable {
 		implementationContract = _implementationContract;
 	}
 
+	/**
+	 * @dev Updates the token factory
+	 * @param _implementationContract address of the new master implementation proxies will point to
+	 */
 	function updateImplementation(address _implementationContract)
 		public
 		onlyOwner
@@ -21,6 +37,12 @@ contract SecurityTokenFactory is ProxyFactory, OpenZeppelinUpgradesOwnable {
 		implementationContract = _implementationContract;
 	}
 
+	/**
+	 * @dev Deploys a new security token proxy contract
+	 * @param _salt random number used to precalculate the contract's address
+	 * @param _admin address of the proxy administrator (able to update implementation)
+	 * @param _data Data to send as msg.data to the implementation to initialize the proxied contract
+	 */
 	function deployNewSecurityToken(
 		uint256 _salt,
 		address _admin,

@@ -16,7 +16,7 @@ abstract contract OffChainValidator is IConstraintModule {
 	/*
     // TODO this constraint module still has to implemented
 
-    ISecurityToken _securityToken;
+    ISecurityToken private _securityToken;
 
     address _signer;
 

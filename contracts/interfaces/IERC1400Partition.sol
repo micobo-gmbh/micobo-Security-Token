@@ -6,6 +6,11 @@ pragma solidity 0.6.6;
  * @dev ERC1400Partition interface
  */
 interface IERC1400Partition {
+	/**
+	 * @dev ERC20 backwards-compatibility
+	 */
+	event Transfer(address indexed from, address indexed to, uint256 value);
+
 	/********************** NEW FUNCTIONS **************************/
 
 	/**
@@ -18,12 +23,6 @@ interface IERC1400Partition {
 		external
 		view
 		returns (uint256);
-
-	/**
-	 * @dev Returns all partition proxy addresses
-	 * @return address[] Array of all partition proxy addresses
-	 */
-	function partitionProxies() external view returns (address[] memory);
 
 	/********************** ERC1400Partition EXTERNAL FUNCTIONS **************************/
 
@@ -85,6 +84,18 @@ interface IERC1400Partition {
 		bytes calldata data,
 		bytes calldata operatorData
 	) external returns (bytes32);
+
+	/**
+	 * [ERC1400Partition INTERFACE (5/10)]
+	 * function getDefaultPartitions
+	 * default partition is always equal to _totalPartitions
+	 */
+
+	/**
+	 * [ERC1400Partition INTERFACE (6/10)]
+	 * function setDefaultPartitions
+	 * default partition is always equal to _totalPartitions
+	 */
 
 	/**
 	 * [ERC1400Partition INTERFACE (7/10)]

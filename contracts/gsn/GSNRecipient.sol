@@ -4,6 +4,8 @@ import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
 import "../../node_modules/@openzeppelin/contracts/GSN/IRelayHub.sol";
 import "../../node_modules/@openzeppelin/contracts/GSN/Context.sol";
 
+import "../storage/SecurityTokenStorage.sol";
+
 
 // copied here to be included in coverage
 
@@ -18,16 +20,11 @@ import "../../node_modules/@openzeppelin/contracts/GSN/Context.sol";
  * information on how to use the pre-built {GSNRecipientSignature} and
  * {GSNRecipientERC20Fee}, or how to write your own.
  */
-abstract contract GSNRecipient is IRelayRecipient, Context {
-	// Default RelayHub address, deployed on mainnet and all testnets at the same address
-	address private _relayHub = 0xD216153c06E857cD7f72665E0aF1d7D82172F494;
-
-	uint256 private constant _RELAYED_CALL_ACCEPTED = 0;
-	uint256 private constant _RELAYED_CALL_REJECTED = 11;
-
-	// How much gas is forwarded to postRelayedCall
-	uint256 internal constant _POST_RELAYED_CALL_MAX_GAS = 100000;
-
+abstract contract GSNRecipient is
+	SecurityTokenStorage,
+	IRelayRecipient,
+	Context
+{
 	/**
 	 * @dev Emitted when a contract changes its {IRelayHub} contract to a new one.
 	 */
@@ -195,7 +192,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _approveRelayedCall()
 		internal
-		pure
+		view
 		returns (uint256, bytes memory)
 	{
 		return _approveRelayedCall("");
@@ -208,7 +205,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _approveRelayedCall(bytes memory context)
 		internal
-		pure
+		view
 		returns (uint256, bytes memory)
 	{
 		return (_RELAYED_CALL_ACCEPTED, context);
@@ -219,7 +216,7 @@ abstract contract GSNRecipient is IRelayRecipient, Context {
 	 */
 	function _rejectRelayedCall(uint256 errorCode)
 		internal
-		pure
+		view
 		returns (uint256, bytes memory)
 	{
 		return (_RELAYED_CALL_REJECTED + errorCode, "");

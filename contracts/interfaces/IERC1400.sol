@@ -1,4 +1,4 @@
-pragma solidity ^0.6.6;
+pragma solidity 0.6.6;
 
 
 /**
@@ -7,7 +7,6 @@ pragma solidity ^0.6.6;
  */
 interface IERC1400 {
 	// Document Management
-
 	/**
 	 * [ERC1400 INTERFACE (1/9)]
 	 * @dev Access a document associated with the token.
@@ -121,12 +120,23 @@ interface IERC1400 {
 		bytes operatorData
 	);
 
+	/**
+	 * [ERC1400 INTERFACE (8/9)]
+	 * function canTransferByPartition
+	 * not implemented
+	 */
+
+	/**
+	 * [ERC1400 INTERFACE (9/9)]
+	 * function canOperatorTransferByPartition
+	 * not implemented
+	 */
+
 	/********************** ERC1400 OPTIONAL FUNCTIONS **************************/
 
 	/**
 	 * [NOT MANDATORY FOR ERC1400 STANDARD]
 	 * @dev Definitely renounce the possibility to control tokens on behalf of tokenHolders.
-	 * INFO this disables ERC20 proxyx contracts
 	 * Once set to false, '_isControllable' can never be set to 'true' again.
 	 */
 	function renounceControl() external;
@@ -137,25 +147,4 @@ interface IERC1400 {
 	 * Once set to false, '_isIssuable' can never be set to 'true' again.
 	 */
 	function renounceIssuance() external;
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400 STANDARD]
-	 * @dev Set list of token controllers.
-	 * @param operators Controller addresses.
-	 */
-	// REPLACED with Administrable
-	/*
-    function setControllers(address[] calldata operators) external;
-    */
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400 STANDARD]
-	 * @dev Set list of token partition controllers.
-	 * @param partition Name of the partition.
-	 * @param operators Controller addresses.
-	 */
-	function setPartitionControllers(
-		bytes32 partition,
-		address[] calldata operators
-	) external;
 }

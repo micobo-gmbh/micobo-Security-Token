@@ -1,8 +1,8 @@
 pragma solidity 0.6.6;
 
-import "./ERC1400Partition.sol";
-
 import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "./ERC1400Partition.sol";
 import "../interfaces/IERC1400Raw.sol";
 
 
@@ -12,20 +12,6 @@ import "../interfaces/IERC1400Raw.sol";
  * @dev Expands ERC1400s function by those of the ERC20 standard
  */
 contract ERC1400ERC20 is ERC1400Partition, IERC20 {
-	/**
-	 * @dev Initialize ERC1400ERC20 parameters
-	 * @param name Name of the token.
-	 * @param symbol Symbol of the token.
-	 * @param granularity Granularity of the token.
-	 */
-	function _initializeERC1400ERC20(
-		string memory name,
-		string memory symbol,
-		uint256 granularity
-	) internal {
-		_initializeERC1400Partition(name, symbol, granularity);
-	}
-
 	/**
 	 * @dev Returns the ERC20 decimal property as 0
 	 * @return uint8 Always returns decimals as 0

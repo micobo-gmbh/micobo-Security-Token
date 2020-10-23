@@ -5,26 +5,12 @@ import "../interfaces/IERC1400Partition.sol";
 
 
 /**
+ * @author Simon Dosch
  * @title ERC1400Partition
  * @dev ERC1400Partition logic
+ * inspired by and modeled after https://github.com/ConsenSys/UniversalToken
  */
 contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
-	/**
-	 * @dev Initialize ERC1400Partition
-	 * @param name Name of the token.
-	 * @param symbol Symbol of the token.
-	 * @param granularity Granularity of the token.
-	 */
-	function _initializeERC1400Partition(
-		string memory name,
-		string memory symbol,
-		uint256 granularity
-	) internal {
-		_initializeERC1400Raw(name, symbol, granularity);
-	}
-
-	/********************** NEW FUNCTIONS **************************/
-
 	/**
 	 * @dev Returns the total supply of a given partition
 	 * For ERC20 compatibility via proxy
@@ -38,19 +24,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		returns (uint256)
 	{
 		return _totalSupplyByPartition[partition];
-	}
-
-	/**
-	 * @dev Returns all partition proxy addresses
-	 * @return address[] Array of all partition proxy addresses
-	 */
-	function partitionProxies()
-		public
-		override
-		view
-		returns (address[] memory)
-	{
-		return _partitionProxies;
 	}
 
 	/********************** ERC1400Partition EXTERNAL FUNCTIONS **************************/
@@ -151,6 +124,18 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 	}
 
 	/**
+	 * [ERC1400Partition INTERFACE (5/10)]
+	 * function getDefaultPartitions
+	 * default partition is always equal to _totalPartitions
+	 */
+
+	/**
+	 * [ERC1400Partition INTERFACE (6/10)]
+	 * function setDefaultPartitions
+	 * default partition is always equal to _totalPartitions
+	 */
+
+	/**
 	 * [ERC1400Partition INTERFACE (7/10)]
 	 * @dev Get controllers for a given partition.
 	 * Function used for ERC1400Raw and ERC20 backwards compatibility.
@@ -229,11 +214,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		address tokenHolder
 	) internal view returns (bool) {
 		return (_authorizedOperatorByPartition[tokenHolder][partition][operator] ||
-			(_isControllable &&
-				(_isControllerByPartition[partition][operator] ||
-					hasRole(bytes32("CONTROLLER"), operator))));
-		// INFO we use _isControllerByPartition only for partitionProxy
-		// renouncing control kills erc20 proxy contracts
+			(_isControllable && hasRole(bytes32("CONTROLLER"), operator)));
 	}
 
 	/**
@@ -293,6 +274,9 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 			data,
 			operatorData
 		);
+
+		// purely for better visibility on etherscan
+		emit Transfer(from, to, value);
 
 		if (toPartition != fromPartition) {
 			emit ChangedPartition(fromPartition, toPartition, value);
@@ -427,29 +411,6 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		returns (bytes32[] memory)
 	{
 		return _totalPartitions;
-	}
-
-	/**
-	 * [NOT MANDATORY FOR ERC1400Partition STANDARD][SHALL BE CALLED ONLY FROM ERC1400]
-	 * @dev Set list of token partition controllers.
-	 * @param partition Name of the partition.
-	 * @param operators Controller addresses.
-	 */
-	function _setPartitionControllers(
-		bytes32 partition,
-		address[] memory operators
-	) internal {
-		for (
-			uint256 i = 0;
-			i < _controllersByPartition[partition].length;
-			i++
-		) {
-			_isControllerByPartition[partition][_controllersByPartition[partition][i]] = false;
-		}
-		for (uint256 j = 0; j < operators.length; j++) {
-			_isControllerByPartition[partition][operators[j]] = true;
-		}
-		_controllersByPartition[partition] = operators;
 	}
 
 	/************** ERC1400Raw BACKWARDS RETROCOMPATIBILITY *************************/

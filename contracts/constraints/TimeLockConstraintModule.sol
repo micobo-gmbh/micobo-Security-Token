@@ -18,7 +18,7 @@ contract TimeLockConstraintModule is IConstraintModule {
 	/**
 	 * @dev Address of securityToken this ConstraintModule is used by
 	 */
-	ISecurityToken _securityToken;
+	ISecurityToken private _securityToken;
 
 	/**
 	 * @dev Standard module name
@@ -123,22 +123,18 @@ contract TimeLockConstraintModule is IConstraintModule {
 	 * @param msg_sender Sender of this function call
 	 * @param partition Partition the tokens are being transferred from
 	 * @param from Token holder.
-	 * @param to Token recipient.
-	 * @param value Number of tokens to transfer.
-	 * @param data Information attached to the transfer.
-	 * @param operatorData Information attached to the transfer, by the operator.
 	 * @return valid transfer is valid
 	 * @return reason Why the transfer failed (intended for require statement)
 	 */
 	function executeTransfer(
 		address msg_sender,
 		bytes32 partition,
-		address operator,
+		address, /* operator */
 		address from,
-		address to,
-		uint256 value,
-		bytes calldata data,
-		bytes calldata operatorData
+		address, /* to */
+		uint256, /* value */
+		bytes calldata, /* data */
+		bytes calldata /* operatorData */
 	) external override returns (bool, string memory) {
 		if (_timeLock > now) {
 			return (false, "partition is still locked");

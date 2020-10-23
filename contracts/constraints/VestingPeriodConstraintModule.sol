@@ -19,7 +19,7 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 	/**
 	 * @dev Address of securityToken this ConstraintModule is used by
 	 */
-	ISecurityToken _securityToken;
+	ISecurityToken private _securityToken;
 
 	/**
 	 * @dev Standard module name
@@ -40,22 +40,22 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 	/**
 	 * @dev Time until vesting starts
 	 */
-	uint256 _vestingStart;
+	uint256 private _vestingStart;
 
 	/**
 	 * @dev Fraction vested after starting
 	 */
-	uint256 _vestedFraction;
+	uint256 private _vestedFraction;
 
 	/**
 	 * @dev Fraction of tokens vested in 1 month
 	 */
-	uint256 _vestingRatio;
+	uint256 private _vestingRatio;
 
 	/**
 	 * @dev Tracks amount already spent by users
 	 */
-	mapping(address => uint256) _amountSpentByUser;
+	mapping(address => uint256) private _amountSpentByUser;
 
 	/**
 	 * [VestingPeriodConstraintModule CONSTRUCTOR]
@@ -99,25 +99,21 @@ contract VestingPeriodConstraintModule is IConstraintModule {
 
 	/**
 	 * @dev Validates live transfer. Can modify state
-	 * @param msg_sender Sender of this function call
 	 * @param partition Partition the tokens are being transferred from
 	 * @param from Token holder.
-	 * @param to Token recipient.
 	 * @param value Number of tokens to transfer.
-	 * @param data Information attached to the transfer.
-	 * @param operatorData Information attached to the transfer, by the operator.
 	 * @return valid transfer is valid
 	 * @return reason Why the transfer failed (intended for require statement)
 	 */
 	function executeTransfer(
-		address msg_sender,
+		address, /* msg_sender */
 		bytes32 partition,
-		address operator,
+		address, /* operator */
 		address from,
-		address to,
+		address, /* to */
 		uint256 value,
-		bytes calldata data,
-		bytes calldata operatorData
+		bytes calldata, /* data */
+		bytes calldata /* operatorData */
 	) external override returns (bool, string memory) {
 		// dormant Period not over
 		if (now < _vestingStart) {

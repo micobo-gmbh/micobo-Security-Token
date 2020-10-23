@@ -33,10 +33,10 @@ interface IERC1400Raw {
 
 	/**
 	 * [ERC1400Raw INTERFACE (6/13)]
-	 * @dev Get the list of controllers as defined by the Administrable contract.
+	 * @dev Get the list of controllers
 	 * @return List of addresses of all the controllers.
 	 */
-	function controllers() external view returns (address[] memory); // 6/13
+	// function controllers() external view returns (address[] memory); // 6/13
 
 	/**
 	 * [ERC1400Raw INTERFACE (7/13)]
@@ -66,13 +66,29 @@ interface IERC1400Raw {
 		view
 		returns (bool); // 9/13
 
-	// overridden in ERC1400Partition
-	// function transferWithData(address to, uint256 value, bytes calldata data) external; // 10/13
-	// function transferFromWithData(address from, address to, uint256 value, bytes calldata data, bytes calldata operatorData) external; // 11/13
+	/**
+	 * [ERC1400Raw INTERFACE (10/13)]
+	 * function transferWithData
+	 * is overridden in ERC1400Partition
+	 */
 
-	// not possible with ERC1400Partition
-	// function redeem(uint256 value, bytes calldata data) external; // 12/13
-	// function redeemFrom(address from, uint256 value, bytes calldata data, bytes calldata operatorData) external; // 13/13
+	/**
+	 * [ERC1400Raw INTERFACE (11/13)]
+	 * function transferFromWithData
+	 * is overridden in ERC1400Partition
+	 */
+
+	/**
+	 * [ERC1400Raw INTERFACE (12/13)]
+	 * function redeem
+	 * is not needed when using ERC1400Partition
+	 */
+
+	/**
+	 * [ERC1400Raw INTERFACE (13/13)]
+	 * function redeemFrom
+	 * is not needed when using ERC1400Partition
+	 */
 
 	/**
 	 * @dev Event emitted when tokens are transferred with data
