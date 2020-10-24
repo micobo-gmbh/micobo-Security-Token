@@ -1,4 +1,8 @@
 const SecurityToken = artifacts.require("SecurityToken")
+const CreateCall = artifacts.require("CreateCall")
+const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
+const securityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
+
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
@@ -33,6 +37,12 @@ module.exports = async () => {
 	// let account = "0x024269E2057b904d1Fa6a7B52056A8580a85180F"
 
 	try {
+		let factory = await SecurityTokenFactory.at("0x765dc89c07d276f702631e733289217a96000285")
+
+		let impl = await factory.implementationContract()
+
+		console.log(impl)
+
 		// WHITELIST_EDITOR
 		/* await st.addRole(
 			"0x57484954454c4953545f454449544f5200000000000000000000000000000000",

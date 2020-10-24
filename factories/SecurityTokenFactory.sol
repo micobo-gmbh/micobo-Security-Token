@@ -16,6 +16,11 @@ contract SecurityTokenFactory is ProxyFactory, OpenZeppelinUpgradesOwnable {
 	address public implementationContract;
 
 	/**
+	 * @dev Events being fired when the implementation contract is updated
+	 */
+	event ImplementationUpdated(address indexed newImplementation);
+
+	/**
 	 * @dev Initializes the token factory
 	 * @param _implementationContract address of the master implementation proxies will point to
 	 */
@@ -35,6 +40,7 @@ contract SecurityTokenFactory is ProxyFactory, OpenZeppelinUpgradesOwnable {
 		onlyOwner
 	{
 		implementationContract = _implementationContract;
+		emit ImplementationUpdated(_implementationContract);
 	}
 
 	/**

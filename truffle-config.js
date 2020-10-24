@@ -19,6 +19,8 @@
  */
 
 const HDWalletProvider = require("@truffle/hdwallet-provider")
+const PrivateKeyProvider = require("truffle-privatekey-provider")
+
 const { GSNProvider } = require("@openzeppelin/gsn-provider")
 
 // const infuraKey = "fj4jll3k.....";
@@ -71,6 +73,20 @@ module.exports = {
 			},
 			network_id: 4,
 			gas: 10000000, // 10.000.000
+			gasPrice: 3000000000, // 3gwei in wei
+			skipDryRun: true,
+		},
+
+		ropsten: {
+			provider: () => {
+				return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
+				/* return new PrivateKeyProvider(
+					"PRIVATE_KEY",
+					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
+				) */
+			},
+			network_id: 3,
+			gas: 8000000, // 10.000.000
 			gasPrice: 3000000000, // 3gwei in wei
 			skipDryRun: true,
 		},
