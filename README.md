@@ -197,8 +197,6 @@ It can be configured here:
 
 ## Code Coverage
 
-(Does not work when using 2 truffle configs, because of different solidity versions)
-
 Stop your local blockchain and start the coverage plugin with:
 
     truffle run coverage --temp /build/solcover --network development
