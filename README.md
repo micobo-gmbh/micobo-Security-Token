@@ -2,7 +2,7 @@
 
 ## Intro
 
-The **micobo Security Token** is an ERC20- and ERC1400-compatible, constrainable token developed by micobo GmbH. It's main features are:  
+The **micobo Security Token** is an ERC20- and ERC1400-compatible, constrainable Ethereum token compliant with German/European Security law and developed by micobo GmbH. It's main features are:  
 #
 -  **ERC 20** compatible
 #
