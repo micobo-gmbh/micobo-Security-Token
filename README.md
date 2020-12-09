@@ -1,5 +1,32 @@
 # micobo Security Token
 
+## Intro
+
+The **micobo Security Token** is an ERC20- and ERC1400-compatible, constrainable token developed by micobo GmbH. It's main features are:  
+#
+-  **ERC 20** compatible
+#
+- **ERC 1400** Partitions
+#
+- Customizable Transfer Constraints (Modules)
+    - **Whitelist** for accounts
+    - **Locking** periods for accounts and amounts
+    - Time-based **spending limits**
+    - **Vesting periods**
+    - Off-chain validation (coming soon)
+#
+- **Controller operations** for compliace (force transfers etc., can be turned off)
+#
+- Very granular, customizable **roles management**
+#
+- Optional "free" transactions through [GSN](https://opengsn.org/) 
+#
+- **Bulk-minting**, -whitelisting and -addRoles
+#
+- Document Management
+#
+
+
 ## Setup
 
 1. Solidity
@@ -12,72 +39,6 @@ look for the brew installation
 2. Truffle
 
 You need truffle installed globally
-
-### Compatibility
-
-We partially implement ERC1400.  
-We implement ERC20 using default partitions.  
-
-We don't implement ERC777 functionality.
-
-#
-## Tests
-
-All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.
-
-The tests are kept as atomic (specific) and autonomous as possible.  
-Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
-
--   Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
-
-*   Also make sure that **Ganache** is running on port `:8545`
-
-*   **GSN_Relayer**: If you test GSN functionality, also run the dev-relayer:
-    ```
-    npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
-    ```
-
-Use the test script to run all tests:
-
-    npm run test
-
-#
-
-## Gas report
-
-Gas report is configured by default in `truffle-config.js`
-
-It can be configured here:
-
-    mocha: {
-            reporter: 'eth-gas-reporter',
-            reporterOptions: {
-                currency: 'EUR',
-                gasPrice: 2,
-                url: 'http://localhost:8545',
-            },
-        },
-    }
-#
-![gsn](resources/gas_consumption.png "GSN")
-#
-
-## Code Coverage
-
-(Does not work when using 2 truffle configs, because of different solidity versions)
-
-Stop your local blockchain and start the coverage plugin with:
-
-    truffle run coverage --temp /build/solcover --network development
-
-_(also run the GSN relayer if you don't want GSN tests to fail)_
-
-For specific files, add
-
-    --file="test/10_spendingLimitTests.js"
-
-[solidity-coverage package on npm](https://www.npmjs.com/package/solidity-coverage#config-options)
-
 #
 
 ## Deployment
@@ -109,7 +70,7 @@ I.e., the off-chain validation module checks for the signature of an offline val
 
 #
 
-## Administrable.sol
+## Administrable
 
 Roles can be **added** and **removed** by the `ADMIN`
 
@@ -183,6 +144,73 @@ This authorization can be revoked at any time.
     Partitions are like token guardians: they hold on to your tokens using different constraint modules.  
     
     Once you can release them, they go into the „base“-partition where they can be transferred freely (or following the constraints defined there) from now on
+#
+
+### Compatibility
+
+We partially implement ERC1400.  
+We implement ERC20 using default partitions.  
+
+We don't implement ERC777 functionality.
+
+#
+## Tests
+
+All functionality of the smart contracts is tested in mulitple test classes found in the `/test` folder.
+
+The tests are kept as atomic (specific) and autonomous as possible.  
+Autonomy means that no test will fail or succeed dependant on the outcome of a different test.
+
+-   Make sure the **solidity version** in `truffle-config.js` is the same as your contracts' pragma statement!
+
+*   Also make sure that **Ganache** is running on port `:8545`
+
+*   **GSN_Relayer**: If you test GSN functionality, also run the dev-relayer:
+    ```
+    npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
+    ```
+
+Use the test script to run all tests:
+
+    npm run test
+
+#
+
+## Gas report
+
+Gas report is configured by default in `truffle-config.js`
+
+It can be configured here:
+
+    mocha: {
+            reporter: 'eth-gas-reporter',
+            reporterOptions: {
+                currency: 'EUR',
+                gasPrice: 2,
+                url: 'http://localhost:8545',
+            },
+        },
+    }
+#
+![gsn](resources/gas_consumption.png "GSN")
+#
+
+## Code Coverage
+
+(Does not work when using 2 truffle configs, because of different solidity versions)
+
+Stop your local blockchain and start the coverage plugin with:
+
+    truffle run coverage --temp /build/solcover --network development
+
+_(also run the GSN relayer if you don't want GSN tests to fail)_
+
+For specific files, add
+
+    --file="test/10_spendingLimitTests.js"
+
+[solidity-coverage package on npm](https://www.npmjs.com/package/solidity-coverage#config-options)
+
 #
 
 #### Diagrams
