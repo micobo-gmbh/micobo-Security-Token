@@ -1,6 +1,6 @@
 const SecurityToken = artifacts.require("SecurityToken")
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
-const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
+const securityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
 
 const { conf } = require("../token-config")
 
@@ -30,90 +30,57 @@ module.exports = async (deployer, network, accounts) => {
 
 	securityToken = await deployer.deploy(SecurityToken)
 
-	securityTokenFactory = await deployer.deploy(SecurityTokenFactory, securityToken.address)
+	securityTokenFactory = new web3.eth.Contract(securityTokenFactoryJSON.abi)
 
-	let tx = await securityTokenFactory.deployNewSecurityToken(
-		Math.floor(Math.random() * 10 + 1),
-		accounts[9], // proxy admin can not use the proxy itself, therefore we use account 9 here
-		data
-	)
+	// securityTokenFactory = await deployer.deploy(SecurityTokenFactory, securityToken.address)
 
-	console.log(tx.logs[0].args.proxy)
+	const newSecurityTokenFactory = await securityTokenFactory
+		.deploy({
+			data: securityTokenFactoryJSON.bytecode,
+			arguments: [securityToken.address],
+		})
+		.send({
+			from: accounts[0],
+			gas: 6000000,
+		})
+
+	let receipt = await newSecurityTokenFactory.methods
+		.deployNewSecurityToken(
+			Math.floor(Math.random() * 10 + 1),
+			accounts[9], // proxy admin can not use the proxy itself, therefore we use account 9 here
+			data
+		)
+		.send({
+			from: accounts[0],
+			gas: 6000000,
+		})
+
+	console.log(receipt.events.ProxyCreated.returnValues.proxy)
 
 	const chainId = await web3.eth.net.getId()
 	try {
-		securityTokenJSON.networks[chainId].address = tx.logs[0].args.proxy
+		// remember proxy contract address for testing
+		if (!securityTokenJSON.networks[chainId]) {
+			console.log("chainId undefined. Setting to", chainId)
+			securityTokenJSON.networks[chainId] = {}
+			// console.log(securityTokenJSON.networks[chainId])
+
+			securityTokenJSON.networks[chainId].address = receipt.events.ProxyCreated.returnValues.proxy
+		} else {
+			securityTokenJSON.networks[chainId].address = receipt.events.ProxyCreated.returnValues.proxy
+		}
+
+		// remember factory contract address for testing
+		if (!securityTokenFactoryJSON.networks[chainId]) {
+			console.log("chainId undefined. Setting to", chainId)
+			securityTokenFactoryJSON.networks[chainId] = {}
+			// console.log(securityTokenJSON.networks[chainId])
+
+			securityTokenFactoryJSON.networks[chainId].address = newSecurityTokenFactory.address
+		} else {
+			securityTokenFactoryJSON.networks[chainId].address = newSecurityTokenFactory
+		}
 	} catch (e) {
-		console.log(e)
+		console.error(e)
 	}
-
-	// use this for testing
-	/* if (network == "development") {
-		console.log("DEV MIGRATION")
-
-		console.log(accounts[0])
-
-		try {
-			let st = await deployer.deploy(
-				SecurityToken,
-			)
-			await st.initialize(
-				conf.name, // name
-				conf.symbol, // symbol
-				conf.granularity, // granularity of 2 for testing
-				conf.standardCap, // cap
-				accounts[0], // admin
-				accounts[7], // controller is account 7 to avoid confusion, because controller disregards constraints
-				accounts[0], // issuer
-				accounts[0], // redeemer
-				accounts[0] // module_editor
-			)
-			console.log(st.address)
-		} catch (e) {
-			throw e
-		}
-	} else if (network == "test") {
-		console.log("TEST MIGRATION")
-		try {
-			let st = await deployer.deploy(
-				SecurityToken,
-			)
-			await st.initialize(
-				conf.name, // name
-				conf.symbol, // symbol
-				1, // granularity
-				conf.standardCap, // cap
-				accounts[0], // admin
-				accounts[0], // controller
-				accounts[0], // issuer
-				accounts[0], // redeemer
-				accounts[0] // module_editor
-			)
-		} catch (e) {
-			throw e
-		}
-
-		// this for everything else
-	} else {
-		try {
-			gnosisMultisigAddress = "0xCf58fD93bd6C6d2802e2Cdf33B37933dAEc024Ea"
-
-			let st = await deployer.deploy(
-				SecurityToken,
-			)
-			await st.initialize(
-				conf.name, // name
-				conf.symbol, // symbol
-				1, // granularity
-				1000000, // cap
-				gnosisMultisigAddress, // admin
-				gnosisMultisigAddress, // controller
-				gnosisMultisigAddress, // issuer
-				gnosisMultisigAddress, // redeemer
-				gnosisMultisigAddress // module_editor
-			)
-		} catch (e) {
-			throw e
-		}
-	} */
 }

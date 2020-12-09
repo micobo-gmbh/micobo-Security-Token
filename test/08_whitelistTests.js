@@ -49,14 +49,17 @@ contract("Test Whitelist", async (accounts) => {
 		// adding whitelist_editor
 		contracts.micoboSecurityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
 
+		// edit whitelist
 		await truffleAssert.passes(whitelistConstraintModule.editWhitelist(accounts[0], true))
 
 		assert.deepEqual(await whitelistConstraintModule.isWhitelisted(accounts[0]), true)
 
+		// bulk edit whitelist
 		await truffleAssert.passes(whitelistConstraintModule.bulkEditWhitelist(accounts, true))
 
 		assert.deepEqual(await whitelistConstraintModule.isWhitelisted(accounts[1]), true)
 
+		// reset
 		await truffleAssert.passes(whitelistConstraintModule.bulkEditWhitelist(accounts, false))
 
 		assert.deepEqual(await whitelistConstraintModule.isWhitelisted(accounts[0]), false)

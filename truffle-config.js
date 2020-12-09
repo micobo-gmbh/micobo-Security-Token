@@ -1,27 +1,9 @@
-/**
- * Use this file to configure your truffle project. It's seeded with some
- * common settings for different networks and features like migrations,
- * compilation and testing. Uncomment the ones you need or modify
- * them to suit your project as necessary.
- *
- * More information about configuration can be found at:
- *
- * truffleframework.com/docs/advanced/configuration
- *
- * To deploy via Infura you'll need a wallet provider (like truffle-hdwallet-provider)
- * to sign your transactions before they're sent to a remote public node. Infura API
- * keys are available for free at: infura.io/register
- *
- * You'll also need a mnemonic - the twelve word phrase the wallet uses to generate
- * public/private key pairs. If you're publishing your code to GitHub make sure you load this
- * phrase from a file you've .gitignored so it doesn't accidentally become public.
- *
- */
-
 const HDWalletProvider = require("@truffle/hdwallet-provider")
 const PrivateKeyProvider = require("truffle-privatekey-provider")
 
 const { GSNProvider } = require("@openzeppelin/gsn-provider")
+
+require("dotenv").config()
 
 // const infuraKey = "fj4jll3k.....";
 
@@ -81,33 +63,28 @@ module.exports = {
 			provider: () => {
 				return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
 				/* return new PrivateKeyProvider(
-					"PRIVATE_KEY",
+					process.env.MAINNET_PRIVATE_KEY,
 					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
 				) */
 			},
 			network_id: 3,
-			gas: 8000000, // 10.000.000
+			gas: 8000000, // 8.000.000
 			gasPrice: 3000000000, // 3gwei in wei
 			skipDryRun: true,
 		},
 
-		// Useful for deploying to a public network.
-		// NB: It's important to wrap the provider as a function.
-		// ropsten: {
-		// provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/${infuraKey}`),
-		// network_id: 3,       // Ropsten's id
-		// gas: 5500000,        // Ropsten has a lower block limit than mainnet
-		// confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-		// timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-		// skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-		// },
-
-		// Useful for private networks
-		// private: {
-		// provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
-		// network_id: 2111,   // This network is yours, in the cloud.
-		// production: true    // Treats this network as if it was a public net. (default: false)
-		// }
+		mainnet: {
+			provider: () => {
+				return new PrivateKeyProvider(
+					process.env.MAINNET_PRIVATE_KEY,
+					"https://mainnet.infura.io/v3/77249052ac71443eb63e5fdd8b61893e"
+				)
+			},
+			network_id: 1,
+			gas: 2000000,
+			gasPrice: 69000000000, // wei
+			skipDryRun: true,
+		},
 	},
 
 	// Set default mocha options here, use special reporters etc.
@@ -115,7 +92,7 @@ module.exports = {
 		reporter: "eth-gas-reporter",
 		reporterOptions: {
 			currency: "EUR",
-			gasPrice: 80,
+			gasPrice: 30,
 			url: "http://localhost:8545",
 		},
 	},
@@ -136,5 +113,9 @@ module.exports = {
 		},
 	},
 
-	plugins: ["truffle-security", "solidity-coverage"],
+	api_keys: {
+		etherscan: process.env.ETHERSCAN_API_KEY,
+	},
+
+	plugins: ["truffle-security", "solidity-coverage", "truffle-plugin-verify"],
 }

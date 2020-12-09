@@ -80,6 +80,8 @@ contract WhitelistConstraintModule is IConstraintModule {
 			"!WHITELIST_EDITOR"
 		);
 
+		require(accounts.length <= 100, "too many accounts");
+
 		for (uint256 i = 0; i < accounts.length; i++) {
 			_editWhitelist(accounts[i], whitelisted);
 		}

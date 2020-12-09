@@ -7,7 +7,7 @@ const SpendingLimitsConstraintModule = artifacts.require("SpendingLimitsConstrai
 const VestingPeriodConstraintModule = artifacts.require("VestingPeriodConstraintModule")
 
 module.exports = async (deployer, network, accounts) => {
-	if (network == "development") {
+	if (network == "development" || network == "soliditycoverage" || network == "test") {
 		console.log("skipping constraint migration")
 		return
 	}

@@ -2,7 +2,7 @@ const SecurityToken = artifacts.require("SecurityToken")
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
 module.exports = async (deployer, network, accounts) => {
-	if (network == "development") {
+	if (network == "development" || network == "soliditycoverage" || network == "test") {
 		console.log("skipping role granting")
 		return
 	}

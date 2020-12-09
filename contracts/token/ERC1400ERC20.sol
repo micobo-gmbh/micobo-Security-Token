@@ -54,8 +54,8 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 			"",
 			""
 		);
-		emit Transfer(_msgSender(), to, value);
-		return true;
+		// emitted in _transferByPartition
+		// emit Transfer(_msgSender(), to, value);		return true;
 	}
 
 	/**
@@ -123,7 +123,8 @@ contract ERC1400ERC20 is ERC1400Partition, IERC20 {
 		// transfer by partition
 		_transferFromTotalPartitions(from, from, to, value, "", "");
 
-		emit Transfer(from, to, value);
+		// emitted in _transferByPartition
+		// emit Transfer(_msgSender(), to, value);
 		return true;
 	}
 }

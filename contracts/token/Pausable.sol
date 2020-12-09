@@ -25,9 +25,9 @@ contract Pausable is IPausable, Constrainable {
 	 */
 	function pause() public {
 		require(!_paused, "paused");
-		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
+		require(hasRole(bytes32("PAUSER"), _msgSender()), "!PAUSER");
 		_paused = true;
-		emit Paused(msg.sender);
+		emit Paused(_msgSender());
 	}
 
 	/**
@@ -35,8 +35,8 @@ contract Pausable is IPausable, Constrainable {
 	 */
 	function unpause() public {
 		require(_paused, "not paused");
-		require(hasRole(bytes32("PAUSER"), msg.sender), "!PAUSER");
+		require(hasRole(bytes32("PAUSER"), _msgSender()), "!PAUSER");
 		_paused = false;
-		emit Unpaused(msg.sender);
+		emit Unpaused(_msgSender());
 	}
 }

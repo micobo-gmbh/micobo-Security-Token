@@ -15,10 +15,8 @@ You need truffle installed globally
 
 ### Compatibility
 
-We implement ERC1400Raw.  
-We implement ERC1400Partition.  
-We implement ERC20 with default partitions.  
-We implement ERC20 as proxies for specific partitions.
+We partially implement ERC1400.  
+We implement ERC20 using default partitions.  
 
 We don't implement ERC777 functionality.
 
@@ -66,7 +64,9 @@ It can be configured here:
 
 ## Code Coverage
 
-Stop you local blockchain and start the coverage plugin with:
+(Does not work when using 2 truffle configs, because of different solidity versions)
+
+Stop your local blockchain and start the coverage plugin with:
 
     truffle run coverage --temp /build/solcover --network development
 

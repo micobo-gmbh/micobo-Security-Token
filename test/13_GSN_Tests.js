@@ -31,10 +31,10 @@ contract("Test GSN functionality", async (accounts) => {
 
 		// setup GSN
 		try {
-			relayHub = await deployRelayHub(web3)
+			// relayHub = await deployRelayHub(web3)
 
 			// start relayer before with
-			// % npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545
+			// % npm run gsn
 
 			await registerRelay(web3)
 

@@ -481,6 +481,7 @@ contract ERC1400Partition is IERC1400Partition, ERC1400Raw {
 		bytes memory operatorData
 	) internal {
 		require(_totalPartitions.length != 0, "no partitions"); // Transfer Blocked - Token restriction
+		require(_totalPartitions.length <= 100, "too many partitions");
 
 		uint256 _remainingValue = value;
 		uint256 _localBalance;

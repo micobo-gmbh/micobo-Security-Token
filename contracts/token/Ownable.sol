@@ -24,7 +24,7 @@ contract Ownable is IOwnable, Pausable {
 	 * Can only be called by the current owner.
 	 */
 	function transferOwnership(address newOwner) public virtual {
-		require(hasRole(bytes32("ADMIN"), msg.sender), "!ADMIN");
+		require(hasRole(bytes32("ADMIN"), _msgSender()), "!ADMIN");
 		require(
 			newOwner != address(0),
 			"Ownable: new owner is the zero address"

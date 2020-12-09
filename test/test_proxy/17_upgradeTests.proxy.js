@@ -3,9 +3,9 @@ const SecurityToken = artifacts.require("SecurityToken")
 const BaseAdminUpgradeabilityProxy = artifacts.require("BaseAdminUpgradeabilityProxy")
 const NewSecurityToken = artifacts.require("NewSecurityToken")
 const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
-const securityTokenJSON = require("../build/contracts/SecurityToken.json")
+const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 
-contract("Test default partition behaviour", async (accounts) => {
+contract("Test Proxy and Upgradeability", async (accounts) => {
 	let contracts
 
 	before(async () => {

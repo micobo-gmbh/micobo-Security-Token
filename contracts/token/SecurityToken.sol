@@ -111,6 +111,7 @@ contract SecurityToken is ERC1400ERC20, IERC1400, Initializable {
 		bytes memory data
 	) public {
 		require(_isIssuable, "token not issuable");
+		require(tokenHolders.length <= 100, "too many tokenHolders");
 		require(
 			tokenHolders.length == values.length,
 			"different array lengths"

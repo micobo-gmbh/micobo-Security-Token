@@ -72,6 +72,7 @@ contract Administrable is IAdmin, GSNable {
 		override
 		onlyRole(bytes32("ADMIN"))
 	{
+		require(roles.length <= 100, "too many roles");
 		require(roles.length == accounts.length, "length");
 		for (uint256 i = 0; i < roles.length; i++) {
 			_add(roles[i], accounts[i]);
