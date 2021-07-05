@@ -136,6 +136,16 @@ Users can authorize addresses to transfer tokens on their behalf on a "by partit
 This authorization can be revoked at any time.
 
 #
+
+## Token Creation
+![tokenCreation](resources/TokenCreation.jpg "Token Creation")
+
+#
+
+## Updateability
+![updateability](resources/Updateability.jpg "Updateability")
+
+#
 ## RIVER Principle
 `If not specified otherwise, tokens will always be transferred to the „base“(0)-partition!`
 
