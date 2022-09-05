@@ -1,5 +1,5 @@
 const SecurityToken = artifacts.require("SecurityToken")
-// const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
+const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
 const securityTokenABI = require("../build/contracts/SecurityToken.json").abi
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
@@ -16,7 +16,7 @@ contract("Test Deployment", async (accounts) => {
 		}
 	})
 
-	/* let securityToken, securityTokenFactory
+	let securityToken, securityTokenFactory
 
 	let micoboSecurityToken = new web3.eth.Contract(securityTokenABI)
 
@@ -46,7 +46,7 @@ contract("Test Deployment", async (accounts) => {
 
 	it("deploy security token proxy successfully", async () => {
 		await securityTokenFactory.deployNewSecurityToken(Math.floor(Math.random() * 10 + 1), accounts[9], data)
-	}) */
+	})
 
 	it("Token gives me all the correct token information", async () => {
 		assert.deepEqual(await contracts.securityToken.name(), conf.name)

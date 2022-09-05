@@ -26,7 +26,7 @@ module.exports = {
 	networks: {
 		// Useful for testing. The `development` name is special - truffle uses it by default
 		// if it's defined here and no other network is specified at the command line.
-		// You should run a client (like ganache-cli, geth or parity) in a separate terminal
+		// You should run a client (like ganache, geth or parity) in a separate terminal
 		// tab if you use this network and you must also set the `host`, `port` and `network_id`
 		// options below to some value.
 
@@ -85,6 +85,50 @@ module.exports = {
 			gasPrice: 69000000000, // wei
 			skipDryRun: true,
 		},
+
+		polygon: {
+			provider: () => {
+				return new HDWalletProvider(mnemonic, process.env.POLYGON_MAINNET)
+			},
+			network_id: 137,
+			gasPrice: 69000000000, // wei
+			skipDryRun: true,
+		},
+
+		mumbai: {
+			provider: () => {
+				return new HDWalletProvider(mnemonic, process.env.POLYGON_MUMBAI)
+			},
+			network_id: 80001,
+			gasPrice: 69000000000, // wei
+			skipDryRun: true,
+		},
+
+		logicDeployment: {
+			provider: () => {
+				return new PrivateKeyProvider(
+					process.env.TOKEN_LOGIC_DEPLOYER_PRIVATE_KEY,
+					// change to desired network
+					process.env.DEPLOYMENT_NETWORK
+				)
+			},
+			network_id: "*",
+			// gasPrice: 69000000000, // wei (set before deployment)
+			skipDryRun: true,
+		},
+
+		factoryDeployment: {
+			provider: () => {
+				return new PrivateKeyProvider(
+					process.env.TOKEN_FACTORY_DEPLOYER_PRIVATE_KEY,
+					// change to desired network
+					process.env.DEPLOYMENT_NETWORK
+				)
+			},
+			network_id: "*",
+			// gasPrice: 69000000000, // wei (set before deployment)
+			skipDryRun: true,
+		},
 	},
 
 	// Set default mocha options here, use special reporters etc.
@@ -115,7 +159,8 @@ module.exports = {
 
 	api_keys: {
 		etherscan: process.env.ETHERSCAN_API_KEY,
+		polygonscan: process.env.POLYGONSCAN_API_KEY,
 	},
 
-	plugins: ["truffle-security", "solidity-coverage", "truffle-plugin-verify"],
+	plugins: ["solidity-coverage", "truffle-plugin-verify"],
 }
