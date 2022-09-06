@@ -8,7 +8,7 @@ require("dotenv").config()
 // const infuraKey = "fj4jll3k.....";
 
 const fs = require("fs")
-const mnemonic = fs.readFileSync(".mnemonic").toString().trim()
+const test_mnemonic = fs.readFileSync(".mnemonic").toString().trim()
 
 module.exports = {
 	/**
@@ -43,7 +43,7 @@ module.exports = {
 
 		test: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "http://localhost:8545")
+				return new HDWalletProvider(test_mnemonic, "http://localhost:8545")
 			},
 			port: 8545,
 			network_id: "*",
@@ -51,7 +51,10 @@ module.exports = {
 
 		rinkeby: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
+				return new HDWalletProvider(
+					test_mnemonic,
+					"https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
+				)
 			},
 			network_id: 4,
 			gas: 10000000, // 10.000.000
@@ -61,7 +64,10 @@ module.exports = {
 
 		ropsten: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af")
+				return new HDWalletProvider(
+					test_mnemonic,
+					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
+				)
 				/* return new PrivateKeyProvider(
 					process.env.MAINNET_PRIVATE_KEY,
 					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
@@ -88,7 +94,7 @@ module.exports = {
 
 		polygon: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, process.env.POLYGON_MAINNET)
+				return new HDWalletProvider(process.env.POLYGON_MNEMONIC, process.env.POLYGON_MAINNET)
 			},
 			network_id: 137,
 			gasPrice: 69000000000, // wei
@@ -97,10 +103,9 @@ module.exports = {
 
 		mumbai: {
 			provider: () => {
-				return new HDWalletProvider(mnemonic, process.env.POLYGON_MUMBAI)
+				return new HDWalletProvider(test_mnemonic, process.env.POLYGON_MUMBAI)
 			},
 			network_id: 80001,
-			gasPrice: 69000000000, // wei
 			skipDryRun: true,
 		},
 
