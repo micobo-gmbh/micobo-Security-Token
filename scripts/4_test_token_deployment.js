@@ -34,6 +34,7 @@ module.exports = async (callback) => {
 			.send({
 				from: accounts[0],
 				gas: 6000000,
+                // gasPrice: 39000000000  turn on and set to current gas price for mainnet
 			})
 
 		console.log(receipt.events.ProxyCreated.returnValues.proxy)

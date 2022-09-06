@@ -8,4 +8,4 @@ read network
 
 echo Verifying token at "$address" on "$network" network
 
-truffle run verify SecurityToken@$address --network $network --debug
+truffle run verify SecurityToken@$address --network $network --debug --custom-proxy InitializableAdminUpgradeabilityProxy
