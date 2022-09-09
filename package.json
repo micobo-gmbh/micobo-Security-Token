@@ -8,10 +8,12 @@
 	},
 	"scripts": {
 		"test": "truffle test",
+		"test-proxy": "truffle test --config truffle-config-factories.js",
+		"test-sales": "truffle test --config truffle-config-sales.js",
 		"deploy": "truffle migrate --reset",
 		"compile": "truffle compile --all",
 		"compile-factories": "truffle compile --config truffle-config-factories.js --all",
-		"compile-all": "truffle compile --all && truffle compile --config truffle-config-factories.js --all",
+		"compile-all": "truffle compile --all && truffle compile --config truffle-config-factories.js --all && truffle compile --config truffle-config-sales.js --all",
 		"ganache": "ganache --chain.chainId 1234 -i 1234 --db ~/ganache-db -m \"sail prevent round weasel physical pear million rebel weekend sea hole mosquito\"",
 		"compile-solc-token": "solc --abi --hashes --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
 		"compile-solc": "solc --abi --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/**/*.sol",
@@ -73,7 +75,7 @@
 	"homepage": "",
 	"dependencies": {
 		"@codechecks/client": "0.1.12",
-		"@openzeppelin/contracts": "4.7.3",
+		"@openzeppelin/contracts": "3.0.0",
 		"@openzeppelin/gsn-helpers": "0.2.4",
 		"@openzeppelin/gsn-provider": "0.1.11",
 		"@openzeppelin/upgrades": "2.8.0",
