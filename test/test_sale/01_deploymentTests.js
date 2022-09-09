@@ -1,9 +1,10 @@
 const SecurityToken = artifacts.require("SecurityToken")
 const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
-const securityTokenABI = require("../build/contracts/SecurityToken.json").abi
-const securityTokenJSON = require("../build/contracts/SecurityToken.json")
+const securityTokenABI = require("../../build/contracts/SecurityToken.json").abi
+const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
+const Sale = artifacts.require("Sale")
 
-const { conf } = require("../token-config")
+const { conf } = require("../../token-config")
 
 contract("Test Deployment", async (accounts) => {
 	let contracts
@@ -16,7 +17,11 @@ contract("Test Deployment", async (accounts) => {
 		}
 	})
 
-	let securityToken, securityTokenFactory
+	let securityToken, securityTokenFactory, sale, proxyAddress
+
+	const mockWhitelistAddress = "0x01FaF3688dee393837fe88Fd589E830c8f3D5B8e"
+	const mockCap = 1000
+	const mockPrimaryMarketEndTimestamp = 1694234541
 
 	let micoboSecurityToken = new web3.eth.Contract(securityTokenABI)
 
@@ -65,5 +70,36 @@ contract("Test Deployment", async (accounts) => {
 		assert.deepEqual((await contracts.securityToken.cap()).toNumber(), conf.standardCap)
 
 		assert.deepEqual((await contracts.securityToken.totalSupply()).toNumber(), 0)
+	})
+
+	it("deploy sale contract", async () => {
+		sale = await Sale.new(
+			accounts[0],
+			securityToken.address,
+			mockWhitelistAddress,
+			mockPrimaryMarketEndTimestamp,
+			mockCap,
+			conf.standardPartition
+		)
+	})
+
+	it("sale contract gives me all the correct info", async () => {
+		assert.deepEqual(await sale.issuer(), accounts[0])
+
+		assert.deepEqual((await sale.cap()).toNumber(), mockCap)
+
+		assert.deepEqual((await sale.sold()).toNumber(), 0)
+
+		assert.deepEqual((await sale.primaryMarketEnd()).toNumber(), mockPrimaryMarketEndTimestamp)
+
+		assert.deepEqual(await sale.partition(), conf.standardPartition)
+
+		assert.deepEqual(await sale.distributed(), false)
+
+		assert.deepEqual(await sale.getTokenAddress(), securityToken.address)
+
+		assert.deepEqual(await sale.getWhitelistAddress(), mockWhitelistAddress)
+
+		assert.deepEqual(await sale.getBuyers(), [])
 	})
 })
