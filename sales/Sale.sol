@@ -1,11 +1,11 @@
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: MIT
 
-// TODO update to 0.8.16, update dependency contracts, get rid of SafeMath (not needed after 0.8.0)
-import "../contracts/constraints/WhitelistConstraintModule.sol";
+pragma solidity 0.8.16;
+
+import "../contracts/interfaces/IWhitelistConstraintModule.sol";
 import "../contracts/interfaces/ISecurityToken.sol";
 
-import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
-import "../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./utils/ReentrancyGuard.sol";
 
 interface ICurrency {
 	function allowance(address owner, address spender)
@@ -34,19 +34,17 @@ contract ContextMixin {
 				)
 			}
 		} else {
-			sender = msg.sender;
+			sender = payable(msg.sender);
 		}
 		return sender;
 	}
 }
 
 contract Sale is ContextMixin, ReentrancyGuard {
-	using SafeMath for uint256;
-
 	address public issuer;
 
 	ISecurityToken private _securityToken;
-	WhitelistConstraintModule private _whitelist;
+	IWhitelistConstraintModule private _whitelist;
 
 	mapping(address => uint256) private _purchases;
 	mapping(address => uint256) private _limits;
@@ -94,20 +92,20 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		uint256 primaryMarketEndTimestamp,
 		uint256 tokenCap,
 		bytes32 defaultPartition
-	) public ReentrancyGuard() {
+	) ReentrancyGuard() {
 		require(issuerWallet != address(0), "issuerWallet zero");
 		// TODO check if contract, or even if securityToken
 		require(tokenAddress != address(0), "tokenAddress zero");
 		// TODO check if contract, or even if whitelist
 		require(whitelistAddress != address(0), "whitelistAddress zero");
 		require(
-			now < primaryMarketEndTimestamp,
+			block.timestamp < primaryMarketEndTimestamp,
 			"primary market end int the past"
 		);
 
 		issuer = issuerWallet;
 		_securityToken = ISecurityToken(tokenAddress);
-		_whitelist = WhitelistConstraintModule(whitelistAddress);
+		_whitelist = IWhitelistConstraintModule(whitelistAddress);
 		primaryMarketEnd = primaryMarketEndTimestamp;
 		cap = tokenCap;
 		partition = defaultPartition;
@@ -120,17 +118,17 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		ICurrency currency = ICurrency(currencyAddress);
 
 		// check primary market end
-		require(now < primaryMarketEnd, "primary market already ended");
+		require(block.timestamp < primaryMarketEnd, "primary market already ended");
 
 		// check whitelist
 		require(_whitelist.isWhitelisted(msgSender()), "buyer not whitelisted");
 
 		// check cap
-		require(sold.add(amount) < cap, "would exceed sales cap");
+		require(sold + amount < cap, "would exceed sales cap");
 
 		// check limits
 		require(
-			_limits[msgSender()].sub(amount) > 0,
+			_limits[msgSender()] - amount > 0,
 			"exceeds allowed purchase limit for this buyer"
 		);
 
@@ -141,7 +139,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		);
 
 		// calculate currency amount needed based on rate
-		uint256 currencyNeeded = _currencyRates[currencyAddress].mul(amount);
+		uint256 currencyNeeded = _currencyRates[currencyAddress] * amount;
 
 		// check allowance
 		require(
@@ -156,10 +154,10 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		addPurchase(msgSender(), amount);
 
 		// add to sold
-		sold = sold.add(amount);
+		sold = sold + amount;
 
 		// sub from _limits
-		_limits[msgSender()] = _limits[msgSender()].sub(amount);
+		_limits[msgSender()] = _limits[msgSender()] - amount;
 
 		emit TokenPurchase(
 			msgSender(),
@@ -172,7 +170,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 
 	// TODO draft, maybe increase bulkmint limit in securityToken impl
 	function distributeTokens() public nonReentrant {
-		require(now >= primaryMarketEnd, "primary market has not ended yet");
+		require(block.timestamp >= primaryMarketEnd, "primary market has not ended yet");
 
 		// prevent from being called multiple times
 		// default boolean value is false
@@ -182,12 +180,12 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		uint256[] memory amountsSubset;
 		uint256 index;
 
-		for (uint256 i = 0; i < _buyers.length.add(100); i.add(100)) {
+		for (uint256 i = 0; i < _buyers.length + 100; i + 100) {
 			index = 0;
-			for (uint256 y = i; y < _buyers.length; y.add(1)) {
+			for (uint256 y = i; y < _buyers.length; y + 1) {
 				buyersSubset[index] = _buyers[y];
 				amountsSubset[index] = _purchases[_buyers[y]];
-				index.add(1);
+				index + 1;
 			}
 			_securityToken.bulkIssueByPartition(
 				partition,
@@ -235,7 +233,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	function addPurchase(address buyer, uint256 amount) private onlySaleAdmin {
 		require(buyer != address(0), "buyer is zero");
 
-		_purchases[buyer] = _purchases[buyer].add(amount);
+		_purchases[buyer] = _purchases[buyer] + amount;
 		_buyers.push(buyer);
 	}
 
@@ -246,14 +244,14 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		require(buyer != address(0), "buyer is zero");
 
 		// subtracting a specific amount makes it possible to cancel only some of a _buyers purchases
-		_purchases[buyer] = _purchases[buyer].sub(amount);
+		_purchases[buyer] = _purchases[buyer] - amount;
 	}
 
 	function editPrimaryMarketEnd(uint256 newPrimaryMarketEndTimestamp)
 		public
 		onlySaleAdmin
 	{
-		require(now < newPrimaryMarketEndTimestamp, "not in future");
+		require(block.timestamp < newPrimaryMarketEndTimestamp, "not in future");
 
 		primaryMarketEnd = newPrimaryMarketEndTimestamp;
 	}

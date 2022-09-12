@@ -13,6 +13,7 @@
 		"deploy": "truffle migrate --reset",
 		"compile": "truffle compile --all",
 		"compile-factories": "truffle compile --config truffle-config-factories.js --all",
+		"compile-sales": "truffle compile --config truffle-config-sales.js --all",
 		"compile-all": "truffle compile --all && truffle compile --config truffle-config-factories.js --all && truffle compile --config truffle-config-sales.js --all",
 		"ganache": "ganache --chain.chainId 1234 -i 1234 --db ~/ganache-db -m \"sail prevent round weasel physical pear million rebel weekend sea hole mosquito\"",
 		"compile-solc-token": "solc --abi --hashes --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
