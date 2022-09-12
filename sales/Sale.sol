@@ -7,18 +7,6 @@ import "../contracts/interfaces/ISecurityToken.sol";
 import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 import "../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-/*
-Features:
-    accept a predetermined amount of stablecoin as payment for 1 token
-    check if user is whitelisted before allowing purchase
-    check for predetermined purchase limit (per user)
-    record purchases and accounts
-    accept purchase entries from authorised address to account for off-chain fiat payments
-    function that triggers distribution of tokens (as operator) to all accounts who made purchases
-    callable only after a certain date
-    purchases can be cancelled by issuer (in case of blacklisting or other events), refund will be taken care of off-chain
-*/
-
 interface ICurrency {
 	function allowance(address owner, address spender)
 		external
@@ -33,7 +21,7 @@ interface ICurrency {
 }
 
 // TODO activate full MetaTransactions
-abstract contract ContextMixin {
+contract ContextMixin {
 	function msgSender() internal view returns (address payable sender) {
 		if (msg.sender == address(this)) {
 			bytes memory array = msg.data;
@@ -132,26 +120,33 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		ICurrency currency = ICurrency(currencyAddress);
 
 		// check primary market end
-		require(now < primaryMarketEnd);
+		require(now < primaryMarketEnd, "primary market already ended");
 
 		// check whitelist
-		require(_whitelist.isWhitelisted(msgSender()));
+		require(_whitelist.isWhitelisted(msgSender()), "buyer not whitelisted");
 
 		// check cap
-		require(sold.add(amount) < cap);
+		require(sold.add(amount) < cap, "would exceed sales cap");
 
 		// check limits
-		require(_limits[msgSender()].sub(amount) > 0);
+		require(
+			_limits[msgSender()].sub(amount) > 0,
+			"exceeds allowed purchase limit for this buyer"
+		);
 
 		// currency must be accepted
-		require(_currencyRates[currencyAddress] > 0);
+		require(
+			_currencyRates[currencyAddress] > 0,
+			"this stablecoin is not accepted"
+		);
 
 		// calculate currency amount needed based on rate
 		uint256 currencyNeeded = _currencyRates[currencyAddress].mul(amount);
 
 		// check allowance
 		require(
-			currency.allowance(address(this), msgSender()) >= currencyNeeded
+			currency.allowance(address(this), msgSender()) >= currencyNeeded,
+			"stablecoin allowance too low"
 		);
 
 		// send payment directly to issuer
@@ -177,11 +172,11 @@ contract Sale is ContextMixin, ReentrancyGuard {
 
 	// TODO draft, maybe increase bulkmint limit in securityToken impl
 	function distributeTokens() public nonReentrant {
-		require(now >= primaryMarketEnd);
+		require(now >= primaryMarketEnd, "primary market has not ended yet");
 
 		// prevent from being called multiple times
 		// default boolean value is false
-		require(!distributed);
+		require(!distributed, "already distributed");
 
 		address[] memory buyersSubset;
 		uint256[] memory amountsSubset;
@@ -211,7 +206,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		public
 		onlySaleAdmin
 	{
-		require(buyer != address(0));
+		require(buyer != address(0), "buyer is zero");
 
 		_purchases[buyer] = amount;
 	}
@@ -220,7 +215,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		public
 		onlySaleAdmin
 	{
-		require(buyer != address(0));
+		require(buyer != address(0), "buyer is zero");
 
 		_limits[buyer] = amount;
 	}
@@ -230,7 +225,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		onlySaleAdmin
 	{
 		// setting the rate back to the default (0) will deactivate the currency
-		require(currencyAddress != address(0));
+		require(currencyAddress != address(0), "currencyAddress is zero");
 
 		_currencyRates[currencyAddress] = rate;
 
@@ -238,7 +233,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	}
 
 	function addPurchase(address buyer, uint256 amount) private onlySaleAdmin {
-		require(buyer != address(0));
+		require(buyer != address(0), "buyer is zero");
 
 		_purchases[buyer] = _purchases[buyer].add(amount);
 		_buyers.push(buyer);
@@ -248,10 +243,19 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		public
 		onlySaleAdmin
 	{
-		require(buyer != address(0));
+		require(buyer != address(0), "buyer is zero");
 
 		// subtracting a specific amount makes it possible to cancel only some of a _buyers purchases
 		_purchases[buyer] = _purchases[buyer].sub(amount);
+	}
+
+	function editPrimaryMarketEnd(uint256 newPrimaryMarketEndTimestamp)
+		public
+		onlySaleAdmin
+	{
+		require(now < newPrimaryMarketEndTimestamp, "not in future");
+
+		primaryMarketEnd = newPrimaryMarketEndTimestamp;
 	}
 
 	// read functions for private types
