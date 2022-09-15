@@ -1,6 +1,7 @@
 const SecurityToken = artifacts.require("SecurityToken")
 const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
 const securityTokenABI = require("../../build/contracts/SecurityToken.json").abi
+const truffleAssert = require("truffle-assertions")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 const Sale = artifacts.require("Sale")
 
@@ -101,5 +102,13 @@ contract("Test Deployment", async (accounts) => {
 		assert.deepEqual(await sale.getWhitelistAddress(), mockWhitelistAddress)
 
 		assert.deepEqual(await sale.getBuyers(), [])
+	})
+
+	it("cannot create sale contract with primaryMarketEndTimestamp in the past", async () => {
+		truffleAssert.fails(
+			Sale.new(accounts[0], securityToken.address, mockWhitelistAddress, 0, mockCap, conf.standardPartition),
+			truffleAssert.ErrorType.REVERT,
+			"primary market end in the past"
+		)
 	})
 })

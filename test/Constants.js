@@ -15,6 +15,8 @@ module.exports = {
 		SPENDING_LIMITS_EDITOR: web3.utils.padRight(web3.utils.fromAscii("SPENDING_LIMITS_EDITOR"), 64),
 		VESTING_PERIOD_EDITOR: web3.utils.padRight(web3.utils.fromAscii("VESTING_PERIOD_EDITOR"), 64),
 		GSN_CONTROLLER: web3.utils.padRight(web3.utils.fromAscii("GSN_CONTROLLER"), 64),
+
+		SALE_ADMIN: web3.utils.padRight(web3.utils.fromAscii("SALE_ADMIN"), 64),
 	},
 
 	/*

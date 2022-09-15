@@ -50,8 +50,9 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	mapping(address => uint256) private _limits;
 
 	// address: address of the token contract managing the currency
-	// uint256: rate, amount of tokens purchased per smallest unit of this currency
-	// i.e. 1 USDC = 1 token --> rate = 10^6 (USDC has 6 decimals)
+	// uint256: rate, amount of the smallest unit of this currency necessary to buy 1 token
+	// rate = 10^unit (where unit is the smallest possible unit of the currency)
+	// i.e. 1,000000 USDC = 1 token --> rate = 10^6 (USDC has 6 decimals)
 	mapping(address => uint256) private _currencyRates;
 
 	address[] private _buyers;
@@ -100,7 +101,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		require(whitelistAddress != address(0), "whitelistAddress zero");
 		require(
 			block.timestamp < primaryMarketEndTimestamp,
-			"primary market end int the past"
+			"primary market end in the past"
 		);
 
 		issuer = issuerWallet;
@@ -116,21 +117,6 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		nonReentrant
 	{
 		ICurrency currency = ICurrency(currencyAddress);
-
-		// check primary market end
-		require(block.timestamp < primaryMarketEnd, "primary market already ended");
-
-		// check whitelist
-		require(_whitelist.isWhitelisted(msgSender()), "buyer not whitelisted");
-
-		// check cap
-		require(sold + amount < cap, "would exceed sales cap");
-
-		// check limits
-		require(
-			_limits[msgSender()] - amount > 0,
-			"exceeds allowed purchase limit for this buyer"
-		);
 
 		// currency must be accepted
 		require(
@@ -151,13 +137,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		currency.transferFrom(msgSender(), issuer, currencyNeeded);
 
 		// register purchase
-		addPurchase(msgSender(), amount);
-
-		// add to sold
-		sold = sold + amount;
-
-		// sub from _limits
-		_limits[msgSender()] = _limits[msgSender()] - amount;
+		_addPurchase(msgSender(), amount);
 
 		emit TokenPurchase(
 			msgSender(),
@@ -170,7 +150,10 @@ contract Sale is ContextMixin, ReentrancyGuard {
 
 	// TODO draft, maybe increase bulkmint limit in securityToken impl
 	function distributeTokens() public nonReentrant {
-		require(block.timestamp >= primaryMarketEnd, "primary market has not ended yet");
+		require(
+			block.timestamp >= primaryMarketEnd,
+			"primary market has not ended yet"
+		);
 
 		// prevent from being called multiple times
 		// default boolean value is false
@@ -204,9 +187,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		public
 		onlySaleAdmin
 	{
-		require(buyer != address(0), "buyer is zero");
-
-		_purchases[buyer] = amount;
+		_addPurchase(buyer, amount);
 	}
 
 	function editPurchaseLimits(address buyer, uint256 amount)
@@ -230,10 +211,37 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		emit CurrencyRatesEdited(currencyAddress, rate);
 	}
 
-	function addPurchase(address buyer, uint256 amount) private onlySaleAdmin {
+	function _addPurchase(address buyer, uint256 amount) private {
 		require(buyer != address(0), "buyer is zero");
 
+		// check primary market end
+		require(
+			block.timestamp < primaryMarketEnd,
+			"primary market already ended"
+		);
+
+		// check whitelist
+		require(_whitelist.isWhitelisted(buyer), "buyer not whitelisted");
+
+		// check cap
+		require(sold + amount < cap, "would exceed sales cap");
+
+		// check limits
+		require(
+			_limits[buyer] >= amount,
+			"exceeds purchase limit for buyer"
+		);
+
+		// add to sold
+		sold = sold + amount;
+
+		// sub from _limits
+		_limits[buyer] = _limits[buyer] - amount;
+
+		// register purchase
 		_purchases[buyer] = _purchases[buyer] + amount;
+
+		// add buyer address to array
 		_buyers.push(buyer);
 	}
 
@@ -243,6 +251,8 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	{
 		require(buyer != address(0), "buyer is zero");
 
+		require(_purchases[buyer] >= amount, "amount too high");
+
 		// subtracting a specific amount makes it possible to cancel only some of a _buyers purchases
 		_purchases[buyer] = _purchases[buyer] - amount;
 	}
@@ -251,7 +261,10 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		public
 		onlySaleAdmin
 	{
-		require(block.timestamp < newPrimaryMarketEndTimestamp, "not in future");
+		require(
+			block.timestamp < newPrimaryMarketEndTimestamp,
+			"not in future"
+		);
 
 		primaryMarketEnd = newPrimaryMarketEndTimestamp;
 	}

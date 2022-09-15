@@ -65,11 +65,11 @@ module.exports = async (deployer, network, accounts) => {
 			conf.symbol,
 			conf.granularity,
 			conf.standardCap,
-			accounts[0],
-			accounts[7],
-			accounts[0],
-			accounts[0],
-			accounts[0]
+			accounts[0],  // admin
+			accounts[7],  // controller
+			accounts[0],  // issuer
+			accounts[0],  // redeemer
+			accounts[0]   // module_editor
 		)
 		.encodeABI()
 
