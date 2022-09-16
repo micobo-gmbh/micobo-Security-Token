@@ -4,58 +4,28 @@ pragma solidity 0.8.16;
 
 import "../contracts/interfaces/IWhitelistConstraintModule.sol";
 import "../contracts/interfaces/ISecurityToken.sol";
-
+import "./interfaces/ICurrency.sol";
+import "./utils/ContextMixin.sol";
 import "./utils/ReentrancyGuard.sol";
 
-interface ICurrency {
-	function allowance(address owner, address spender)
-		external
-		view
-		returns (uint256);
-
-	function transferFrom(
-		address sender,
-		address recipient,
-		uint256 amount
-	) external returns (bool);
-}
-
 // TODO activate full MetaTransactions
-contract ContextMixin {
-	function msgSender() internal view returns (address payable sender) {
-		if (msg.sender == address(this)) {
-			bytes memory array = msg.data;
-			uint256 index = msg.data.length;
-			assembly {
-				// Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
-				sender := and(
-					mload(add(array, index)),
-					0xffffffffffffffffffffffffffffffffffffffff
-				)
-			}
-		} else {
-			sender = payable(msg.sender);
-		}
-		return sender;
-	}
-}
 
-contract Sale is ContextMixin, ReentrancyGuard {
+abstract contract Sale is ContextMixin, ReentrancyGuard {
 	address public issuer;
 
-	ISecurityToken private _securityToken;
-	IWhitelistConstraintModule private _whitelist;
+	ISecurityToken internal _securityToken;
+	IWhitelistConstraintModule internal _whitelist;
 
-	mapping(address => uint256) private _purchases;
-	mapping(address => uint256) private _limits;
+	mapping(address => uint256) internal _purchases;
+	mapping(address => uint256) internal _limits;
 
 	// address: address of the token contract managing the currency
 	// uint256: rate, amount of the smallest unit of this currency necessary to buy 1 token
 	// rate = 10^unit (where unit is the smallest possible unit of the currency)
 	// i.e. 1,000000 USDC = 1 token --> rate = 10^6 (USDC has 6 decimals)
-	mapping(address => uint256) private _currencyRates;
+	mapping(address => uint256) internal _currencyRates;
 
-	address[] private _buyers;
+	address[] internal _buyers;
 
 	// maximum amount of tokens that can be sold
 	// could be different than token cap
@@ -68,6 +38,8 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	uint256 public primaryMarketEnd;
 
 	bytes32 public partition;
+
+	address public premintAddress;
 
 	event TokenPurchase(
 		address indexed buyer,
@@ -92,7 +64,8 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		address whitelistAddress,
 		uint256 primaryMarketEndTimestamp,
 		uint256 tokenCap,
-		bytes32 defaultPartition
+		bytes32 defaultPartition,
+		address premintWallet
 	) ReentrancyGuard() {
 		require(issuerWallet != address(0), "issuerWallet zero");
 		// TODO check if contract, or even if securityToken
@@ -110,6 +83,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		primaryMarketEnd = primaryMarketEndTimestamp;
 		cap = tokenCap;
 		partition = defaultPartition;
+		premintAddress = premintWallet;
 	}
 
 	function purchaseTokenWithAllowance(address currencyAddress, uint256 amount)
@@ -148,23 +122,6 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		);
 	}
 
-	function claimTokens() public nonReentrant {
-		require(
-			block.timestamp >= primaryMarketEnd,
-			"primary market has not ended yet"
-		);
-
-		uint256 amountClaimable = _purchases[msgSender()];
-
-		require(amountClaimable > 0, "no tokens to claim");
-
-		_purchases[msgSender()] = 0;
-
-		_securityToken.issueByPartition(partition, msgSender(), amountClaimable, "0x");
-
-		emit TokenClaim(msgSender(), amountClaimable);
-	}
-
 	function addFiatPurchase(address buyer, uint256 amount)
 		public
 		onlySaleAdmin
@@ -193,50 +150,22 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		emit CurrencyRatesEdited(currencyAddress, rate);
 	}
 
-	function _addPurchase(address buyer, uint256 amount) private {
-		require(buyer != address(0), "buyer is zero");
+	// implement in contracts who inherit from this
+	function _addPurchase(address buyer, uint256 amount) internal virtual;
 
-		// check primary market end
-		require(
-			block.timestamp < primaryMarketEnd,
-			"primary market already ended"
-		);
-
-		// check whitelist
-		require(_whitelist.isWhitelisted(buyer), "buyer not whitelisted");
-
-		// check cap
-		require(sold + amount < cap, "would exceed sales cap");
-
-		// check limits
-		require(
-			_limits[buyer] >= amount,
-			"exceeds purchase limit for buyer"
-		);
-
-		// add to sold
-		sold = sold + amount;
-
-		// sub from _limits
-		_limits[buyer] = _limits[buyer] - amount;
-
-		// register purchase
-		_purchases[buyer] = _purchases[buyer] + amount;
-
-		// add buyer address to array
-		_buyers.push(buyer);
-	}
-
-	function cancelPurchase(address buyer, uint256 amount)
-		public
-		onlySaleAdmin
-	{
-		require(buyer != address(0), "buyer is zero");
-
-		require(_purchases[buyer] >= amount, "amount too high");
-
-		// subtracting a specific amount makes it possible to cancel only some of a _buyers purchases
-		_purchases[buyer] = _purchases[buyer] - amount;
+	function issueTokens(address buyer, uint256 amount) internal {
+		if (premintAddress == address(0)) {
+			_securityToken.issueByPartition(partition, buyer, amount, "0x");
+		} else {
+			_securityToken.operatorTransferByPartition(
+				partition,
+				premintAddress,
+				buyer,
+				amount,
+				"0x",
+				"0x"
+			);
+		}
 	}
 
 	function editPrimaryMarketEnd(uint256 newPrimaryMarketEndTimestamp)

@@ -1,5 +1,5 @@
 const truffleAssert = require("truffle-assertions")
-const Sale = artifacts.require("Sale")
+const Sale = artifacts.require("SaleInstant")
 const SecurityToken = artifacts.require("SecurityToken")
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
@@ -7,7 +7,7 @@ const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 const { Role } = require("../Constants")
 const { conf, mock } = require("../../token-config")
 
-contract("Test Purchase", async (accounts) => {
+contract("Test Instant Purchase", async (accounts) => {
 	let sale, securityToken
 
 	const amount = 100
@@ -47,8 +47,12 @@ contract("Test Purchase", async (accounts) => {
 			whitelist.address,
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
-			conf.standardPartition
+			conf.standardPartition,
+			mock.premintWallet
 		)
+
+		// issue tokens to premintWallet
+		securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
 
 		// add sale_admin role
 		await securityToken.addRole(Role.SALE_ADMIN, accounts[0])
@@ -105,47 +109,5 @@ contract("Test Purchase", async (accounts) => {
 		// see if coins we transferred correctly
 		assert.deepEqual((await currencyToken.balanceOf(accounts[1])).toNumber(), 0)
 		assert.deepEqual((await currencyToken.balanceOf(accounts[0])).toNumber(), amount)
-	})
-
-	it("cannot claim tokens if primary market not over", async () => {
-		await truffleAssert.fails(
-			sale.claimTokens({ from: accounts[1] }),
-			truffleAssert.ErrorType.REVERT,
-			"primary market has not ended yet"
-		)
-	})
-
-	it("cannot claim tokens if none purchased", async () => {
-		let now = new Date().getTime()
-		now = (now / 1000).toFixed(0)
-
-		// set the primaryMarketEnd to 1 second from now
-		await sale.editPrimaryMarketEnd(now - -1)
-
-		function sleep(ms) {
-			return new Promise((resolve) => setTimeout(resolve, ms))
-		}
-
-		// wait 2 seconds
-		await sleep(2000)
-
-		// trigger a transaction to advance blocktime (this is only needed because testnets mine blocks only when needed)
-		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
-
-		await truffleAssert.fails(
-			sale.claimTokens({ from: accounts[2] }),
-			truffleAssert.ErrorType.REVERT,
-			"no tokens to claim"
-		)
-	})
-
-	it("can claim tokens", async () => {
-		await sale.claimTokens({ from: accounts[1] })
-
-		// check purchase mapping
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), 0)
-
-		// check new token balance
-		assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
 	})
 })

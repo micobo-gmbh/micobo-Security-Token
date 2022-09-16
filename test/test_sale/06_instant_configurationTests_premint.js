@@ -1,5 +1,5 @@
 const truffleAssert = require("truffle-assertions")
-const Sale = artifacts.require("Sale")
+const Sale = artifacts.require("SaleInstant")
 const SecurityToken = artifacts.require("SecurityToken")
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
@@ -7,7 +7,7 @@ const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 const { Role } = require("../Constants")
 const { conf, mock } = require("../../token-config")
 
-contract("Test Configuration", async (accounts) => {
+contract("Test Instant Configuration Premint", async (accounts) => {
 	let sale, securityToken
 
 	const amount = 100
@@ -29,8 +29,15 @@ contract("Test Configuration", async (accounts) => {
 			whitelist.address,
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
-			conf.standardPartition
+			conf.standardPartition,
+			accounts[9]
 		)
+
+		// issue tokens to premintWallet
+		securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
+
+		// make sale contract controller
+		await securityToken.addRole(Role.CONTROLLER, sale.address)
 	})
 
 	it("cannot add fiat purchase if not admin", async () => {
@@ -92,14 +99,6 @@ contract("Test Configuration", async (accounts) => {
 		assert.deepEqual(await sale.getBuyers(), [accounts[1]])
 	})
 
-	it("purchases add up", async () => {
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
-
-		await sale.addFiatPurchase(accounts[1], amount)
-
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount * 2)
-	})
-
 	it("admin can edit currency rates", async () => {
 		assert.deepEqual((await sale.getCurrencyRate(mock.currencyAddress)).toNumber(), 0)
 
@@ -114,34 +113,6 @@ contract("Test Configuration", async (accounts) => {
 		await sale.editCurrencyRates(mock.currencyAddress, rate)
 
 		assert.deepEqual((await sale.getCurrencyRate(mock.currencyAddress)).toNumber(), rate)
-	})
-
-	it("can cancel Purchase", async () => {
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount * 2)
-
-		await truffleAssert.fails(
-			sale.cancelPurchase(accounts[1], amount, {
-				from: accounts[1],
-			}),
-			truffleAssert.ErrorType.REVERT,
-			"!SALE_ADMIN"
-		)
-
-		await truffleAssert.fails(
-			sale.cancelPurchase("0x0000000000000000000000000000000000000000", amount),
-			truffleAssert.ErrorType.REVERT,
-			"buyer is zero"
-		)
-
-		await sale.cancelPurchase(accounts[1], amount)
-
-		await truffleAssert.fails(
-			sale.cancelPurchase(accounts[1], amount * 2),
-			truffleAssert.ErrorType.REVERT,
-			"amount too high"
-		)
-
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
 	})
 
 	it("can edit primaryMarketEnd", async () => {
