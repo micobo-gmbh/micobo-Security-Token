@@ -64,20 +64,20 @@ contract Sale is ContextMixin, ReentrancyGuard {
 	// counts amount of tokens sold
 	uint256 public sold;
 
-	// unix timestamp of time the sale will be closed and distribute function can be called
+	// unix timestamp of time the sale will be closed and claim function can be called
 	uint256 public primaryMarketEnd;
 
 	bytes32 public partition;
 
-	bool public distributed;
-
 	event TokenPurchase(
-		address indexed purchaser,
+		address indexed buyer,
 		address indexed beneficiary,
 		uint256 value,
 		address paymentToken,
 		uint256 amount
 	);
+
+	event TokenClaim(address indexed buyer, uint256 value);
 
 	event CurrencyRatesEdited(address tokenAddress, uint256 rate);
 
@@ -129,7 +129,7 @@ contract Sale is ContextMixin, ReentrancyGuard {
 
 		// check allowance
 		require(
-			currency.allowance(address(this), msgSender()) >= currencyNeeded,
+			currency.allowance(msgSender(), address(this)) >= currencyNeeded,
 			"stablecoin allowance too low"
 		);
 
@@ -148,39 +148,21 @@ contract Sale is ContextMixin, ReentrancyGuard {
 		);
 	}
 
-	// TODO draft, maybe increase bulkmint limit in securityToken impl
-	function distributeTokens() public nonReentrant {
+	function claimTokens() public nonReentrant {
 		require(
 			block.timestamp >= primaryMarketEnd,
 			"primary market has not ended yet"
 		);
 
-		// prevent from being called multiple times
-		// default boolean value is false
-		require(!distributed, "already distributed");
+		uint256 amountClaimable = _purchases[msgSender()];
 
-		address[] memory buyersSubset;
-		uint256[] memory amountsSubset;
-		uint256 index;
+		require(amountClaimable > 0, "no tokens to claim");
 
-		for (uint256 i = 0; i < _buyers.length + 100; i + 100) {
-			index = 0;
-			for (uint256 y = i; y < _buyers.length; y + 1) {
-				buyersSubset[index] = _buyers[y];
-				amountsSubset[index] = _purchases[_buyers[y]];
-				index + 1;
-			}
-			_securityToken.bulkIssueByPartition(
-				partition,
-				buyersSubset,
-				amountsSubset,
-				"0x"
-			);
-			delete buyersSubset;
-			delete amountsSubset;
-		}
+		_purchases[msgSender()] = 0;
 
-		distributed = true;
+		_securityToken.issueByPartition(partition, msgSender(), amountClaimable, "0x");
+
+		emit TokenClaim(msgSender(), amountClaimable);
 	}
 
 	function addFiatPurchase(address buyer, uint256 amount)

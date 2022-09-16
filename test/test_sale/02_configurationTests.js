@@ -38,7 +38,7 @@ contract("Test Configuration", async (accounts) => {
 	})
 
 	it("cannot add fiat purchase if address zero", async () => {
-		// add admin role
+		// add sale_admin role
 		await securityToken.addRole(Role.SALE_ADMIN, accounts[0])
 
 		await truffleAssert.fails(
@@ -83,13 +83,13 @@ contract("Test Configuration", async (accounts) => {
 		// increase limit for buyer
 		await sale.editPurchaseLimits(accounts[1], amount * 2)
 
-    assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), 0)
-    assert.deepEqual(await sale.getBuyers(), [])
+		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), 0)
+		assert.deepEqual(await sale.getBuyers(), [])
 
 		await sale.addFiatPurchase(accounts[1], amount)
 
-    assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
-    assert.deepEqual(await sale.getBuyers(), [accounts[1]])
+		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
+		assert.deepEqual(await sale.getBuyers(), [accounts[1]])
 	})
 
 	it("purchases add up", async () => {
@@ -153,13 +153,9 @@ contract("Test Configuration", async (accounts) => {
 			}),
 			truffleAssert.ErrorType.REVERT,
 			"!SALE_ADMIN"
-    )
-    
-    await truffleAssert.fails(
-			sale.editPrimaryMarketEnd(100),
-			truffleAssert.ErrorType.REVERT,
-			"not in future"
 		)
+
+		await truffleAssert.fails(sale.editPrimaryMarketEnd(100), truffleAssert.ErrorType.REVERT, "not in future")
 
 		await sale.editPrimaryMarketEnd(mock.primaryMarketEndTimestamp + 100)
 

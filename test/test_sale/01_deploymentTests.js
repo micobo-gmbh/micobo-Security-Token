@@ -71,12 +71,14 @@ contract("Test Deployment", async (accounts) => {
 		assert.deepEqual((await contracts.securityToken.cap()).toNumber(), conf.standardCap)
 
 		assert.deepEqual((await contracts.securityToken.totalSupply()).toNumber(), 0)
+
+		assert.deepEqual(await contracts.securityToken.version(), "1.0.0")
 	})
 
 	it("deploy sale contract", async () => {
 		sale = await Sale.new(
 			accounts[0],
-			securityToken.address,
+			contracts.securityToken.address,
 			mockWhitelistAddress,
 			mockPrimaryMarketEndTimestamp,
 			mockCap,
@@ -95,9 +97,7 @@ contract("Test Deployment", async (accounts) => {
 
 		assert.deepEqual(await sale.partition(), conf.standardPartition)
 
-		assert.deepEqual(await sale.distributed(), false)
-
-		assert.deepEqual(await sale.getTokenAddress(), securityToken.address)
+		assert.deepEqual(await sale.getTokenAddress(), contracts.securityToken.address)
 
 		assert.deepEqual(await sale.getWhitelistAddress(), mockWhitelistAddress)
 
@@ -106,7 +106,14 @@ contract("Test Deployment", async (accounts) => {
 
 	it("cannot create sale contract with primaryMarketEndTimestamp in the past", async () => {
 		truffleAssert.fails(
-			Sale.new(accounts[0], securityToken.address, mockWhitelistAddress, 0, mockCap, conf.standardPartition),
+			Sale.new(
+				accounts[0],
+				contracts.securityToken.address,
+				mockWhitelistAddress,
+				0,
+				mockCap,
+				conf.standardPartition
+			),
 			truffleAssert.ErrorType.REVERT,
 			"primary market end in the past"
 		)
