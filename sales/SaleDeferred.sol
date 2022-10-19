@@ -7,8 +7,6 @@ import "../contracts/interfaces/ISecurityToken.sol";
 import "./interfaces/ICurrency.sol";
 import "./Sale.sol";
 
-// TODO activate full MetaTransactions
-
 contract SaleDeferred is Sale {
 	constructor(
 		address issuerWallet,
@@ -17,7 +15,8 @@ contract SaleDeferred is Sale {
 		uint256 primaryMarketEndTimestamp,
 		uint256 tokenCap,
 		bytes32 defaultPartition,
-		address premintWallet
+		address premintWallet,
+		string memory domainNameSeperator
 	)
 		Sale(
 			issuerWallet,
@@ -26,7 +25,8 @@ contract SaleDeferred is Sale {
 			primaryMarketEndTimestamp,
 			tokenCap,
 			defaultPartition,
-			premintWallet
+			premintWallet,
+			domainNameSeperator
 		)
 	{}
 
@@ -43,7 +43,7 @@ contract SaleDeferred is Sale {
 		_purchases[msgSender()] = 0;
 
 		// ISSUE TOKENS
-		issueTokens(msgSender(), amountClaimable);
+		_issueTokens(msgSender(), amountClaimable);
 
 		emit TokenClaim(msgSender(), amountClaimable);
 	}

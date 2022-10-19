@@ -30,7 +30,8 @@ contract("Test Instant Configuration", async (accounts) => {
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
-			mock.premintWallet
+			mock.premintWallet,
+			mock.EIP712Name
 		)
 
 		// make sale contract issuer

@@ -158,7 +158,7 @@ module.exports = {
 					enabled: true,
 					runs: 1024, // 2^10
 				},
-				evmVersion: "istanbul",
+				evmVersion: "london",
 			},
 		},
 	},

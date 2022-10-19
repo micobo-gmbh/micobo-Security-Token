@@ -48,7 +48,8 @@ contract("Test Deferred Purchase", async (accounts) => {
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
-			mock.premintWallet
+			mock.premintWallet,
+			mock.EIP712Name
 		)
 
 		// add sale_admin role

@@ -8,8 +8,6 @@ import "./interfaces/ICurrency.sol";
 import "./utils/ContextMixin.sol";
 import "./Sale.sol";
 
-// TODO activate full MetaTransactions
-
 contract SaleInstant is Sale {
 	constructor(
 		address issuerWallet,
@@ -18,7 +16,8 @@ contract SaleInstant is Sale {
 		uint256 primaryMarketEndTimestamp,
 		uint256 tokenCap,
 		bytes32 defaultPartition,
-		address premintWallet
+		address premintWallet,
+		string memory domainNameSeperator
 	)
 		Sale(
 			issuerWallet,
@@ -27,7 +26,8 @@ contract SaleInstant is Sale {
 			primaryMarketEndTimestamp,
 			tokenCap,
 			defaultPartition,
-			premintWallet
+			premintWallet,
+			domainNameSeperator
 		)
 	{}
 
@@ -62,6 +62,6 @@ contract SaleInstant is Sale {
 		_buyers.push(buyer);
 
 		// ISSUE TOKENS
-		issueTokens(buyer, amount);
+		_issueTokens(buyer, amount);
 	}
 }

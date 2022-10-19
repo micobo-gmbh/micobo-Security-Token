@@ -48,7 +48,8 @@ contract("Test Deferred Purchase Premint", async (accounts) => {
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
-			accounts[9]
+			accounts[9],
+			mock.EIP712Name
 		)
 
 		// issue tokens to premintWallet

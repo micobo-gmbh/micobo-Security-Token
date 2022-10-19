@@ -48,11 +48,12 @@ contract("Test Instant Purchase", async (accounts) => {
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
-			mock.premintWallet
+			mock.premintWallet,
+			mock.EIP712Name
 		)
 
 		// issue tokens to premintWallet
-		securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
+		await securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
 
 		// add sale_admin role
 		await securityToken.addRole(Role.SALE_ADMIN, accounts[0])

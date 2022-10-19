@@ -5,12 +5,10 @@ pragma solidity 0.8.16;
 import "../contracts/interfaces/IWhitelistConstraintModule.sol";
 import "../contracts/interfaces/ISecurityToken.sol";
 import "./interfaces/ICurrency.sol";
-import "./utils/ContextMixin.sol";
 import "./utils/ReentrancyGuard.sol";
+import "./utils/NativeMetaTransaction.sol";
 
-// TODO activate full MetaTransactions
-
-abstract contract Sale is ContextMixin, ReentrancyGuard {
+abstract contract Sale is NativeMetaTransaction, ReentrancyGuard {
 	address public issuer;
 
 	ISecurityToken internal _securityToken;
@@ -65,7 +63,8 @@ abstract contract Sale is ContextMixin, ReentrancyGuard {
 		uint256 primaryMarketEndTimestamp,
 		uint256 tokenCap,
 		bytes32 defaultPartition,
-		address premintWallet
+		address premintWallet,
+		string memory domainNameSeperator
 	) ReentrancyGuard() {
 		require(issuerWallet != address(0), "issuerWallet zero");
 		// TODO check if contract, or even if securityToken
@@ -84,6 +83,8 @@ abstract contract Sale is ContextMixin, ReentrancyGuard {
 		cap = tokenCap;
 		partition = defaultPartition;
 		premintAddress = premintWallet;
+
+		_initializeEIP712(domainNameSeperator);
 	}
 
 	function purchaseTokenWithAllowance(address currencyAddress, uint256 amount)
@@ -122,6 +123,59 @@ abstract contract Sale is ContextMixin, ReentrancyGuard {
 		);
 	}
 
+	function purchaseWithAuthorization(
+		address currencyAddress,
+		uint256 amount,
+		address userAddress,
+		bytes32 sigR,
+		bytes32 sigS,
+		uint8 sigV
+	) public nonReentrant {
+		ICurrency currency = ICurrency(currencyAddress);
+
+		// currency must be accepted
+		require(
+			_currencyRates[currencyAddress] > 0,
+			"this stablecoin is not accepted"
+		);
+
+		// calculate currency needed based on rate and token amount
+		uint256 currencyNeeded = _currencyRates[currencyAddress] * amount;
+
+		// create the expected function signature
+		bytes memory calculatedFunctionSignature = abi.encodeWithSignature(
+			"transfer(address,uint256)",
+			issuer,
+			currencyNeeded
+		);
+
+		// check balance
+		require(
+			currency.balanceOf(userAddress) >= currencyNeeded,
+			"stablecoin balance too low"
+		);
+
+		// send payment directly to issuer
+		currency.executeMetaTransaction(
+			userAddress,
+			calculatedFunctionSignature,
+			sigR,
+			sigS,
+			sigV
+		);
+
+		// register purchase
+		_addPurchase(userAddress, amount);
+
+		emit TokenPurchase(
+			userAddress,
+			issuer,
+			currencyNeeded,
+			currencyAddress,
+			amount
+		);
+	}
+
 	function addFiatPurchase(address buyer, uint256 amount)
 		public
 		onlySaleAdmin
@@ -153,7 +207,7 @@ abstract contract Sale is ContextMixin, ReentrancyGuard {
 	// implement in contracts who inherit from this
 	function _addPurchase(address buyer, uint256 amount) internal virtual;
 
-	function issueTokens(address buyer, uint256 amount) internal {
+	function _issueTokens(address buyer, uint256 amount) internal {
 		if (premintAddress == address(0)) {
 			_securityToken.issueByPartition(partition, buyer, amount, "0x");
 		} else {
