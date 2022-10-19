@@ -49,33 +49,16 @@ module.exports = {
 			network_id: "*",
 		},
 
-		rinkeby: {
+		goerli: {
 			provider: () => {
 				return new HDWalletProvider(
 					test_mnemonic,
-					"https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
+					process.env.GOERLI
 				)
 			},
-			network_id: 4,
+			network_id: 5,
 			gas: 10000000, // 10.000.000
-			gasPrice: 3000000000, // 3gwei in wei
-			skipDryRun: true,
-		},
-
-		ropsten: {
-			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				)
-				/* return new PrivateKeyProvider(
-					process.env.MAINNET_PRIVATE_KEY,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				) */
-			},
-			network_id: 3,
-			gas: 8000000, // 8.000.000
-			gasPrice: 3000000000, // 3gwei in wei
+			gasPrice: 100000000, // 0.1 gwei in wei
 			skipDryRun: true,
 		},
 
@@ -83,7 +66,7 @@ module.exports = {
 			provider: () => {
 				return new PrivateKeyProvider(
 					process.env.MAINNET_PRIVATE_KEY,
-					"https://mainnet.infura.io/v3/77249052ac71443eb63e5fdd8b61893e"
+					process.env.MAINNET
 				)
 			},
 			network_id: 1,
