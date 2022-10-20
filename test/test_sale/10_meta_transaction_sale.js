@@ -1,5 +1,5 @@
 const truffleAssert = require("truffle-assertions")
-const Sale = artifacts.require("SaleInstant")
+const Sale = artifacts.require("SaleDeferred")
 const SecurityToken = artifacts.require("SecurityToken")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
@@ -59,9 +59,6 @@ contract("Test Meta Transactions", async (accounts) => {
 
 		console.log("Sale deployed at: ", sale.address)
 
-		// issue tokens to premintWallet
-		await securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
-
 		// make sale contract controller
 		await securityToken.addRole(Role.CONTROLLER, sale.address)
 
@@ -85,7 +82,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		//create transfer tx, recipient is issuer (acc 0)
 		functionSig = await createTransferTransactionSignature(accounts[0], amount)
 
-		let { r, s, v } = await signMetaTransactionWithAccountOne(functionSig)
+		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		await truffleAssert.fails(
 			sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v),
@@ -102,7 +99,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		//create transfer tx, recipient is issuer (acc 0)
 		functionSig = await createTransferTransactionSignature(accounts[0], amount * rate)
 
-		let { r, s, v } = await signMetaTransactionWithAccountOne(functionSig)
+		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		// execute the purchase
 		await sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v)
@@ -110,47 +107,50 @@ contract("Test Meta Transactions", async (accounts) => {
 		// see if purchase has happened
 		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
 		assert.deepEqual(await sale.getBuyers(), [accounts[1]])
-		assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
+
+		// deferred, token are not minted yet
+		// assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
 
 		// see if coins we transferred correctly
 		assert.deepEqual((await currencyToken.balanceOf(accounts[1])).toNumber(), 0)
 		assert.deepEqual((await currencyToken.balanceOf(accounts[0])).toNumber(), amount * rate)
 	})
 
-	it("fails if premint address is empty", async () => {
-		// increase limit for buyer
-		await sale.editPurchaseLimits(accounts[1], amount)
-
-		// issue some test coins
-		let depositData = web3.eth.abi.encodeParameter("uint256", amount * rate)
-		await currencyToken.deposit(accounts[1], depositData)
-
-		//create transfer tx, recipient is issuer (acc 0)
-		functionSig = await createTransferTransactionSignature(accounts[0], amount * rate)
-
-		let { r, s, v } = await signMetaTransactionWithAccountOne(functionSig)
+	it("claiming fails if premint address is empty", async () => {
+		let now = new Date().getTime()
+		now = (now / 1000).toFixed(0)
+		// set the primaryMarketEnd to 1 second from now
+		await sale.editPrimaryMarketEnd(now - -1)
+		function sleep(ms) {
+			return new Promise((resolve) => setTimeout(resolve, ms))
+		}
+		// wait 2 seconds
+		await sleep(2000)
+		// trigger a transaction to advance blocktime (this is only needed because testnets mine blocks only when needed)
+		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
 
 		await truffleAssert.fails(
-			sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v),
+			sale.claimTokens({ from: accounts[1] }),
 			truffleAssert.ErrorType.REVERT,
 			"insufficient funds"
 		)
 	})
 
-	it("fails if transfer transaction not correct", async () => {
-		//create transfer tx, recipient is issuer (acc 0)
-		functionSig = await createTransferTransactionSignature(accounts[0], amount * rate - 1)
+	it("can claim tokens using meta transaction", async () => {
+		// issue tokens to premintWallet
+		await securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
 
-		let { r, s, v } = await signMetaTransactionWithAccountOne(functionSig)
+		functionSig = await createClaimTransactionSignature()
 
-		await truffleAssert.fails(
-			sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v),
-			truffleAssert.ErrorType.REVERT,
-			"Signer and signature do not match"
-		)
+		let { r, s, v } = await signMetaTransactionForSale(functionSig)
+
+		await sale.executeMetaTransaction(investor, functionSig, r, s, v)
+
+		// now the tokens should be minted
+		assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
 	})
 
-	signMetaTransactionWithAccountOne = async (functionSig) => {
+	signMetaTransactionForCurrency = async (functionSig) => {
 		// getting the nonce for meta-transactions from the currency token
 		let nonce = parseInt(await currencyToken.nonces(investor))
 
@@ -168,6 +168,31 @@ contract("Test Meta Transactions", async (accounts) => {
 			},
 		})
 
+		return signMetaTransaction(dataToSign)
+	}
+
+	signMetaTransactionForSale = async (functionSig) => {
+		// getting the nonce for meta-transactions from the currency token
+		let nonce = parseInt(await sale.getNonce(investor))
+
+		const dataToSign = createTypedData({
+			domain: {
+				name: mock.EIP712Name,
+				version: "1",
+				verifyingContract: sale.address,
+				salt: salt,
+			},
+			message: {
+				nonce: nonce,
+				from: investor,
+				functionSignature: functionSig,
+			},
+		})
+
+		return signMetaTransaction(dataToSign)
+	}
+
+	signMetaTransaction = async (dataToSign) => {
 		// sign the data using private key of account 1 (investor)
 		let sig = await sigUtil.signTypedData({
 			privateKey: testAccountOnePrivateKey,
@@ -197,6 +222,22 @@ contract("Test Meta Transactions", async (accounts) => {
 				],
 			},
 			[to, amount]
+		)
+
+		// convert it to bytes
+		functionSig = web3.utils.hexToBytes(functionSig)
+
+		return functionSig
+	}
+
+	createClaimTransactionSignature = async () => {
+		let functionSig = await web3.eth.abi.encodeFunctionCall(
+			{
+				name: "claimTokens",
+				type: "function",
+				inputs: [],
+			},
+			[]
 		)
 
 		// convert it to bytes

@@ -111,7 +111,8 @@ contract("Test Deployment", async (accounts) => {
 				0,
 				mock.cap,
 				conf.standardPartition,
-				mock.premintWallet
+				mock.premintWallet,
+				mock.EIP712Name
 			),
 			truffleAssert.ErrorType.REVERT,
 			"primary market end in the past"
