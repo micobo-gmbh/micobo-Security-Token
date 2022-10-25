@@ -9,9 +9,9 @@ contract("Test Proxy and Upgradeability", async (accounts) => {
 	let contracts
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
+		const networkId = await web3.eth.net.getId()
 
-		let proxyAddress = securityTokenJSON.networks[chainId].address
+		let proxyAddress = securityTokenJSON.networks[networkId].address
 		console.log("proxy address", proxyAddress)
 
 		contracts = {

@@ -42,12 +42,11 @@ module.exports = {
 			network_id: "*",
 		},
 
-		test: {
-			provider: () => {
-				return new HDWalletProvider(test_mnemonic, "http://localhost:8545")
-			},
+		coverage: {
+			host: "127.0.0.1",
 			port: 8545,
 			network_id: "*",
+			gas: 10000000, // 10.000.000
 		},
 
 		rinkeby: {
@@ -107,32 +106,6 @@ module.exports = {
 				return new HDWalletProvider(test_mnemonic, process.env.POLYGON_MUMBAI)
 			},
 			network_id: 80001,
-			skipDryRun: true,
-		},
-
-		logicDeployment: {
-			provider: () => {
-				return new PrivateKeyProvider(
-					process.env.TOKEN_LOGIC_DEPLOYER_PRIVATE_KEY,
-					// change to desired network
-					process.env.DEPLOYMENT_NETWORK
-				)
-			},
-			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
-			skipDryRun: true,
-		},
-
-		factoryDeployment: {
-			provider: () => {
-				return new PrivateKeyProvider(
-					process.env.TOKEN_FACTORY_DEPLOYER_PRIVATE_KEY,
-					// change to desired network
-					process.env.DEPLOYMENT_NETWORK
-				)
-			},
-			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
 			skipDryRun: true,
 		},
 	},

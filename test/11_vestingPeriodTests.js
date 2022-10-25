@@ -15,10 +15,10 @@ contract("Test Vesting Period", async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
+		const networkId = await web3.eth.net.getId()
 
 		contracts = {
-			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[networkId].address),
 		}
 
 		// mint some new tokens to test with

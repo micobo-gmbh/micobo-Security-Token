@@ -88,5 +88,5 @@ module.exports = {
 		etherscan: process.env.ETHERSCAN_API_KEY,
 	},
 
-	plugins: ["truffle-security", "solidity-coverage", "truffle-plugin-verify"],
+	plugins: ["solidity-coverage", "truffle-plugin-verify"],
 }

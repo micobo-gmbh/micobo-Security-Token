@@ -14,10 +14,10 @@ contract("Test Document Management", async (accounts) => {
 	let contracts
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
+		const networkId = await web3.eth.net.getId()
 
 		contracts = {
-			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[networkId].address),
 		}
 	})
 

@@ -1,14 +1,14 @@
 const fs = require("fs")
 
-const saveContractAddress = (json, chainId, newContract, relativePath) => {
-	if (!json.networks[chainId]) {
-		console.log("New chainId. Creating new entry for", chainId)
-		json.networks[chainId] = {}
+const saveContractAddress = (json, networkId, newContract, relativePath) => {
+	if (!json.networks[networkId]) {
+		console.log("New networkId. Creating new entry for", networkId)
+		json.networks[networkId] = {}
 
-		json.networks[chainId].address = newContract.options.address
+		json.networks[networkId].address = newContract.options.address
 	} else {
-		console.log("Setting new address for chain: ", chainId)
-		json.networks[chainId].address = newContract.options.address
+		console.log("Setting new address for network: ", networkId)
+		json.networks[networkId].address = newContract.options.address
 	}
 	console.log("Address: ", newContract.options.address)
 

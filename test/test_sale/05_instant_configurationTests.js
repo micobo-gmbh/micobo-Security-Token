@@ -1,7 +1,6 @@
 const truffleAssert = require("truffle-assertions")
 const Sale = artifacts.require("SaleInstant")
-const SecurityToken = artifacts.require("SecurityToken")
-const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
+const whitelistConstraintModuleJSON = require("../../build/contracts/WhitelistConstraintModule.json")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 
 const { Role } = require("../Constants")
@@ -15,27 +14,40 @@ contract("Test Instant Configuration", async (accounts) => {
 	const rate = 1000000
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
+		const networkId = await web3.eth.net.getId()
 
-		securityToken = await SecurityToken.at(securityTokenJSON.networks[chainId].address)
+		securityToken = new web3.eth.Contract(securityTokenJSON.abi, securityTokenJSON.networks[networkId].address)
 
-		whitelist = await WhitelistConstraintModule.new(securityToken.address)
+		// new whitelist module
+		whitelist = new web3.eth.Contract(whitelistConstraintModuleJSON.abi)
+		whitelist = await whitelist
+			.deploy({
+				data: whitelistConstraintModuleJSON.bytecode,
+				arguments: [securityToken.options.address],
+			})
+			.send({
+				from: accounts[0],
+				gas: 9000000,
+			})
 
-		await securityToken.setModulesByPartition(conf.standardPartition, [whitelist.address])
+		await securityToken.methods
+			.setModulesByPartition(conf.standardPartition, [whitelist.options.address])
+			.send({ from: accounts[0], gasLimit: 1000000 })
 
+		// deploy Sale
 		sale = await Sale.new(
 			accounts[0],
-			securityToken.address,
-			whitelist.address,
+			securityToken.options.address,
+			whitelist.options.address,
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
-			mock.premintWallet,
+			mock.zeroWallet,
 			mock.EIP712Name
 		)
 
 		// make sale contract issuer
-		await securityToken.addRole(Role.ISSUER, sale.address)
+		await securityToken.methods.addRole(Role.ISSUER, sale.address).send({ from: accounts[0], gasLimit: 1000000 })
 	})
 
 	it("cannot add fiat purchase if not admin", async () => {
@@ -44,7 +56,7 @@ contract("Test Instant Configuration", async (accounts) => {
 
 	it("cannot add fiat purchase if address zero", async () => {
 		// add sale_admin role
-		await securityToken.addRole(Role.SALE_ADMIN, accounts[0])
+		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0] })
 
 		await truffleAssert.fails(
 			sale.addFiatPurchase("0x0000000000000000000000000000000000000000", amount),
@@ -64,10 +76,10 @@ contract("Test Instant Configuration", async (accounts) => {
 
 	it("cannot add fiat purchase if it exceeds cap", async () => {
 		// make whitelist editor
-		await securityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
+		await securityToken.methods.addRole(Role.WHITELIST_EDITOR, accounts[0]).send({ from: accounts[0] })
 
 		// whitelist user
-		await whitelist.editWhitelist(accounts[1], true)
+		await whitelist.methods.editWhitelist(accounts[1], true).send({ from: accounts[0] })
 
 		await truffleAssert.fails(
 			sale.addFiatPurchase(accounts[1], amount * 100),

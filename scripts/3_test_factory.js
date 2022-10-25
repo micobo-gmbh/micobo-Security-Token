@@ -12,7 +12,7 @@ module.exports = async (callback) => {
 		console.log("logic:", result)
 		console.log("Should be: ", "0xc1aAB2dc3Fe5082D2D3eAaf67f4D49619B9862C9")
 
-		const chainId = await web3.eth.net.getId()
+		const chainId = await web3.eth.getChainId()
 
 		const newSecurityTokenFactory = {
 			options: {

@@ -1,9 +1,8 @@
 const truffleAssert = require("truffle-assertions")
 const Sale = artifacts.require("SaleDeferred")
-const SecurityToken = artifacts.require("SecurityToken")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
-const WhitelistConstraintModule = artifacts.require("WhitelistConstraintModule")
-const USDC = artifacts.require("UChildERC20")
+const whitelistConstraintModuleJSON = require("../../build/contracts/WhitelistConstraintModule.json")
+const usdcJSON = require("../../build/contracts/UChildERC20.json")
 const { Role } = require("../Constants")
 const { conf, mock } = require("../../token-config")
 const sigUtil = require("@metamask/eth-sig-util")
@@ -26,30 +25,49 @@ contract("Test Meta Transactions", async (accounts) => {
 	)
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
-
-		salt = web3.utils.padLeft(web3.utils.numberToHex(chainId), 64)
+		const networkId = await web3.eth.net.getId()
 
 		// deploy security token (this will be bought)
-		securityToken = await SecurityToken.at(securityTokenJSON.networks[chainId].address)
+		securityToken = new web3.eth.Contract(securityTokenJSON.abi, securityTokenJSON.networks[networkId].address)
 
 		// deploy test USDC token
-		currencyToken = await USDC.new()
+		currencyToken = new web3.eth.Contract(usdcJSON.abi)
+		currencyToken = await currencyToken
+			.deploy({
+				data: usdcJSON.bytecode,
+				arguments: [],
+			})
+			.send({
+				from: accounts[0],
+				gas: 9000000,
+			})
 
 		// init, make account 0 "childChainManager" who can deposit/mint tokens
-		await currencyToken.initialize(currencyName, "USDC", 18, accounts[0])
+		await currencyToken.methods
+			.initialize(currencyName, "USDC", 18, accounts[0])
+			.send({ from: accounts[0], gasLimit: 1000000 })
 
-		console.log("USDC deployed at: ", currencyToken.address)
+		// console.log("USDC deployed at: ", currencyToken.options.address)
 
 		// new whitelist module
-		whitelist = await WhitelistConstraintModule.new(securityToken.address)
-		await securityToken.setModulesByPartition(conf.standardPartition, [whitelist.address])
+		whitelist = new web3.eth.Contract(whitelistConstraintModuleJSON.abi)
+		whitelist = await whitelist
+			.deploy({
+				data: whitelistConstraintModuleJSON.bytecode,
+				arguments: [securityToken.options.address],
+			})
+			.send({
+				from: accounts[0],
+				gas: 9000000,
+			})
+
+		await securityToken.methods.setModulesByPartition(conf.standardPartition, [whitelist.options.address])
 
 		// deploy Sale
 		sale = await Sale.new(
 			accounts[0],
-			securityToken.address,
-			whitelist.address,
+			securityToken.options.address,
+			whitelist.options.address,
 			mock.primaryMarketEndTimestamp,
 			mock.cap,
 			conf.standardPartition,
@@ -57,25 +75,35 @@ contract("Test Meta Transactions", async (accounts) => {
 			mock.EIP712Name
 		)
 
-		console.log("Sale deployed at: ", sale.address)
+		// console.log("Sale deployed at: ", sale.address)
+
+		// getting actual chainId from sale contract, more reliable than web3.eth.getChainId()
+		chainId = await sale.getChainId()
+		// console.log("ChainID: ", chainId.toNumber())
+
+		salt = web3.utils.padLeft(web3.utils.numberToHex(chainId), 64)
 
 		// make sale contract controller
-		await securityToken.addRole(Role.CONTROLLER, sale.address)
+		await securityToken.methods
+			.addRole(Role.CONTROLLER, sale.address)
+			.send({ from: accounts[0], gasLimit: 1000000 })
 
 		// add sale_admin role
-		await securityToken.addRole(Role.SALE_ADMIN, accounts[0])
+		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0], gasLimit: 1000000 })
 
 		// make whitelist editor
-		await securityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
+		await securityToken.methods
+			.addRole(Role.WHITELIST_EDITOR, accounts[0])
+			.send({ from: accounts[0], gasLimit: 1000000 })
 
 		// whitelist user
-		await whitelist.editWhitelist(accounts[1], true)
+		await whitelist.methods.editWhitelist(accounts[1], true).send({ from: accounts[0], gasLimit: 1000000 })
 
 		// increase limit for buyer
 		await sale.editPurchaseLimits(accounts[1], amount)
 
 		// add currency
-		await sale.editCurrencyRates(currencyToken.address, rate)
+		await sale.editCurrencyRates(currencyToken.options.address, rate)
 	})
 
 	it("fails if stablecoin balance too low", async () => {
@@ -85,7 +113,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		await truffleAssert.fails(
-			sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v),
+			sale.purchaseWithAuthorization(currencyToken.options.address, amount, investor, r, s, v),
 			truffleAssert.ErrorType.REVERT,
 			"stablecoin balance too low"
 		)
@@ -94,7 +122,7 @@ contract("Test Meta Transactions", async (accounts) => {
 	it("can use meta transaction to buy tokens", async () => {
 		// issue some test coins
 		let depositData = web3.eth.abi.encodeParameter("uint256", amount * rate)
-		await currencyToken.deposit(accounts[1], depositData)
+		await currencyToken.methods.deposit(accounts[1], depositData).send({ from: accounts[0], gasLimit: 1000000 })
 
 		//create transfer tx, recipient is issuer (acc 0)
 		functionSig = await createTransferTransactionSignature(accounts[0], amount * rate)
@@ -102,7 +130,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		// execute the purchase
-		await sale.purchaseWithAuthorization(currencyToken.address, amount, investor, r, s, v)
+		await sale.purchaseWithAuthorization(currencyToken.options.address, amount, investor, r, s, v)
 
 		// see if purchase has happened
 		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
@@ -112,8 +140,8 @@ contract("Test Meta Transactions", async (accounts) => {
 		// assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
 
 		// see if coins we transferred correctly
-		assert.deepEqual((await currencyToken.balanceOf(accounts[1])).toNumber(), 0)
-		assert.deepEqual((await currencyToken.balanceOf(accounts[0])).toNumber(), amount * rate)
+		assert.deepEqual(parseInt(await currencyToken.methods.balanceOf(accounts[1]).call()), 0)
+		assert.deepEqual(parseInt(await currencyToken.methods.balanceOf(accounts[0]).call()), amount * rate)
 	})
 
 	it("claiming fails if premint address is empty", async () => {
@@ -138,7 +166,9 @@ contract("Test Meta Transactions", async (accounts) => {
 
 	it("can claim tokens using meta transaction", async () => {
 		// issue tokens to premintWallet
-		await securityToken.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
+		await securityToken.methods
+			.issueByPartition(conf.standardPartition, accounts[9], amount, "0x0")
+			.send({ from: accounts[0], gasLimit: 1000000 })
 
 		functionSig = await createClaimTransactionSignature()
 
@@ -147,18 +177,18 @@ contract("Test Meta Transactions", async (accounts) => {
 		await sale.executeMetaTransaction(investor, functionSig, r, s, v)
 
 		// now the tokens should be minted
-		assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
+		assert.deepEqual(parseInt(await securityToken.methods.balanceOf(accounts[1]).call()), amount)
 	})
 
 	signMetaTransactionForCurrency = async (functionSig) => {
 		// getting the nonce for meta-transactions from the currency token
-		let nonce = parseInt(await currencyToken.nonces(investor))
+		let nonce = parseInt(await currencyToken.methods.nonces(investor).call())
 
 		const dataToSign = createTypedData({
 			domain: {
 				name: currencyName,
 				version: "1",
-				verifyingContract: currencyToken.address,
+				verifyingContract: currencyToken.options.address,
 				salt: salt,
 			},
 			message: {
@@ -200,7 +230,7 @@ contract("Test Meta Transactions", async (accounts) => {
 			version: "V3",
 		})
 
-		console.log("Signature: ", sig)
+		// console.log("Signature: ", sig)
 
 		return getSignatureParameters(sig)
 	}

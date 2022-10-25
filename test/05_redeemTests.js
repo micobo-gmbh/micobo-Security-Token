@@ -16,10 +16,10 @@ contract("Test Redeeming", async (accounts) => {
 	// deepEqual compares with '==='
 
 	before(async () => {
-		const chainId = await web3.eth.net.getId()
+		const networkId = await web3.eth.net.getId()
 
 		contracts = {
-			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[chainId].address),
+			micoboSecurityToken: await SecurityToken.at(securityTokenJSON.networks[networkId].address),
 		}
 
 		await contracts.micoboSecurityToken.addRole(Role.ISSUER, issuer)
