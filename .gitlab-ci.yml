@@ -6,4 +6,4 @@ pages:
   - echo 'publishing'
   artifacts:
     paths:
-    - coverage
+    - public
