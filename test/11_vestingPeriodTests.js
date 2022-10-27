@@ -79,6 +79,9 @@ contract("Test Vesting Period", async (accounts) => {
 
 		await sleep(11000)
 
+		// trigger a transaction to advance blocktime (this is only needed because testnets mine blocks only when needed)
+		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
+
 		// can transfer again
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 2, "0x0", {
@@ -94,7 +97,7 @@ contract("Test Vesting Period", async (accounts) => {
 			})
 		)
 
-		// 1/4 of 1000 should now be vested, we take 249 since 1 has already been transferred
+		// 1/4 of 1000 should now be vested, we take 248 since 2 have already been transferred
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 248, "0x0", {
 				from: accounts[0],

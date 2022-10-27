@@ -2,7 +2,7 @@ const truffleAssert = require("truffle-assertions")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 // we use the json file here to use this contract with web3 natively
 // truffle would not find its artifact when running tests and also coverage checks
-// because it is not part of the "sale" truffle project (truffle-config-sales.js)
+// because it is not part of the "sale" truffle project (truffle-config-sale.js)
 const Sale = artifacts.require("SaleDeferred")
 
 const { conf, mock } = require("../../token-config")

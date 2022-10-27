@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for token/Administrable.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">token/</a> Administrable.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/17</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity 0.6.6;
+&nbsp;
+import "../interfaces/IAdmin.sol";
+import "../gsn/GSNable.sol";
+&nbsp;
+&nbsp;
+/**
+ * @author Simon Dosch
+ * @title Administrable
+ * @dev Manages roles for all inheriting contracts
+ */
+contract Administrable is IAdmin, GSNable {
+	/**
+     * @dev list of standard roles
+     * roles can be added (i.e. for constraint modules)
+     *
+     * --main roles--
+     * ADMIN   (can add and remove roles)
+     * CONTROLLER (ERC1400, can force-transfer tokens if contract _isControllable)
+     * ISSUER (ISSUER)
+     * REDEEMER (BURNER, can redeem tokens, their own OR others IF _isOperatorForPartition())
+     * MODULE_EDITOR (can edit constraint modules),
+     *
+     * --additional roles--
+     * DOCUMENT_EDITOR
+     * CAP_EDITOR
+&nbsp;
+     * --constraint module roles--
+     * PAUSER
+     * WHITELIST_EDITOR
+     * TIME_LOCK_EDITOR
+     * SPENDING_LIMITS_EDITOR
+     * VESTING_PERIOD_EDITOR
+     * GSN_CONTROLLER
+     * DEFAULT_PARTITIONS_EDITOR
+	 *
+	 * ...
+     */
+&nbsp;
+	// EVENTS in IAdmin.sol
+&nbsp;
+	/**
+	 * @dev Modifier to make a function callable only when the caller is a specific role.
+	 */
+<span class="fstat-no" title="function not covered" >	modifier onlyRole(bytes32 role) {</span>
+<span class="cstat-no" title="statement not covered" >		require(hasRole(role, _msgSender()), "unauthorized")</span>;
+		_;
+	}
+&nbsp;
+	/**
+	 * @param role Role that is being assigned
+	 * @param account The address that is being assigned a role
+	 * @dev Assigns a role to an account
+	 * only ADMIN
+	 */
+<span class="fstat-no" title="function not covered" >	function addRole(bytes32 role, address account)</span>
+		public
+		override
+		onlyRole(bytes32("ADMIN"))
+	{
+<span class="cstat-no" title="statement not covered" >		_add(role, account)</span>;
+	}
+&nbsp;
+	/**
+	 * @param roles Roles that are being assigned
+	 * @param accounts The addresses that are being assigned a role
+	 * @dev Assigns a bulk of roles to accounts
+	 * only ADMIN
+	 */
+<span class="fstat-no" title="function not covered" >	function bulkAddRole(bytes32[] memory roles, address[] memory accounts)</span>
+		public
+		override
+		onlyRole(bytes32("ADMIN"))
+	{
+<span class="cstat-no" title="statement not covered" >		require(roles.length &lt;= 100, "too many roles")</span>;
+<span class="cstat-no" title="statement not covered" >		require(roles.length == accounts.length, "length")</span>;
+<span class="cstat-no" title="statement not covered" >		for (uint256 i = 0; i &lt; roles.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			_add(roles[i], accounts[i])</span>;
+		}
+	}
+&nbsp;
+	/**
+	 * @param role Role that is being removed
+	 * @param account The address that a role is removed from
+	 * @dev Removes a role from an account
+	 * only ADMIN
+	 */
+<span class="fstat-no" title="function not covered" >	function removeRole(bytes32 role, address account)</span>
+		public
+		override
+		onlyRole(bytes32("ADMIN"))
+	{
+<span class="cstat-no" title="statement not covered" >		_remove(role, account)</span>;
+	}
+&nbsp;
+	/**
+	 * @param role Role that is being renounced by the _msgSender()
+	 * @dev Removes a role from the sender's address
+	 * ATTENTION: it is possible to remove the last ADMINN role by renouncing it!
+	 */
+<span class="fstat-no" title="function not covered" >	function renounceRole(bytes32 role) public override {</span>
+<span class="cstat-no" title="statement not covered" >		_remove(role, _msgSender())</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		emit RoleRenounced(role, _msgSender());</span>
+	}
+&nbsp;
+	/**
+	 * @dev check if an account has a role
+	 * @return bool True if account has role
+	 */
+<span class="fstat-no" title="function not covered" >	function hasRole(bytes32 role, address account)</span>
+		public
+		override
+		view
+		returns (bool)
+	{
+<span class="cstat-no" title="statement not covered" >		return _roles[role][account];</span>
+	}
+&nbsp;
+	/******* INTERNAL FUNCTIONS *******/
+&nbsp;
+	/**
+	 * @dev give an account access to a role
+	 */
+<span class="fstat-no" title="function not covered" >	function _add(bytes32 role, address account) internal {</span>
+<span class="cstat-no" title="statement not covered" >		require(!hasRole(role, account), "already has role")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		_roles[role][account] = true</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		emit RoleGranted(role, account, _msgSender());</span>
+	}
+&nbsp;
+	/**
+	 * @dev remove an account's access to a role
+	 * cannot remove own ADMIN role
+	 * address must have role
+	 */
+<span class="fstat-no" title="function not covered" >	function _remove(bytes32 role, address account) internal {</span>
+<span class="cstat-no" title="statement not covered" >		require(hasRole(role, account), "does not have role")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		_roles[role][account] = false</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		emit RoleRevoked(role, account, _msgSender());</span>
+	}
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Oct 27 2022 11:00:35 GMT+0200 (Central European Summer Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

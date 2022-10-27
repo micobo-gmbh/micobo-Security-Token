@@ -1,5 +1,5 @@
 const SecurityToken = artifacts.require("SecurityToken")
-const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
+const SecurityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
 const securityTokenABI = require("../build/contracts/SecurityToken.json").abi
 const securityTokenJSON = require("../build/contracts/SecurityToken.json")
 
@@ -41,11 +41,20 @@ contract("Test Deployment", async (accounts) => {
 
 	it("deploy security token factory successfully", async () => {
 		// the implementation is the master security token contract
-		securityTokenFactory = await SecurityTokenFactory.new(securityToken.address)
+		securityTokenFactory = new web3.eth.Contract(SecurityTokenFactoryJSON.abi)
+		securityTokenFactory = await securityTokenFactory
+			.deploy({
+				data: SecurityTokenFactoryJSON.bytecode,
+				arguments: [securityToken.address],
+			})
+			.send({
+				from: accounts[0],
+				gas: 9000000,
+			})
 	})
 
 	it("deploy security token proxy successfully", async () => {
-		await securityTokenFactory.deployNewSecurityToken(Math.floor(Math.random() * 10 + 1), accounts[9], data)
+		await securityTokenFactory.methods.deployNewSecurityToken(Math.floor(Math.random() * 10 + 1), accounts[9], data)
 	})
 
 	it("Token gives me all the correct token information", async () => {

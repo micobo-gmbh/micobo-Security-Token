@@ -251,7 +251,7 @@ contract("Test Token Transfer", async (accounts) => {
 
 	it("RIVER principle works as intended", async () => {
 		// 0 transfers fund from newPartition
-		contracts.micoboSecurityToken.transferByPartition(newPartition, accounts[1], value, "0x")
+		await contracts.micoboSecurityToken.transferByPartition(newPartition, accounts[1], value, "0x")
 
 		// newPartition doesn't exist anymore
 		assert.deepEqual(await contracts.micoboSecurityToken.totalPartitions(), [conf.standardPartition])
