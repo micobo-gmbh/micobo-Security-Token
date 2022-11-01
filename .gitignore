@@ -5,6 +5,7 @@ contracts/dummy/
 node_modules
 .DS_Store
 build/
+coverage
 coverage.json
 migrations/coverage/
 .coverage_contracts

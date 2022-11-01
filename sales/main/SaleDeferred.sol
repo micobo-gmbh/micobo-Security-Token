@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
-import "../contracts/interfaces/IWhitelistConstraintModule.sol";
-import "../contracts/interfaces/ISecurityToken.sol";
-import "./interfaces/ICurrency.sol";
+import "../../contracts/interfaces/IWhitelistConstraintModule.sol";
+import "../../contracts/interfaces/ISecurityToken.sol";
+import "../interfaces/ICurrency.sol";
 import "./Sale.sol";
 
 contract SaleDeferred is Sale {
+	uint256 private distributeCounter;
+
 	constructor(
 		address issuerWallet,
 		address tokenAddress,
@@ -46,6 +48,56 @@ contract SaleDeferred is Sale {
 		_issueTokens(msgSender(), amountClaimable);
 
 		emit TokenClaim(msgSender(), amountClaimable);
+	}
+
+	function distributeTokens(uint256 batchSize) public nonReentrant {
+		require(
+			block.timestamp >= primaryMarketEnd,
+			"primary market has not ended yet"
+		);
+
+		uint256 end;
+
+		if (distributeCounter < _buyers.length) {
+			end = distributeCounter + batchSize;
+		} else {
+			revert("done distributing");
+		}
+
+		if (end > _buyers.length) {
+			end = _buyers.length;
+		}
+
+		if (premintAddress == address(0)) {
+			for (; distributeCounter < end; distributeCounter++) {
+				address investor = _buyers[distributeCounter];
+
+				// distribute tokens
+				_securityToken.issueByPartition(
+					partition,
+					investor,
+					_purchases[investor],
+					"0x"
+				);
+				_purchases[investor] = 0;
+			}
+		} else {
+			for (; distributeCounter < end; distributeCounter++) {
+				address investor = _buyers[distributeCounter];
+
+				// distribute tokens
+				_securityToken.operatorTransferByPartition(
+					partition,
+					premintAddress,
+					investor,
+					_purchases[investor],
+					"0x",
+					"0x"
+				);
+
+				_purchases[investor] = 0;
+			}
+		}
 	}
 
 	function cancelPurchase(address buyer, uint256 amount)

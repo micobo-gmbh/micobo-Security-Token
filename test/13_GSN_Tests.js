@@ -14,6 +14,7 @@ const GSNMode = {
 }
 
 contract("Test GSN functionality", async (accounts) => {
+	return 
 	let contracts
 
 	let value = 1000

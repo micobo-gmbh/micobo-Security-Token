@@ -123,8 +123,11 @@ module.exports = {
 	mocha: {
 		reporter: "eth-gas-reporter",
 		reporterOptions: {
+			src: "./contracts",
 			currency: "EUR",
-			gasPrice: 30,
+			token: "MATIC",
+			// gasPrice: 30,
+			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",
 		},
 	},
@@ -139,6 +142,8 @@ module.exports = {
 				optimizer: {
 					enabled: true,
 					runs: 1024, // 2^10
+					// A “runs” parameter of “1” will produce short but expensive code. In contrast, a larger “runs” parameter will produce longer but more gas efficient code.
+					// https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html
 				},
 				evmVersion: "istanbul",
 			},

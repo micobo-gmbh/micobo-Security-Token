@@ -6,6 +6,7 @@ module.exports = {
 		allowUnlimitedContractSize: true,
 		mnemonic: test_mnemonic,
 	},
+	istanbulFolder: "./public/coverage",
 	client: require("ganache-cli"),
 	// onCompileComplete: serverReadyHandler,
 }

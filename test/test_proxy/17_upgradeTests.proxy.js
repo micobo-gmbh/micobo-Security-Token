@@ -3,6 +3,7 @@ const SecurityToken = artifacts.require("SecurityToken")
 const BaseAdminUpgradeabilityProxy = artifacts.require("BaseAdminUpgradeabilityProxy")
 const NewSecurityToken = artifacts.require("NewSecurityToken")
 const SecurityTokenFactory = artifacts.require("SecurityTokenFactory")
+const securityTokenFactoryJSON = require("../../build/contracts/SecurityTokenFactory.json")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 
 contract("Test Proxy and Upgradeability", async (accounts) => {
@@ -12,12 +13,11 @@ contract("Test Proxy and Upgradeability", async (accounts) => {
 		const networkId = await web3.eth.net.getId()
 
 		let proxyAddress = securityTokenJSON.networks[networkId].address
-		console.log("proxy address", proxyAddress)
 
 		contracts = {
 			securityTokenProxy: await SecurityToken.at(proxyAddress),
 			proxyInterface: await BaseAdminUpgradeabilityProxy.at(proxyAddress),
-			securityTokenFactory: await SecurityTokenFactory.deployed(),
+			securityTokenFactory: await SecurityTokenFactory.at(securityTokenFactoryJSON.networks[networkId].address),
 			securityToken: await SecurityToken.deployed(),
 			newSecurityToken: await NewSecurityToken.new(),
 		}

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
-import "../contracts/interfaces/IWhitelistConstraintModule.sol";
-import "../contracts/interfaces/ISecurityToken.sol";
-import "./interfaces/ICurrency.sol";
-import "./utils/ReentrancyGuard.sol";
-import "./utils/NativeMetaTransaction.sol";
+import "../../contracts/interfaces/IWhitelistConstraintModule.sol";
+import "../../contracts/interfaces/ISecurityToken.sol";
+import "../interfaces/ICurrency.sol";
+import "../utils/ReentrancyGuard.sol";
+import "../utils/NativeMetaTransaction.sol";
 
 abstract contract Sale is NativeMetaTransaction, ReentrancyGuard {
 	address public issuer;

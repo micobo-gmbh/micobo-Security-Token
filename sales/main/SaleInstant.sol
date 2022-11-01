@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
-import "../contracts/interfaces/IWhitelistConstraintModule.sol";
-import "../contracts/interfaces/ISecurityToken.sol";
-import "./interfaces/ICurrency.sol";
-import "./utils/ContextMixin.sol";
+import "../../contracts/interfaces/IWhitelistConstraintModule.sol";
+import "../../contracts/interfaces/ISecurityToken.sol";
+import "../interfaces/ICurrency.sol";
+import "../utils/ContextMixin.sol";
 import "./Sale.sol";
 
 contract SaleInstant is Sale {

@@ -133,6 +133,9 @@ contract("Test Spending Limits", async (accounts) => {
 
 		await sleep(11000)
 
+		// trigger a transaction to advance blocktime (this is only needed because testnets mine blocks only when needed)
+		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
+
 		// can transfer 80 again
 		await truffleAssert.passes(
 			contracts.micoboSecurityToken.transferByPartition(conf.standardPartition, accounts[1], 80, "0x0", {

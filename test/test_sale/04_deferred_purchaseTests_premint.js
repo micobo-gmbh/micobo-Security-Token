@@ -15,6 +15,8 @@ contract("Test Deferred Purchase Premint", async (accounts) => {
 
 	const premintWallet = accounts[9]
 
+	const nrOfInvestors = 101 // should be more than batchSize
+
 	before(async () => {
 		const networkId = await web3.eth.net.getId()
 
@@ -74,7 +76,7 @@ contract("Test Deferred Purchase Premint", async (accounts) => {
 			securityToken.options.address,
 			whitelist.options.address,
 			mock.primaryMarketEndTimestamp,
-			mock.cap,
+			mock.cap * (nrOfInvestors - -1),
 			conf.standardPartition,
 			premintWallet,
 			mock.EIP712Name
@@ -182,5 +184,65 @@ contract("Test Deferred Purchase Premint", async (accounts) => {
 
 		// check new token balance
 		assert.deepEqual(parseInt(await securityToken.methods.balanceOf(accounts[1]).call()), amount)
+	})
+
+	it("can distribute tokens en masse", async () => {
+		// issue tokens to premintWallet
+		await securityToken.methods
+			.issueByPartition(conf.standardPartition, premintWallet, amount * nrOfInvestors, "0x0")
+			.send({ from: accounts[0], gasLimit: 1000000 })
+
+		let now = new Date().getTime()
+		now = (now / 1000).toFixed(0)
+
+		// set the primaryMarketEnd to far in the future
+		await sale.editPrimaryMarketEnd(now - -1000000)
+
+		for (i = 0; i < nrOfInvestors; i++) {
+			account = web3.eth.accounts.create("entropy" + i)
+
+			// whitelist user
+			await whitelist.methods.editWhitelist(account.address, true).send({ from: accounts[0], gasLimit: 1000000 })
+
+			// increase limit for buyer
+			await sale.editPurchaseLimits(account.address, amount)
+
+			// add purchase
+			await sale.addFiatPurchase(account.address, amount)
+		}
+
+		assert.deepEqual((await sale.getBuyers()).length, nrOfInvestors - -1) // plus the one from test before
+
+		now = new Date().getTime()
+		now = (now / 1000).toFixed(0)
+
+		// set the primaryMarketEnd to 1 second from now
+		await sale.editPrimaryMarketEnd(now - -1)
+
+		function sleep(ms) {
+			return new Promise((resolve) => setTimeout(resolve, ms))
+		}
+
+		// wait 2 seconds
+		await sleep(2000)
+
+		// trigger a transaction to advance blocktime (this is only needed because testnets mine blocks only when needed)
+		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
+
+		doneDistributing = false
+
+		while (!doneDistributing) {
+			try {
+				await sale.distributeTokens(100)
+			} catch (e) {
+				assert.deepEqual(e.reason, "done distributing")
+				doneDistributing = true
+			}
+		}
+
+		// check balance of last account
+		assert.deepEqual(parseInt(await securityToken.methods.balanceOf(account.address).call()), amount)
+
+		assert.deepEqual(parseInt(await securityToken.methods.totalSupply().call()), amount * (nrOfInvestors - -1))
 	})
 })

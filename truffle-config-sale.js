@@ -114,8 +114,11 @@ module.exports = {
 	mocha: {
 		reporter: "eth-gas-reporter",
 		reporterOptions: {
+			src: "./sales",
 			currency: "EUR",
-			gasPrice: 30,
+			token: "MATIC",
+			// gasPrice: 30,
+			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",
 		},
 	},
@@ -123,13 +126,15 @@ module.exports = {
 	// Configure your compilers
 	compilers: {
 		solc: {
-			version: "0.8.16", // Version truffle should use, default: truffle's internal version
+			version: "0.8.17", // Version truffle should use, default: truffle's internal version
 			docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
 					runs: 1024, // 2^10
+					// A “runs” parameter of “1” will produce short but expensive code. In contrast, a larger “runs” parameter will produce longer but more gas efficient code.
+					// https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html
 				},
 				evmVersion: "london",
 			},

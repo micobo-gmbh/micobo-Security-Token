@@ -47,7 +47,7 @@ contract("Test Whitelist", async (accounts) => {
 
 	it("can edit whitelist when Whitelist_editor", async () => {
 		// adding whitelist_editor
-		contracts.micoboSecurityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
+		await contracts.micoboSecurityToken.addRole(Role.WHITELIST_EDITOR, accounts[0])
 
 		// edit whitelist
 		await truffleAssert.passes(whitelistConstraintModule.editWhitelist(accounts[0], true))
