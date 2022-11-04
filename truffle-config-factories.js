@@ -72,6 +72,7 @@ module.exports = {
 			src: "./factories",
 			currency: "EUR",
 			token: "MATIC",
+			coinmarketcap: "a7f0b6d9-a02e-4303-8835-9c9b3441ae1e", // sd@micobo.com
 			// gasPrice: 30,
 			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",

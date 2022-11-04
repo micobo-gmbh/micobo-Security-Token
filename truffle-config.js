@@ -51,8 +51,8 @@ module.exports = {
 
 		goerli: {
 			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
+				return new PrivateKeyProvider(
+					process.env.GOERLI_PRIVATE_KEY,
 					process.env.GOERLI
 				)
 			},
@@ -126,6 +126,7 @@ module.exports = {
 			src: "./contracts",
 			currency: "EUR",
 			token: "MATIC",
+			coinmarketcap: "a7f0b6d9-a02e-4303-8835-9c9b3441ae1e", // sd@micobo.com
 			// gasPrice: 30,
 			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",
