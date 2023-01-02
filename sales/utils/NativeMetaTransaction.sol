@@ -6,11 +6,7 @@ import { EIP712Base } from "./EIP712Base.sol";
 import "./ContextMixin.sol";
 
 contract NativeMetaTransaction is EIP712Base, ContextMixin {
-	bytes32 private constant META_TRANSACTION_TYPEHASH = keccak256(
-		bytes(
-			"MetaTransaction(uint256 nonce,address from,bytes functionSignature)"
-		)
-	);
+	bytes32 private constant META_TRANSACTION_TYPEHASH = keccak256(bytes("MetaTransaction(uint256 nonce,address from,bytes functionSignature)"));
 	event MetaTransactionExecuted(
 		address userAddress,
 		address payable relayerAddress,
@@ -42,19 +38,12 @@ contract NativeMetaTransaction is EIP712Base, ContextMixin {
 			functionSignature: functionSignature
 		});
 
-		require(
-			verify(userAddress, metaTx, sigR, sigS, sigV),
-			"Signer and signature do not match"
-		);
+		require(verify(userAddress, metaTx, sigR, sigS, sigV), "Signer and signature do not match");
 
 		// increase nonce for user (to avoid re-use)
 		nonces[userAddress] = nonces[userAddress] + 1;
 
-		emit MetaTransactionExecuted(
-			userAddress,
-			msgSender(),
-			functionSignature
-		);
+		emit MetaTransactionExecuted(userAddress, msgSender(), functionSignature);
 
 		// Append userAddress and relayer address at the end to extract it from calling context
 		(bool success, bytes memory returnData) = address(this).call(
@@ -65,11 +54,7 @@ contract NativeMetaTransaction is EIP712Base, ContextMixin {
 		return returnData;
 	}
 
-	function hashMetaTransaction(MetaTransaction memory metaTx)
-		internal
-		pure
-		returns (bytes32)
-	{
+	function hashMetaTransaction(MetaTransaction memory metaTx) internal pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encode(
@@ -94,12 +79,6 @@ contract NativeMetaTransaction is EIP712Base, ContextMixin {
 	) internal view returns (bool) {
 		require(signer != address(0), "<: INVALID_SIGNER");
 		return
-			signer ==
-			ecrecover(
-				toTypedMessageHash(hashMetaTransaction(metaTx)),
-				sigV,
-				sigR,
-				sigS
-			);
+			signer == ecrecover(toTypedMessageHash(hashMetaTransaction(metaTx)), sigV, sigR, sigS);
 	}
 }

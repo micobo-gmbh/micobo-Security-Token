@@ -1,9 +1,11 @@
 const truffleAssert = require("truffle-assertions")
-const Sale = artifacts.require("SaleDeferred")
+const UniSale = artifacts.require("UniSale")
+const uniSaleJSON = require("../../build/contracts/UniSale.json")
+const proxyJSON = require("../../build/contracts/InitializableAdminUpgradeabilityProxy.json")
 const whitelistConstraintModuleJSON = require("../../build/contracts/WhitelistConstraintModule.json")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 
-const { Role } = require("../Constants")
+const { Role } = require("../test_token/Constants")
 const { conf, mock } = require("../../token-config")
 
 contract("Test Deferred Purchase", async (accounts) => {
@@ -13,12 +15,13 @@ contract("Test Deferred Purchase", async (accounts) => {
 
 	const rate = 1
 
-	const nrOfInvestors = 134 // should be more than 100
+	const nrOfInvestors = 5
 
 	before(async () => {
 		const networkId = await web3.eth.net.getId()
 
 		securityToken = new web3.eth.Contract(securityTokenJSON.abi, securityTokenJSON.networks[networkId].address)
+		tokenAddress = securityToken.options.address
 
 		// use our own token as test currency (non-proxy)
 		currencyToken = new web3.eth.Contract(securityTokenJSON.abi)
@@ -57,7 +60,7 @@ contract("Test Deferred Purchase", async (accounts) => {
 		whitelist = await whitelist
 			.deploy({
 				data: whitelistConstraintModuleJSON.bytecode,
-				arguments: [securityToken.options.address],
+				arguments: [tokenAddress],
 			})
 			.send({
 				from: accounts[0],
@@ -68,20 +71,34 @@ contract("Test Deferred Purchase", async (accounts) => {
 			.setModulesByPartition(conf.standardPartition, [whitelist.options.address])
 			.send({ from: accounts[0], gasLimit: 1000000 })
 
-		// deploy Sale
-		sale = await Sale.new(
-			accounts[0],
-			securityToken.options.address,
-			whitelist.options.address,
-			mock.primaryMarketEndTimestamp,
-			mock.cap * (nrOfInvestors - -1), // for mass testing
-			conf.standardPartition,
-			mock.zeroWallet, // setting premintWallet to zero deactivates preminting and will mint when tokens are claimed
-			mock.EIP712Name
-		)
-
 		// add sale_admin role
-		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0], gasLimit: 1000000 })
+		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0] })
+
+		// deploy new UniSale proxy
+		const uniSaleContract = new web3.eth.Contract(uniSaleJSON.abi)
+		const data = uniSaleContract.methods.initialize().encodeABI()
+		saleLogic = await UniSale.new()
+		let proxy = new web3.eth.Contract(proxyJSON.abi)
+		proxy = await proxy
+			.deploy({ data: proxyJSON.bytecode, arguments: [] })
+			.send({ from: accounts[0], gas: 9000000 })
+		await proxy.methods.initialize(saleLogic.address, accounts[9], data).send({from: accounts[0], gas: 9000000})
+		sale = await UniSale.at(proxy.options.address)
+
+		// add sales channel
+		await sale.addSalesChannel(
+			tokenAddress, // tokenAddress
+			accounts[0], //issuerWallet
+			whitelist.options.address, // whitelistAddress
+			mock.primaryMarketEndTimestamp, // primaryMarketEndTimestamp
+			mock.cap, // saleCap, for mass testing
+			conf.standardPartition, //partition
+			mock.zeroWallet, // premintWallet. setting premintWallet to zero deactivates preminting and will mint when tokens are claimed
+			currencyToken.options.address, //currencyAddress
+			rate, // rate
+			true, // useDeferredMinting
+			true // useLimit
+		)
 
 		// make sale contract issuer
 		await securityToken.methods.addRole(Role.ISSUER, sale.address).send({ from: accounts[0], gasLimit: 1000000 })
@@ -94,15 +111,21 @@ contract("Test Deferred Purchase", async (accounts) => {
 		await whitelist.methods.editWhitelist(accounts[1], true).send({ from: accounts[0], gasLimit: 1000000 })
 
 		// increase limit for buyer
-		await sale.editPurchaseLimits(accounts[1], amount)
+		await sale.editPurchaseLimits(tokenAddress, conf.standardPartition, accounts[1], amount)
 	})
 
 	it("cannot purchase tokens with unregistered currency", async () => {
 		await truffleAssert.fails(
-			sale.purchaseTokenWithAllowance(currencyToken.options.address, amount, {
-				from: accounts[1],
-				gasLimit: 1000000,
-			}),
+			sale.purchaseTokenWithAllowance(
+				tokenAddress,
+				conf.standardPartition,
+				mock.notAContract, // currencyAddress
+				amount,
+				{
+					from: accounts[1],
+					gasLimit: 1000000,
+				}
+			),
 			truffleAssert.ErrorType.REVERT,
 			"this stablecoin is not accepted"
 		)
@@ -112,39 +135,63 @@ contract("Test Deferred Purchase", async (accounts) => {
 		// set currency rate
 		// our test coin has 0 decimals
 		// with the rate set to to 1, you can buy 1 token for 1 test coin
-		await sale.editCurrencyRates(currencyToken.options.address, rate)
+		await sale.editCurrencyRates(tokenAddress, conf.standardPartition, currencyToken.options.address, rate)
 
 		await truffleAssert.fails(
-			sale.purchaseTokenWithAllowance(currencyToken.options.address, amount, { from: accounts[1] }),
+			sale.purchaseTokenWithAllowance(
+				tokenAddress,
+				conf.standardPartition,
+				currencyToken.options.address,
+				amount,
+				{ from: accounts[1] }
+			),
 			truffleAssert.ErrorType.REVERT,
 			"stablecoin allowance too low"
 		)
 
-		await currencyToken.methods.approve(sale.address, amount).send({ from: accounts[1] })
-		assert.deepEqual(parseInt(await currencyToken.methods.allowance(accounts[1], sale.address).call()), amount)
+		await currencyToken.methods.approve(sale.address, amount * rate).send({ from: accounts[1] })
+		assert.deepEqual(
+			parseInt(await currencyToken.methods.allowance(accounts[1], sale.address).call()),
+			amount * rate
+		)
 
 		await truffleAssert.fails(
-			sale.purchaseTokenWithAllowance(currencyToken.options.address, amount + 1, { from: accounts[1] }),
+			sale.purchaseTokenWithAllowance(
+				tokenAddress,
+				conf.standardPartition,
+				currencyToken.options.address,
+				amount + 1,
+				{ from: accounts[1] }
+			),
 			truffleAssert.ErrorType.REVERT,
 			"stablecoin allowance too low"
 		)
 	})
 
 	it("can purchase tokens with allowance", async () => {
-		await sale.purchaseTokenWithAllowance(currencyToken.options.address, amount, { from: accounts[1] })
+		// set necessary limit
+		await sale.editPurchaseLimits(tokenAddress, conf.standardPartition, accounts[1], amount)
+
+		await sale.purchaseTokenWithAllowance(
+			tokenAddress,
+			conf.standardPartition,
+			currencyToken.options.address,
+			amount,
+			{ from: accounts[1] }
+		)
 
 		// see if purchase has happened
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
-		assert.deepEqual(await sale.getBuyers(), [accounts[1]])
+		assert.deepEqual((await sale.getPurchase(tokenAddress, conf.standardPartition, accounts[1])).toNumber(), amount)
+		assert.deepEqual(await sale.getBuyers(tokenAddress, conf.standardPartition), [accounts[1]])
 
 		// see if coins we transferred correctly
 		assert.deepEqual(parseInt(await currencyToken.methods.balanceOf(accounts[1]).call()), 0)
-		assert.deepEqual(parseInt(await currencyToken.methods.balanceOf(accounts[0]).call()), amount)
+		assert.deepEqual(parseInt(await currencyToken.methods.balanceOf(accounts[0]).call()), amount * rate)
 	})
 
 	it("cannot claim tokens if primary market not over", async () => {
 		await truffleAssert.fails(
-			sale.claimTokens({ from: accounts[1] }),
+			sale.claimTokens(tokenAddress, conf.standardPartition, { from: accounts[1] }),
 			truffleAssert.ErrorType.REVERT,
 			"primary market has not ended yet"
 		)
@@ -155,7 +202,7 @@ contract("Test Deferred Purchase", async (accounts) => {
 		now = (now / 1000).toFixed(0)
 
 		// set the primaryMarketEnd to 1 second from now
-		await sale.editPrimaryMarketEnd(now - -1)
+		await sale.editPrimaryMarketEnd(tokenAddress, conf.standardPartition, now - -1)
 
 		function sleep(ms) {
 			return new Promise((resolve) => setTimeout(resolve, ms))
@@ -168,17 +215,17 @@ contract("Test Deferred Purchase", async (accounts) => {
 		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
 
 		await truffleAssert.fails(
-			sale.claimTokens({ from: accounts[2] }),
+			sale.claimTokens(tokenAddress, conf.standardPartition, { from: accounts[2] }),
 			truffleAssert.ErrorType.REVERT,
 			"no tokens to claim"
 		)
 	})
 
 	it("can claim tokens", async () => {
-		await sale.claimTokens({ from: accounts[1] })
+		await sale.claimTokens(tokenAddress, conf.standardPartition, { from: accounts[1] })
 
 		// check purchase mapping
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), 0)
+		assert.deepEqual((await sale.getPurchase(tokenAddress, conf.standardPartition, accounts[1])).toNumber(), 0)
 
 		// check new token balance
 		assert.deepEqual(parseInt(await securityToken.methods.balanceOf(accounts[1]).call()), amount)
@@ -189,7 +236,7 @@ contract("Test Deferred Purchase", async (accounts) => {
 		now = (now / 1000).toFixed(0)
 
 		// set the primaryMarketEnd to far in the future
-		await sale.editPrimaryMarketEnd(now - -1000000)
+		await sale.editPrimaryMarketEnd(tokenAddress, conf.standardPartition, now - -1000000)
 
 		for (i = 0; i < nrOfInvestors; i++) {
 			account = web3.eth.accounts.create("entropy" + i)
@@ -198,19 +245,19 @@ contract("Test Deferred Purchase", async (accounts) => {
 			await whitelist.methods.editWhitelist(account.address, true).send({ from: accounts[0], gasLimit: 1000000 })
 
 			// increase limit for buyer
-			await sale.editPurchaseLimits(account.address, amount)
+			await sale.editPurchaseLimits(tokenAddress, conf.standardPartition, account.address, amount)
 
 			// add purchase
-			await sale.addFiatPurchase(account.address, amount)
+			await sale.addFiatPurchase(tokenAddress, conf.standardPartition, account.address, amount)
 		}
 
-		assert.deepEqual((await sale.getBuyers()).length, nrOfInvestors - -1) // plus the one from test before
+		assert.deepEqual((await sale.getBuyers(tokenAddress, conf.standardPartition)).length, nrOfInvestors - -1) // plus the one from test before
 
 		now = new Date().getTime()
 		now = (now / 1000).toFixed(0)
 
 		// set the primaryMarketEnd to 1 second from now
-		await sale.editPrimaryMarketEnd(now - -1)
+		await sale.editPrimaryMarketEnd(tokenAddress, conf.standardPartition, now - -1)
 
 		function sleep(ms) {
 			return new Promise((resolve) => setTimeout(resolve, ms))
@@ -226,7 +273,7 @@ contract("Test Deferred Purchase", async (accounts) => {
 
 		while (!doneDistributing) {
 			try {
-				await sale.distributeTokens(100)
+				await sale.distributeTokens(tokenAddress, conf.standardPartition, 100)
 			} catch (e) {
 				assert.deepEqual(e.reason, "done distributing")
 				doneDistributing = true

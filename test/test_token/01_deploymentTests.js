@@ -1,9 +1,9 @@
 const SecurityToken = artifacts.require("SecurityToken")
-const SecurityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
-const securityTokenABI = require("../build/contracts/SecurityToken.json").abi
-const securityTokenJSON = require("../build/contracts/SecurityToken.json")
+const SecurityTokenFactoryJSON = require("../../build/contracts/SecurityTokenFactory.json")
+const securityTokenABI = require("../../build/contracts/SecurityToken.json").abi
+const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 
-const { conf } = require("../token-config")
+const { conf } = require("../../token-config")
 
 contract("Test Deployment", async (accounts) => {
 	let contracts

@@ -1,70 +1,36 @@
-const truffleAssert = require("truffle-assertions")
-const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 // we use the json file here to use this contract with web3 natively
 // truffle would not find its artifact when running tests and also coverage checks
 // because it is not part of the "sale" truffle project (truffle-config-sale.js)
-const Sale = artifacts.require("SaleDeferred")
-
-const { conf, mock } = require("../../token-config")
+const UniSale = artifacts.require("UniSale")
+const uniSaleJSON = require("../../build/contracts/UniSale.json")
+const proxyJSON = require("../../build/contracts/InitializableAdminUpgradeabilityProxy.json")
 
 contract("Test Deployment", async (accounts) => {
-	let contracts
+	it("deploy sale contract logic", async () => {
+		const uniSaleContract = new web3.eth.Contract(uniSaleJSON.abi)
 
-	before(async () => {
-		const networkId = await web3.eth.net.getId()
+		const data = uniSaleContract.methods.initialize().encodeABI()
 
-		contracts = {
-			securityToken: new web3.eth.Contract(securityTokenJSON.abi, securityTokenJSON.networks[networkId].address),
-		}
-	})
+		const saleLogic = await UniSale.new()
 
-	let sale
+		// we create a web3 contract here to explicitly CALL "implementation" instead of sending a transaction.
+		// Because of the old "nonpayable" stateMutability status,
+		// Truffle(and also Etherscan) treat it as a "write" function, when it is not
+		let proxy = new web3.eth.Contract(proxyJSON.abi)
+		proxy = await proxy
+			.deploy({
+				data: proxyJSON.bytecode,
+				arguments: [],
+			})
+			.send({
+				from: accounts[0],
+				gas: 9000000,
+			})
 
-	it("deploy sale contract", async () => {
-		sale = await Sale.new(
-			accounts[0],
-			contracts.securityToken.options.address,
-			mock.whitelistAddress,
-			mock.primaryMarketEndTimestamp,
-			mock.cap,
-			conf.standardPartition,
-			mock.zeroWallet,
-			mock.EIP712Name
-		)
-	})
+		await proxy.methods.initialize(saleLogic.address, accounts[9], data).send({ from: accounts[0], gas: 9000000 })
 
-	it("sale contract gives me all the correct info", async () => {
-		assert.deepEqual(await sale.issuer(), accounts[0])
+		const impl = await proxy.methods.implementation().call({ from: accounts[9] })
 
-		assert.deepEqual((await sale.cap()).toNumber(), mock.cap)
-
-		assert.deepEqual((await sale.sold()).toNumber(), 0)
-
-		assert.deepEqual((await sale.primaryMarketEnd()).toNumber(), mock.primaryMarketEndTimestamp)
-
-		assert.deepEqual(await sale.partition(), conf.standardPartition)
-
-		assert.deepEqual(await sale.getTokenAddress(), contracts.securityToken.options.address)
-
-		assert.deepEqual(await sale.getWhitelistAddress(), mock.whitelistAddress)
-
-		assert.deepEqual(await sale.getBuyers(), [])
-	})
-
-	it("cannot create sale contract with primaryMarketEndTimestamp in the past", async () => {
-		await truffleAssert.fails(
-			Sale.new(
-				accounts[0],
-				contracts.securityToken.options.address,
-				mock.whitelistAddress,
-				0,
-				mock.cap,
-				conf.standardPartition,
-				mock.zeroWallet,
-				mock.EIP712Name
-			),
-			truffleAssert.ErrorType.REVERT,
-			"primary market end in the past"
-		)
+		assert.deepEqual(impl, saleLogic.address)
 	})
 })

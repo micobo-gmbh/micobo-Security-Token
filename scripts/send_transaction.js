@@ -1,10 +1,9 @@
-const securityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
-const USDC = require("../build/contracts/UChildERC20.json")
-const sigUtil = require("@metamask/eth-sig-util")
+// const securityTokenFactoryJSON = require("../build/contracts/SecurityTokenFactory.json")
+const usdcJSON = require("../build/contracts/UChildERC20.json")
 
 module.exports = async (callback) => {
 	try {
-		await sendTransaction()
+		await sendTestTokens()
 	} catch (e) {
 		console.log(e)
 	}
@@ -17,7 +16,7 @@ const currencyTokenAddress = "0x9E2B03EffA92CdCE71b34e9E4C00b67b1Aa49c0D"
 const checkBalance = async () => {
 	const accounts = await web3.eth.getAccounts()
 
-	currency = new web3.eth.Contract(USDC.abi, currencyTokenAddress)
+	currency = new web3.eth.Contract(usdcJSON.abi, currencyTokenAddress)
 
 	balance = await currency.methods.balanceOf(accounts[0]).call({
 		from: accounts[0],

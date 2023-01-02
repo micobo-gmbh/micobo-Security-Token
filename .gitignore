@@ -11,4 +11,5 @@ migrations/coverage/
 .coverage_contracts
 *.tgz
 .env
+.vscode/
 scripts/misc.js

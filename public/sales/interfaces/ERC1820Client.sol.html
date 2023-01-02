@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for main/SaleInstant.sol</title>
+    <title>Code coverage report for interfaces/ERC1820Client.sol</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -16,32 +16,32 @@
 <div class='wrapper'>
   <div class='pad1'>
     <h1>
-      <a href="../index.html">all files</a> / <a href="index.html">main/</a> SaleInstant.sol
+      <a href="../index.html">all files</a> / <a href="index.html">interfaces/</a> ERC1820Client.sol
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">33.33% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>10/10</span>
+        <span class='fraction'>1/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>9/10</span>
+        <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>2/2</span>
+        <span class='fraction'>1/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">33.33% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>10/10</span>
+        <span class='fraction'>1/3</span>
       </div>
     </div>
   </div>
-  <div class='status-line high'></div>
+  <div class='status-line low'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -92,25 +92,7 @@
 47
 48
 49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+50</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -143,105 +125,69 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">25×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">20×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: MIT
 &nbsp;
 pragma solidity 0.8.17;
 &nbsp;
-import "../../contracts/interfaces/IWhitelistConstraintModule.sol";
-import "../../contracts/interfaces/ISecurityToken.sol";
-import "../interfaces/ICurrency.sol";
-import "../utils/ContextMixin.sol";
-import "./Sale.sol";
+/**
+ * @dev Taken from node_modules/erc1820
+ * updated solidity version
+ * commented out interfaceAddr &amp; delegateManagement
+ */
+interface ERC1820Registry {
+	function setInterfaceImplementer(
+		address _addr,
+		bytes32 _interfaceHash,
+		address _implementer
+	) external;
 &nbsp;
-contract SaleInstant is Sale {
-	constructor(
-		address issuerWallet,
-		address tokenAddress,
-		address whitelistAddress,
-		uint256 primaryMarketEndTimestamp,
-		uint256 tokenCap,
-		bytes32 defaultPartition,
-		address premintWallet,
-		string memory domainNameSeperator
-	)
-		Sale(
-			issuerWallet,
-			tokenAddress,
-			whitelistAddress,
-			primaryMarketEndTimestamp,
-			tokenCap,
-			defaultPartition,
-			premintWallet,
-			domainNameSeperator
-		)
-	{}
+	function getInterfaceImplementer(address _addr, bytes32 _interfaceHash)
+		external
+		view
+		returns (address);
 &nbsp;
-	function _addPurchase(address buyer, uint256 amount) internal override {
-		require(buyer != address(0), "buyer is zero");
+	function setManager(address _addr, address _newManager) external;
 &nbsp;
-		// check primary market end
-		<span class="missing-if-branch" title="else path not taken" >E</span>require(
-			block.timestamp &lt; primaryMarketEnd,
-			"primary market already ended"
-		);
+	function getManager(address _addr) external view returns (address);
+}
 &nbsp;
-		// check whitelist
-		require(_whitelist.isWhitelisted(buyer), "buyer not whitelisted");
+/// Base client to interact with the registry.
+contract ERC1820Client {
+	ERC1820Registry constant ERC1820REGISTRY = ERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
 &nbsp;
-		// check cap
-		require(sold + amount &lt; cap, "would exceed sales cap");
+<span class="fstat-no" title="function not covered" >	function setInterfaceImplementation(string memory _interfaceLabel, address _implementation)</span>
+		internal
+	{
+<span class="cstat-no" title="statement not covered" >		bytes32 interfaceHash = keccak256(abi.encodePacked(_interfaceLabel));</span>
+<span class="cstat-no" title="statement not covered" >		ERC1820REGISTRY.setInterfaceImplementer(address(this), interfaceHash, _implementation)</span>;
+	}
 &nbsp;
-		// check limits
-		require(_limits[buyer] &gt;= amount, "exceeds purchase limit for buyer");
-&nbsp;
-		// add to sold
-		sold = sold + amount;
-&nbsp;
-		// sub from _limits
-		_limits[buyer] = _limits[buyer] - amount;
-&nbsp;
-		// register purchase
-		_purchases[buyer] = _purchases[buyer] + amount;
-&nbsp;
-		// add buyer address to array
-		_buyers.push(buyer);
-&nbsp;
-		// ISSUE TOKENS
-		_issueTokens(buyer, amount);
+	function getInterfaceImplementer(address _addr, string memory _interfaceLabel)
+		internal
+		view
+		returns (address)
+	{
+		return
+			ERC1820REGISTRY.getInterfaceImplementer(
+				_addr,
+				keccak256(abi.encodePacked(_interfaceLabel))
+			);
 	}
 }
 &nbsp;</pre></td></tr>
@@ -250,7 +196,7 @@ contract SaleInstant is Sale {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2022 16:03:34 GMT+0100 (Central European Standard Time)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Jan 02 2023 13:27:46 GMT+0100 (Central European Standard Time)
 </div>
 </div>
 <script src="../prettify.js"></script>

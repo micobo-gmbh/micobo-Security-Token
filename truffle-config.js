@@ -22,6 +22,7 @@ module.exports = {
 	 */
 
 	contracts_directory: "./contracts",
+	test_directory: "./test/test_token",
 
 	networks: {
 		// Useful for testing. The `development` name is special - truffle uses it by default
@@ -51,10 +52,7 @@ module.exports = {
 
 		goerli: {
 			provider: () => {
-				return new PrivateKeyProvider(
-					process.env.GOERLI_PRIVATE_KEY,
-					process.env.GOERLI
-				)
+				return new PrivateKeyProvider(process.env.GOERLI_PRIVATE_KEY, process.env.GOERLI)
 			},
 			network_id: 5,
 			gas: 10000000, // 10.000.000
@@ -64,10 +62,7 @@ module.exports = {
 
 		mainnet: {
 			provider: () => {
-				return new PrivateKeyProvider(
-					process.env.MAINNET_PRIVATE_KEY,
-					process.env.MAINNET
-				)
+				return new PrivateKeyProvider(process.env.MAINNET_PRIVATE_KEY, process.env.MAINNET)
 			},
 			network_id: 1,
 			gas: 2000000,
@@ -77,7 +72,7 @@ module.exports = {
 
 		polygon: {
 			provider: () => {
-				return new HDWalletProvider(process.env.POLYGON_MNEMONIC, process.env.POLYGON_MAINNET)
+				return new PrivateKeyProvider(process.env.POLYGON_PRIVATE_KEY, process.env.POLYGON_MAINNET)
 			},
 			network_id: 137,
 			gasPrice: 69000000000, // wei
@@ -101,7 +96,6 @@ module.exports = {
 				)
 			},
 			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
 			skipDryRun: true,
 		},
 
@@ -114,7 +108,6 @@ module.exports = {
 				)
 			},
 			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
 			skipDryRun: true,
 		},
 	},

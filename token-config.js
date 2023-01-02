@@ -12,8 +12,9 @@ module.exports = {
 		cap: 1000,
 		primaryMarketEndTimestamp: 1694234541,
 		currencyAddress: "0x123481eD7f5E326e3bEA0D3AaD980BC12e44adcf",
+		notAContract: "0x123481eD7f5E326e3bEA0D3AaD980BC12e44adcf",
 		whitelistAddress: "0x01FaF3688dee393837fe88Fd589E830c8f3D5B8e",
 		zeroWallet: "0x0000000000000000000000000000000000000000",
-		EIP712Name: "Micobo Sales Point",
+		EIP712Name: "UniSale - Security Tokens Primary Market",
 	},
 }

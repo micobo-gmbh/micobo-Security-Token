@@ -1,9 +1,11 @@
 const truffleAssert = require("truffle-assertions")
-const Sale = artifacts.require("SaleDeferred")
+const UniSale = artifacts.require("UniSale")
+const uniSaleJSON = require("../../build/contracts/UniSale.json")
+const proxyJSON = require("../../build/contracts/InitializableAdminUpgradeabilityProxy.json")
 const securityTokenJSON = require("../../build/contracts/SecurityToken.json")
 const whitelistConstraintModuleJSON = require("../../build/contracts/WhitelistConstraintModule.json")
 const usdcJSON = require("../../build/contracts/UChildERC20.json")
-const { Role } = require("../Constants")
+const { Role } = require("../test_token/Constants")
 const { conf, mock } = require("../../token-config")
 const sigUtil = require("@metamask/eth-sig-util")
 
@@ -13,6 +15,8 @@ contract("Test Meta Transactions", async (accounts) => {
 	const investor = accounts[1]
 
 	const amount = 100
+
+	const premintWallet = accounts[9]
 
 	const currencyName = "USD Coin (PoS)"
 	const usdcDecimals = 6
@@ -29,6 +33,7 @@ contract("Test Meta Transactions", async (accounts) => {
 
 		// deploy security token (this will be bought)
 		securityToken = new web3.eth.Contract(securityTokenJSON.abi, securityTokenJSON.networks[networkId].address)
+		tokenAddress = securityToken.options.address
 
 		// deploy test USDC token
 		currencyToken = new web3.eth.Contract(usdcJSON.abi)
@@ -63,16 +68,32 @@ contract("Test Meta Transactions", async (accounts) => {
 
 		await securityToken.methods.setModulesByPartition(conf.standardPartition, [whitelist.options.address])
 
-		// deploy Sale
-		sale = await Sale.new(
-			accounts[0],
-			securityToken.options.address,
-			whitelist.options.address,
-			mock.primaryMarketEndTimestamp,
-			mock.cap,
-			conf.standardPartition,
-			accounts[9],
-			mock.EIP712Name
+		// add sale_admin role
+		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0], gasLimit: 1000000 })
+
+		// deploy new UniSale proxy
+		const uniSaleContract = new web3.eth.Contract(uniSaleJSON.abi)
+		const data = uniSaleContract.methods.initialize().encodeABI()
+		saleLogic = await UniSale.new()
+		let proxy = new web3.eth.Contract(proxyJSON.abi)
+		proxy = await proxy
+			.deploy({ data: proxyJSON.bytecode, arguments: [] })
+			.send({ from: accounts[0], gas: 9000000 })
+		await proxy.methods.initialize(saleLogic.address, accounts[9], data).send({from: accounts[0], gas: 9000000})
+		sale = await UniSale.at(proxy.options.address)
+
+		await sale.addSalesChannel(
+			tokenAddress, // tokenAddress
+			accounts[0], //issuerWallet
+			whitelist.options.address, // whitelistAddress
+			mock.primaryMarketEndTimestamp, // primaryMarketEndTimestamp
+			mock.cap, // saleCap, for mass testing
+			conf.standardPartition, //partition
+			premintWallet, // premintWallet. setting premintWallet to zero deactivates preminting and will mint when tokens are claimed
+			mock.currencyAddress, //currencyAddress
+			rate, // rate
+			true, // useDeferredMinting
+			true // useLimit
 		)
 
 		// console.log("Sale deployed at: ", sale.address)
@@ -88,8 +109,6 @@ contract("Test Meta Transactions", async (accounts) => {
 			.addRole(Role.CONTROLLER, sale.address)
 			.send({ from: accounts[0], gasLimit: 1000000 })
 
-		// add sale_admin role
-		await securityToken.methods.addRole(Role.SALE_ADMIN, accounts[0]).send({ from: accounts[0], gasLimit: 1000000 })
 
 		// make whitelist editor
 		await securityToken.methods
@@ -100,10 +119,10 @@ contract("Test Meta Transactions", async (accounts) => {
 		await whitelist.methods.editWhitelist(accounts[1], true).send({ from: accounts[0], gasLimit: 1000000 })
 
 		// increase limit for buyer
-		await sale.editPurchaseLimits(accounts[1], amount)
+		await sale.editPurchaseLimits(tokenAddress, conf.standardPartition, accounts[1], amount)
 
 		// add currency
-		await sale.editCurrencyRates(currencyToken.options.address, rate)
+		await sale.editCurrencyRates(tokenAddress, conf.standardPartition, currencyToken.options.address, rate)
 	})
 
 	it("fails if stablecoin balance too low", async () => {
@@ -113,7 +132,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		await truffleAssert.fails(
-			sale.purchaseWithAuthorization(currencyToken.options.address, amount, investor, r, s, v),
+			sale.purchaseWithAuthorization(tokenAddress, conf.standardPartition, currencyToken.options.address, amount, investor, r, s, v),
 			truffleAssert.ErrorType.REVERT,
 			"stablecoin balance too low"
 		)
@@ -130,11 +149,11 @@ contract("Test Meta Transactions", async (accounts) => {
 		let { r, s, v } = await signMetaTransactionForCurrency(functionSig)
 
 		// execute the purchase
-		await sale.purchaseWithAuthorization(currencyToken.options.address, amount, investor, r, s, v)
+		await sale.purchaseWithAuthorization(tokenAddress, conf.standardPartition, currencyToken.options.address, amount, investor, r, s, v)
 
 		// see if purchase has happened
-		assert.deepEqual((await sale.getPurchase(accounts[1])).toNumber(), amount)
-		assert.deepEqual(await sale.getBuyers(), [accounts[1]])
+		assert.deepEqual((await sale.getPurchase(tokenAddress, conf.standardPartition, accounts[1])).toNumber(), amount)
+		assert.deepEqual(await sale.getBuyers(tokenAddress, conf.standardPartition), [accounts[1]])
 
 		// deferred, token are not minted yet
 		// assert.deepEqual((await securityToken.balanceOf(accounts[1])).toNumber(), amount)
@@ -148,7 +167,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		let now = new Date().getTime()
 		now = (now / 1000).toFixed(0)
 		// set the primaryMarketEnd to 1 second from now
-		await sale.editPrimaryMarketEnd(now - -1)
+		await sale.editPrimaryMarketEnd(tokenAddress, conf.standardPartition, now - -1)
 		function sleep(ms) {
 			return new Promise((resolve) => setTimeout(resolve, ms))
 		}
@@ -158,7 +177,7 @@ contract("Test Meta Transactions", async (accounts) => {
 		await web3.eth.sendTransaction({ to: accounts[1], from: accounts[0], value: web3.utils.toWei("1") })
 
 		await truffleAssert.fails(
-			sale.claimTokens({ from: accounts[1] }),
+			sale.claimTokens(tokenAddress, conf.standardPartition, { from: accounts[1] }),
 			truffleAssert.ErrorType.REVERT,
 			"insufficient funds"
 		)
@@ -265,9 +284,18 @@ contract("Test Meta Transactions", async (accounts) => {
 			{
 				name: "claimTokens",
 				type: "function",
-				inputs: [],
+				inputs: [
+					{
+						name: "tokenAddress",
+						type: "address",
+					},
+					{
+						name: "partition",
+						type: "bytes32",
+					},
+				],
 			},
-			[]
+			[tokenAddress, conf.standardPartition]
 		)
 
 		// convert it to bytes
