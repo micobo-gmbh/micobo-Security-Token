@@ -49,36 +49,6 @@ module.exports = {
 			gas: 10000000, // 10.000.000
 		},
 
-		rinkeby: {
-			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
-					"https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				)
-			},
-			network_id: 4,
-			gas: 10000000, // 10.000.000
-			gasPrice: 3000000000, // 3gwei in wei
-			skipDryRun: true,
-		},
-
-		ropsten: {
-			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				)
-				/* return new PrivateKeyProvider(
-					process.env.MAINNET_PRIVATE_KEY,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				) */
-			},
-			network_id: 3,
-			gas: 8000000, // 8.000.000
-			gasPrice: 3000000000, // 3gwei in wei
-			skipDryRun: true,
-		},
-
 		mainnet: {
 			provider: () => {
 				return new PrivateKeyProvider(
@@ -94,7 +64,7 @@ module.exports = {
 
 		polygon: {
 			provider: () => {
-				return new HDWalletProvider(process.env.POLYGON_MNEMONIC, process.env.POLYGON_MAINNET)
+				return new PrivateKeyProvider(process.env.UNISALE_DEPLOYER_PRIVATE_KEY, process.env.POLYGON_MAINNET)
 			},
 			network_id: 137,
 			gasPrice: 69000000000, // wei
@@ -103,7 +73,7 @@ module.exports = {
 
 		mumbai: {
 			provider: () => {
-				return new HDWalletProvider(test_mnemonic, process.env.POLYGON_MUMBAI)
+				return new PrivateKeyProvider(process.env.UNISALE_DEPLOYER_PRIVATE_KEY, process.env.POLYGON_MUMBAI)
 			},
 			network_id: 80001,
 			skipDryRun: true,
@@ -137,7 +107,6 @@ module.exports = {
 					// A “runs” parameter of “1” will produce short but expensive code. In contrast, a larger “runs” parameter will produce longer but more gas efficient code.
 					// https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html
 				},
-				evmVersion: "london",
 			},
 		},
 	},
