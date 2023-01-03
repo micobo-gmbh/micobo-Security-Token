@@ -6,7 +6,7 @@ module.exports = async (callback) => {
 
 	try {
 		const accounts = await web3.eth.getAccounts()
-		const chainId = await web3.eth.net.getId()
+		const chainId = await web3.eth.getChainId()
 
 		let micoboSecurityToken = new web3.eth.Contract(securityTokenJSON.abi)
 

@@ -4,7 +4,7 @@ const { saveContractAddress } = require("./utils.js")
 
 module.exports = async (callback) => {
 	try {
-		const chainId = await web3.eth.net.getId()
+		const chainId = await web3.eth.getChainId()
 
 		// get the address of the security token implementation/logic on the current chain
 		securityTokenLogicAddress = securityTokenJSON.networks[chainId].address

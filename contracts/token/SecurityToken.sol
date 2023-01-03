@@ -1,6 +1,6 @@
 pragma solidity 0.6.6;
 
-import "../../node_modules/@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 import "./ERC1400ERC20.sol";
 import "../interfaces/IERC1400.sol";

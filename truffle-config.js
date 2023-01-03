@@ -22,6 +22,7 @@ module.exports = {
 	 */
 
 	contracts_directory: "./contracts",
+	test_directory: "./test/test_token",
 
 	networks: {
 		// Useful for testing. The `development` name is special - truffle uses it by default
@@ -49,42 +50,19 @@ module.exports = {
 			network_id: "*",
 		},
 
-		rinkeby: {
+		goerli: {
 			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
-					"https://rinkeby.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				)
+				return new PrivateKeyProvider(process.env.GOERLI_PRIVATE_KEY, process.env.GOERLI)
 			},
-			network_id: 4,
+			network_id: 5,
 			gas: 10000000, // 10.000.000
-			gasPrice: 3000000000, // 3gwei in wei
-			skipDryRun: true,
-		},
-
-		ropsten: {
-			provider: () => {
-				return new HDWalletProvider(
-					test_mnemonic,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				)
-				/* return new PrivateKeyProvider(
-					process.env.MAINNET_PRIVATE_KEY,
-					"https://ropsten.infura.io/v3/303b722ab2ff4afb8b0f8f6a966ab6af"
-				) */
-			},
-			network_id: 3,
-			gas: 8000000, // 8.000.000
-			gasPrice: 3000000000, // 3gwei in wei
+			gasPrice: 100000000, // 0.1 gwei in wei
 			skipDryRun: true,
 		},
 
 		mainnet: {
 			provider: () => {
-				return new PrivateKeyProvider(
-					process.env.MAINNET_PRIVATE_KEY,
-					"https://mainnet.infura.io/v3/77249052ac71443eb63e5fdd8b61893e"
-				)
+				return new PrivateKeyProvider(process.env.MAINNET_PRIVATE_KEY, process.env.MAINNET)
 			},
 			network_id: 1,
 			gas: 2000000,
@@ -94,7 +72,7 @@ module.exports = {
 
 		polygon: {
 			provider: () => {
-				return new HDWalletProvider(process.env.POLYGON_MNEMONIC, process.env.POLYGON_MAINNET)
+				return new PrivateKeyProvider(process.env.POLYGON_PRIVATE_KEY, process.env.POLYGON_MAINNET)
 			},
 			network_id: 137,
 			gasPrice: 69000000000, // wei
@@ -118,7 +96,6 @@ module.exports = {
 				)
 			},
 			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
 			skipDryRun: true,
 		},
 
@@ -131,7 +108,6 @@ module.exports = {
 				)
 			},
 			network_id: "*",
-			// gasPrice: 69000000000, // wei (set before deployment)
 			skipDryRun: true,
 		},
 	},
@@ -140,8 +116,12 @@ module.exports = {
 	mocha: {
 		reporter: "eth-gas-reporter",
 		reporterOptions: {
+			src: "./contracts",
 			currency: "EUR",
-			gasPrice: 30,
+			token: "MATIC",
+			coinmarketcap: "a7f0b6d9-a02e-4303-8835-9c9b3441ae1e", // sd@micobo.com
+			// gasPrice: 30,
+			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",
 		},
 	},
@@ -156,6 +136,8 @@ module.exports = {
 				optimizer: {
 					enabled: true,
 					runs: 1024, // 2^10
+					// A “runs” parameter of “1” will produce short but expensive code. In contrast, a larger “runs” parameter will produce longer but more gas efficient code.
+					// https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html
 				},
 				evmVersion: "istanbul",
 			},

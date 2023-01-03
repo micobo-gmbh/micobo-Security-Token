@@ -17,6 +17,7 @@ module.exports = {
 	 */
 
 	contracts_directory: "./factories",
+	test_directory: "./test/test_proxy",
 
 	networks: {
 		// Useful for testing. The `development` name is special - truffle uses it by default
@@ -31,6 +32,13 @@ module.exports = {
 			},
 			port: 8545,
 			network_id: "*",
+		},
+
+		coverage: {
+			host: "127.0.0.1",
+			port: 8545,
+			network_id: "*",
+			gas: 10000000, // 10.000.000
 		},
 
 		rinkeby: {
@@ -61,8 +69,12 @@ module.exports = {
 	mocha: {
 		reporter: "eth-gas-reporter",
 		reporterOptions: {
+			src: "./factories",
 			currency: "EUR",
-			gasPrice: 80,
+			token: "MATIC",
+			coinmarketcap: "a7f0b6d9-a02e-4303-8835-9c9b3441ae1e", // sd@micobo.com
+			// gasPrice: 30,
+			// gets the current gasPrice dynamically if not set
 			url: "http://localhost:8545",
 		},
 	},
@@ -70,13 +82,15 @@ module.exports = {
 	// Configure your compilers
 	compilers: {
 		solc: {
-			// version: "0.5.3", // Version truffle should use, default: truffle's internal version
+			version: "0.5.3", // Version truffle should use, default: truffle's internal version
 			docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
 			settings: {
 				// See the solidity docs for advice about optimization and evmVersion
 				optimizer: {
 					enabled: true,
 					runs: 1024, // 2^10
+					// A “runs” parameter of “1” will produce short but expensive code. In contrast, a larger “runs” parameter will produce longer but more gas efficient code.
+					// https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html
 				},
 				evmVersion: "constantinople",
 			},
@@ -87,5 +101,5 @@ module.exports = {
 		etherscan: process.env.ETHERSCAN_API_KEY,
 	},
 
-	plugins: ["truffle-security", "solidity-coverage", "truffle-plugin-verify"],
+	plugins: ["solidity-coverage", "truffle-plugin-verify"],
 }

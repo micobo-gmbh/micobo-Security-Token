@@ -65,11 +65,11 @@ module.exports = async (deployer, network, accounts) => {
 			conf.symbol,
 			conf.granularity,
 			conf.standardCap,
-			accounts[0],
-			accounts[7],
-			accounts[0],
-			accounts[0],
-			accounts[0]
+			accounts[0],  // admin
+			accounts[7],  // controller
+			accounts[0],  // issuer
+			accounts[0],  // redeemer
+			accounts[0]   // module_editor
 		)
 		.encodeABI()
 
@@ -86,28 +86,28 @@ module.exports = async (deployer, network, accounts) => {
 
 	console.log("token proxy deployed at: ", receipt.events.ProxyCreated.returnValues.proxy)
 
-	const chainId = await web3.eth.net.getId()
+	const networkId = await web3.eth.net.getId()
 	try {
 		// remember proxy contract address for testing
-		if (!securityTokenJSON.networks[chainId]) {
-			console.log("chainId undefined. Setting to", chainId)
-			securityTokenJSON.networks[chainId] = {}
-			// console.log(securityTokenJSON.networks[chainId])
+		if (!securityTokenJSON.networks[networkId]) {
+			console.log("networkId undefined. Setting to", networkId)
+			securityTokenJSON.networks[networkId] = {}
+			// console.log(securityTokenJSON.networks[networkId])
 
-			securityTokenJSON.networks[chainId].address = receipt.events.ProxyCreated.returnValues.proxy
+			securityTokenJSON.networks[networkId].address = receipt.events.ProxyCreated.returnValues.proxy
 		} else {
-			securityTokenJSON.networks[chainId].address = receipt.events.ProxyCreated.returnValues.proxy
+			securityTokenJSON.networks[networkId].address = receipt.events.ProxyCreated.returnValues.proxy
 		}
 
 		// remember factory contract address for testing
-		if (!securityTokenFactoryJSON.networks[chainId]) {
-			console.log("chainId undefined. Setting to", chainId)
-			securityTokenFactoryJSON.networks[chainId] = {}
-			// console.log(securityTokenJSON.networks[chainId])
+		if (!securityTokenFactoryJSON.networks[networkId]) {
+			console.log("networkId undefined. Setting to", networkId)
+			securityTokenFactoryJSON.networks[networkId] = {}
+			// console.log(securityTokenJSON.networks[networkId])
 
-			securityTokenFactoryJSON.networks[chainId].address = newSecurityTokenFactory.options.address
+			securityTokenFactoryJSON.networks[networkId].address = newSecurityTokenFactory.options.address
 		} else {
-			securityTokenFactoryJSON.networks[chainId].address = newSecurityTokenFactory.options.address
+			securityTokenFactoryJSON.networks[networkId].address = newSecurityTokenFactory.options.address
 		}
 	} catch (e) {
 		console.error(e)

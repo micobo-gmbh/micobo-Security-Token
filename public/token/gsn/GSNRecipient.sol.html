@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for gsn/GSNRecipient.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">gsn/</a> GSNRecipient.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/30</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/12</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/32</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity 0.6.6;
+&nbsp;
+import "../../node_modules/@openzeppelin/contracts/GSN/IRelayRecipient.sol";
+import "../../node_modules/@openzeppelin/contracts/GSN/IRelayHub.sol";
+import "../../node_modules/@openzeppelin/contracts/GSN/Context.sol";
+&nbsp;
+import "../storage/SecurityTokenStorage.sol";
+&nbsp;
+&nbsp;
+// copied here to be included in coverage
+&nbsp;
+/**
+ * @dev Base GSN recipient contract: includes the {IRelayRecipient} interface
+ * and enables GSN support on all contracts in the inheritance tree.
+ *
+ * TIP: This contract is abstract. The functions {IRelayRecipient-acceptRelayedCall},
+ *  {_preRelayedCall}, and {_postRelayedCall} are not implemented and must be
+ * provided by derived contracts. See the
+ * xref:ROOT:gsn-strategies.adoc#gsn-strategies[GSN strategies] for more
+ * information on how to use the pre-built {GSNRecipientSignature} and
+ * {GSNRecipientERC20Fee}, or how to write your own.
+ */
+abstract contract GSNRecipient is
+	SecurityTokenStorage,
+	IRelayRecipient,
+	Context
+{
+	/**
+	 * @dev Emitted when a contract changes its {IRelayHub} contract to a new one.
+	 */
+	event RelayHubChanged(
+		address indexed oldRelayHub,
+		address indexed newRelayHub
+	);
+&nbsp;
+	/**
+	 * @dev Returns the address of the {IRelayHub} contract for this recipient.
+	 */
+<span class="fstat-no" title="function not covered" >	function getHubAddr() public override view returns (address) {</span>
+<span class="cstat-no" title="statement not covered" >		return _relayHub;</span>
+	}
+&nbsp;
+	/**
+	 * @dev Switches to a new {IRelayHub} instance. This method is added for future-proofing: there's no reason to not
+	 * use the default instance.
+	 *
+	 * IMPORTANT: After upgrading, the {GSNRecipient} will no longer be able to receive relayed calls from the old
+	 * {IRelayHub} instance. Additionally, all funds should be previously withdrawn via {_withdrawDeposits}.
+	 */
+<span class="fstat-no" title="function not covered" >	function _upgradeRelayHub(address newRelayHub) internal virtual {</span>
+<span class="cstat-no" title="statement not covered" >		address currentRelayHub = _relayHub;</span>
+<span class="cstat-no" title="statement not covered" >		require(newRelayHub != address(0), "zero address")</span>;
+<span class="cstat-no" title="statement not covered" >		require(newRelayHub != currentRelayHub, "current one")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		emit RelayHubChanged(currentRelayHub, newRelayHub);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		_relayHub = newRelayHub</span>;
+	}
+&nbsp;
+	/**
+	 * @dev Returns the version string of the {IRelayHub} for which this recipient implementation was built. If
+	 * {_upgradeRelayHub} is used, the new {IRelayHub} instance should be compatible with this version.
+	 */
+	// This function is view for future-proofing, it may require reading from
+	// storage in the future.
+<span class="fstat-no" title="function not covered" >	function relayHubVersion() public view returns (string memory) {</span>
+		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+<span class="cstat-no" title="statement not covered" >		return "1.0.0";</span>
+	}
+&nbsp;
+	/**
+	 * @dev Withdraws the recipient's deposits in `RelayHub`.
+	 *
+	 * Derived contracts should expose this in an external interface with proper access control.
+	 */
+<span class="fstat-no" title="function not covered" >	function _withdrawDeposits(uint256 amount, address payable payee)</span>
+		internal
+		virtual
+	{
+<span class="cstat-no" title="statement not covered" >		IRelayHub(_relayHub).withdraw(amount, payee)</span>;
+	}
+&nbsp;
+	// Overrides for Context's functions: when called from RelayHub, sender and
+	// data require some pre-processing: the actual sender is stored at the end
+	// of the call data, which in turns means it needs to be removed from it
+	// when handling said data.
+&nbsp;
+	/**
+	 * @dev Replacement for msg.sender. Returns the actual sender of a transaction: msg.sender for regular transactions,
+	 * and the end-user for GSN relayed calls (where msg.sender is actually `RelayHub`).
+	 *
+	 * IMPORTANT: Contracts derived from {GSNRecipient} should never use `msg.sender`, and use {_msgSender} instead.
+	 */
+<span class="fstat-no" title="function not covered" >	function _msgSender()</span>
+		internal
+		virtual
+		override
+		view
+		returns (address payable)
+	{
+<span class="cstat-no" title="statement not covered" >		if (msg.sender != _relayHub) {</span>
+<span class="cstat-no" title="statement not covered" >			return msg.sender;</span>
+		} else {
+<span class="cstat-no" title="statement not covered" >			return _getRelayedCallSender();</span>
+		}
+	}
+&nbsp;
+	/**
+	 * @dev Replacement for msg.data. Returns the actual calldata of a transaction: msg.data for regular transactions,
+	 * and a reduced version for GSN relayed calls (where msg.data contains additional information).
+	 *
+	 * IMPORTANT: Contracts derived from {GSNRecipient} should never use `msg.data`, and use {_msgData} instead.
+	 */
+<span class="fstat-no" title="function not covered" >	function _msgData() internal virtual override view returns (bytes memory) {</span>
+<span class="cstat-no" title="statement not covered" >		if (msg.sender != _relayHub) {</span>
+<span class="cstat-no" title="statement not covered" >			return msg.data;</span>
+		} else {
+<span class="cstat-no" title="statement not covered" >			return _getRelayedCallData();</span>
+		}
+	}
+&nbsp;
+	// Base implementations for pre and post relayedCall: only RelayHub can invoke them, and data is forwarded to the
+	// internal hook.
+&nbsp;
+	/**
+	 * @dev See `IRelayRecipient.preRelayedCall`.
+	 *
+	 * This function should not be overriden directly, use `_preRelayedCall` instead.
+	 *
+	 * * Requirements:
+	 *
+	 * - the caller must be the `RelayHub` contract.
+	 */
+<span class="fstat-no" title="function not covered" >	function preRelayedCall(bytes memory context)</span>
+		public
+		virtual
+		override
+		returns (bytes32)
+	{
+<span class="cstat-no" title="statement not covered" >		require(msg.sender == getHubAddr(), "not hub")</span>;
+<span class="cstat-no" title="statement not covered" >		return _preRelayedCall(context);</span>
+	}
+&nbsp;
+	/**
+	 * @dev See `IRelayRecipient.preRelayedCall`.
+	 *
+	 * Called by `GSNRecipient.preRelayedCall`, which asserts the caller is the `RelayHub` contract. Derived contracts
+	 * must implement this function with any relayed-call preprocessing they may wish to do.
+	 *
+	 */
+	function _preRelayedCall(bytes memory context)
+		internal
+		virtual
+		returns (bytes32);
+&nbsp;
+	/**
+	 * @dev See `IRelayRecipient.postRelayedCall`.
+	 *
+	 * This function should not be overriden directly, use `_postRelayedCall` instead.
+	 *
+	 * * Requirements:
+	 *
+	 * - the caller must be the `RelayHub` contract.
+	 */
+<span class="fstat-no" title="function not covered" >	function postRelayedCall(</span>
+		bytes memory context,
+		bool success,
+		uint256 actualCharge,
+		bytes32 preRetVal
+	) public virtual override {
+<span class="cstat-no" title="statement not covered" >		require(msg.sender == getHubAddr(), "not hub")</span>;
+<span class="cstat-no" title="statement not covered" >		_postRelayedCall(context, success, actualCharge, preRetVal)</span>;
+	}
+&nbsp;
+	/**
+	 * @dev See `IRelayRecipient.postRelayedCall`.
+	 *
+	 * Called by `GSNRecipient.postRelayedCall`, which asserts the caller is the `RelayHub` contract. Derived contracts
+	 * must implement this function with any relayed-call postprocessing they may wish to do.
+	 *
+	 */
+	function _postRelayedCall(
+		bytes memory context,
+		bool success,
+		uint256 actualCharge,
+		bytes32 preRetVal
+	) internal virtual;
+&nbsp;
+	/**
+	 * @dev Return this in acceptRelayedCall to proceed with the execution of a relayed call. Note that this contract
+	 * will be charged a fee by RelayHub
+	 */
+<span class="fstat-no" title="function not covered" >	function _approveRelayedCall()</span>
+		internal
+		view
+		returns (uint256, bytes memory)
+	{
+<span class="cstat-no" title="statement not covered" >		return _approveRelayedCall("");</span>
+	}
+&nbsp;
+	/**
+	 * @dev See `GSNRecipient._approveRelayedCall`.
+	 *
+	 * This overload forwards `context` to _preRelayedCall and _postRelayedCall.
+	 */
+<span class="fstat-no" title="function not covered" >	function _approveRelayedCall(bytes memory context)</span>
+		internal
+		view
+		returns (uint256, bytes memory)
+	{
+<span class="cstat-no" title="statement not covered" >		return (_RELAYED_CALL_ACCEPTED, context);</span>
+	}
+&nbsp;
+	/**
+	 * @dev Return this in acceptRelayedCall to impede execution of a relayed call. No fees will be charged.
+	 */
+<span class="fstat-no" title="function not covered" >	function _rejectRelayedCall(uint256 errorCode)</span>
+		internal
+		view
+		returns (uint256, bytes memory)
+	{
+<span class="cstat-no" title="statement not covered" >		return (_RELAYED_CALL_REJECTED + errorCode, "");</span>
+	}
+&nbsp;
+	/*
+	 * @dev Calculates how much RelayHub will charge a recipient for using `gas` at a `gasPrice`, given a relayer's
+	 * `serviceFee`.
+	 */
+<span class="fstat-no" title="function not covered" >	function _computeCharge(</span>
+		uint256 gas,
+		uint256 gasPrice,
+		uint256 serviceFee
+	) internal pure returns (uint256) {
+		// The fee is expressed as a percentage. E.g. a value of 40 stands for a 40% fee, so the recipient will be
+		// charged for 1.4 times the spent amount.
+<span class="cstat-no" title="statement not covered" >		return (gas * gasPrice * (100 + serviceFee)) / 100;</span>
+	}
+&nbsp;
+<span class="fstat-no" title="function not covered" >	function _getRelayedCallSender()</span>
+		private
+		pure
+		returns (address payable result)
+	{
+		// We need to read 20 bytes (an address) located at array index msg.data.length - 20. In memory, the array
+		// is prefixed with a 32-byte length value, so we first add 32 to get the memory read index. However, doing
+		// so would leave the address in the upper 20 bytes of the 32-byte word, which is inconvenient and would
+		// require bit shifting. We therefore subtract 12 from the read index so the address lands on the lower 20
+		// bytes. This can always be done due to the 32-byte prefix.
+&nbsp;
+		// The final memory read index is msg.data.length - 20 + 32 - 12 = msg.data.length. Using inline assembly is the
+		// easiest/most-efficient way to perform this operation.
+&nbsp;
+		// These fields are not accessible from assembly
+<span class="cstat-no" title="statement not covered" >		bytes memory array = msg.data;</span>
+<span class="cstat-no" title="statement not covered" >		uint256 index = msg.data.length;</span>
+&nbsp;
+		// solhint-disable-next-line no-inline-assembly
+		assembly {
+			// Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
+			result := and(
+				mload(add(array, index)),
+				0xffffffffffffffffffffffffffffffffffffffff
+			)
+		}
+<span class="cstat-no" title="statement not covered" >		return result;</span>
+	}
+&nbsp;
+<span class="fstat-no" title="function not covered" >	function _getRelayedCallData() private pure returns (bytes memory) {</span>
+		// RelayHub appends the sender address at the end of the calldata, so in order to retrieve the actual msg.data,
+		// we must strip the last 20 bytes (length of an address type) from it.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		uint256 actualDataLength = msg.data.length - 20;</span>
+<span class="cstat-no" title="statement not covered" >		bytes memory actualData = new bytes(actualDataLength);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		for (uint256 i = 0; i &lt; actualDataLength; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >			actualData[i] = msg.data[i]</span>;
+		}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		return actualData;</span>
+	}
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Dec 06 2022 11:29:26 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

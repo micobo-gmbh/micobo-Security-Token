@@ -8,23 +8,30 @@
 	},
 	"scripts": {
 		"test": "truffle test",
+		"test-factories": "truffle test --config truffle-config-factories.js",
+		"test-sales": "truffle test --config truffle-config-sales.js",
 		"deploy": "truffle migrate --reset",
 		"compile": "truffle compile --all",
 		"compile-factories": "truffle compile --config truffle-config-factories.js --all",
-		"compile-all": "truffle compile --all && truffle compile --config truffle-config-factories.js --all",
+		"compile-sales": "truffle compile --config truffle-config-sales.js --all",
+		"compile-all": "truffle compile --all && truffle compile --config truffle-config-factories.js --all && truffle compile --config truffle-config-sales.js --all",
 		"ganache": "ganache --chain.chainId 1234 -i 1234 --db ~/ganache-db -m \"sail prevent round weasel physical pear million rebel weekend sea hole mosquito\"",
 		"compile-solc-token": "solc --abi --hashes --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/token/SecurityToken.sol",
 		"compile-solc": "solc --abi --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . contracts/**/*.sol",
+		"compile-solc-sale": "solc --abi --bin --optimize --optimize-runs 1024 -o build/solc --overwrite --allow-paths . sales/**/*.sol",
 		"abigen-token": "abigen --abi ./build/solc/SecurityToken.abi --bin ./build/solc/SecurityToken.bin --pkg ethcore --type SecurityToken --out ./build/go/securityToken.go",
 		"abigen-constraints": "abigen --abi ./build/solc/IConstraintModule.abi --bin ./build/solc/IConstraintModule.bin --pkg ethcore --type IConstraintModule --out ./build/go/iConstraintModule.go",
 		"abigen-spending": "abigen --abi ./build/solc/SpendingLimitsConstraintModule.abi --bin ./build/solc/SpendingLimitsConstraintModule.bin --pkg ethcore --type SpendingLimitsConstraintModule --out ./build/go/spendingLimitsConstraintModule.go",
 		"abigen-timelock": "abigen --abi ./build/solc/TimeLockConstraintModule.abi --bin ./build/solc/TimeLockConstraintModule.bin --pkg ethcore --type TimeLockConstraintModule --out ./build/go/timeLockConstraintModule.go",
 		"abigen-vesting": "abigen --abi ./build/solc/VestingPeriodConstraintModule.abi --bin ./build/solc/VestingPeriodConstraintModule.bin --pkg ethcore --type VestingPeriodConstraintModule --out ./build/go/vestingPeriodConstraintModule.go",
 		"abigen-whitelist": "abigen --abi ./build/solc/WhitelistConstraintModule.abi --bin ./build/solc/WhitelistConstraintModule.bin --pkg ethcore --type WhitelistConstraintModule --out ./build/go/whitelistConstraintModule.go",
+		"abigen-sale-deferred": "abigen --abi ./build/solc/SaleDeferred.abi --bin ./build/solc/SaleDeferred.bin --pkg ethcore --type SaleDeferred --out ./build/go/saleDeferred.go",
 		"size": "truffle compile --all && truffle exec scripts/check-size.js",
-		"solcover": "truffle run coverage --temp /build/solcover --network development --file='test/*.js'",
-		"verify-logic": "truffle run verify SecurityToken --network polygon --debug",
-		"verify-factory": "truffle run verify SecurityTokenFactory --network polygon --debug",
+		"solcover": "truffle run coverage --temp /build/solcover --network development --file='test/test_token/*.js' && rm -rf public/token && mv public/coverage public/token",
+		"solcover-sales": "truffle run coverage --temp /build/solcover --config truffle-config-sales.js --network coverage --file='test/test_sale/*.js' && rm -rf public/sales && mv public/coverage public/sales",
+		"solcover-factories": "truffle run coverage --temp /build/solcover --config truffle-config-sales.js --network coverage --file='test/test_proxy/*.js' && rm -rf public/factories && mv public/coverage public/factories",
+		"verify-logic": "truffle run verify SecurityToken --network goerli --debug",
+		"verify-factory": "truffle run verify SecurityTokenFactory --network goerli --debug",
 		"verify-new-token-proxy": "./scripts/verifyToken.sh",
 		"gsn": "npx oz-gsn run-relayer --ethereumNodeURL http://localhost:8545",
 		"deploy-logic": "truffle exec scripts/1_deploy_logic.js --network logicDeployment",
@@ -65,7 +72,7 @@
 			{
 				"files": "*.sol",
 				"options": {
-					"printWidth": 80
+					"printWidth": 100
 				}
 			}
 		]
@@ -73,6 +80,8 @@
 	"homepage": "",
 	"dependencies": {
 		"@codechecks/client": "0.1.12",
+		"@maticnetwork/pos-portal": "^1.5.2",
+		"@metamask/eth-sig-util": "^5.0.0",
 		"@openzeppelin/contracts": "3.0.0",
 		"@openzeppelin/gsn-helpers": "0.2.4",
 		"@openzeppelin/gsn-provider": "0.1.11",
@@ -82,13 +91,14 @@
 		"dotenv": "16.0.1",
 		"eth-gas-reporter": "0.2.25",
 		"solc": "0.6.6",
-		"solidity-coverage": "0.7.21",
+		"solidity-coverage": "0.7.22",
 		"truffle-assertions": "0.9.2",
 		"truffle-privatekey-provider": "1.5.0",
 		"typescript": "4.8.2",
 		"web3": "1.7.4"
 	},
 	"devDependencies": {
+		"ethlint": "1.2.5",
 		"ganache": "7.4.0",
 		"husky": "8.0.1",
 		"lint-staged": "13.0.3",

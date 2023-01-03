@@ -14,7 +14,7 @@ import "../interfaces/IConstraintModule.sol";
 
 abstract contract OffChainValidator is IConstraintModule {
 	/*
-    // TODO this constraint module still has to implemented
+    // TODO this constraint module still has to be implemented
 
     ISecurityToken private _securityToken;
 

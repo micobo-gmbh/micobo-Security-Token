@@ -1,4 +1,6 @@
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: MIT License
+
+pragma solidity >=0.6.6;
 
 import "./IConstraintModule.sol";
 
